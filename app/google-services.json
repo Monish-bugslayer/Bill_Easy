@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "730741436380",
+    "project_id": "bill-easy-d4a0e",
+    "storage_bucket": "bill-easy-d4a0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730741436380:android:4da175eec528faf0eea919",
+        "android_client_info": {
+          "package_name": "com.gravity.billeasy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1ehW9M8NVvNUgpsfIyYadU01VBW3_cHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
