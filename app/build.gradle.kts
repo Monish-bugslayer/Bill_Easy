@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    id ("com.google.protobuf") version "0.9.1"
 }
 
 android {
@@ -48,6 +49,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:3.24.1"
+        }
+        generateProtoTasks {
+            all().forEach { task->
+                task.builtins {
+                    create("java") {
+                        option("lite")
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -67,10 +82,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    //proto datastore
+    implementation  (libs.protobuf.javalite)
 
-    // firebase dependencies
-    implementation(libs.firebase.bom)
-    implementation(libs.firebase.analytics)
+    //firebase dependencies
+    implementation(platform(libs.firebase.bom))
 
     //compose navigation dependency
     val navVersion = "2.8.3"
@@ -79,5 +95,9 @@ dependencies {
     // datastore dependency
     implementation (libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.core)
+
+    //lottie animation
+    implementation (libs.lottie.compose)
+
 
 }

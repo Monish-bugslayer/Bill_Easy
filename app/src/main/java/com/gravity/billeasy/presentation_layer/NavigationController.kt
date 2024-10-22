@@ -9,12 +9,15 @@ import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.Utils.NavigationConstants
 import com.gravity.billeasy.loginscreen.LoginScreen
 
-@Composable
-fun NavigationController() {
-    val navController: NavHostController = rememberNavController()
-    NavHost(navController = navController, startDestination = NavigationConstants.LOGIN_SCREEN) {
-        composable(route = NavigationConstants.LOGIN_SCREEN) {
-            LoginScreen()
-        }
-    }
+interface NavigationController {
+
+    fun navigateFromMainActivityToLoginScreen()
+    fun navigateFromLoginScreenToMainActivity()
+
+//    val navController: NavHostController = rememberNavController()
+//    NavHost(navController = navController, startDestination = NavigationConstants.LOGIN_SCREEN) {
+//        composable(route = NavigationConstants.LOGIN_SCREEN) {
+//            LoginScreen()
+//        }
+//    }
 }

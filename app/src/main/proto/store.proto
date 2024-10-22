@@ -1,0 +1,7 @@
+syntax = "proto3";
+option java_package = "com.gravity.billeasy";
+option java_multiple_files = true;
+
+message Login {
+    string login_user_id = 1;
+}
