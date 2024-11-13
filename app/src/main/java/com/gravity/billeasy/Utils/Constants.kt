@@ -1,11 +1,13 @@
 package com.gravity.billeasy.Utils
 
+import androidx.datastore.preferences.core.stringPreferencesKey
+
 object NavigationConstants {
     const val LOGIN_SCREEN = "loginScreen"
+    const val MAIN_ACTIVITY_SCREEN = "mainActivityScreen"
 }
 
 object AppConstants{
     const val APP_DATASTORE = "appDataStore"
-    const val INT_PREFERENCE_KEY = "intPreferenceKey"
-    const val STRING_PREFERENCE_KEY = "stringPreferenceKey"
+    val loggedInUserIdPreferenceKey = stringPreferencesKey("loggedInUserId")
 }
