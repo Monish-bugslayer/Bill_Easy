@@ -87,6 +87,8 @@ dependencies {
 
     //firebase dependencies
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+
 
     //compose navigation dependency
     val navVersion = "2.8.3"
