@@ -1,23 +1,40 @@
 package com.gravity.billeasy.presentation_layer
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.gravity.billeasy.Utils.NavigationConstants
-import com.gravity.billeasy.loginscreen.LoginScreen
+import com.gravity.billeasy.loginscreens.CREATE_ACCOUNT
+import com.gravity.billeasy.loginscreens.CreateAccountScreen
+import com.gravity.billeasy.loginscreens.LoginScreen
+import com.gravity.billeasy.loginscreens.OTPVerificationScreen
 
-interface NavigationController {
+enum class BillEasyScreens {
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, ALL_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT
+}
 
-    fun navigateFromMainActivityToLoginScreen()
-    fun navigateFromLoginScreenToMainActivity()
+interface AppNavigationController {
 
-//    val navController: NavHostController = rememberNavController()
-//    NavHost(navController = navController, startDestination = NavigationConstants.LOGIN_SCREEN) {
-//        composable(route = NavigationConstants.LOGIN_SCREEN) {
-//            LoginScreen()
-//        }
-//    }
+    fun navigateFromLoginScreenToCreateAccountScreen()
+    fun navigateFromLoginScreenToOTPVerificationScreen()
+    fun navigateFromCreateAccountToOTPVerificationScreen()
+}
+
+class AppNavigationControllerImpl(private val navHostController: NavHostController) :
+    AppNavigationController {
+
+    override fun navigateFromLoginScreenToCreateAccountScreen() {
+        navHostController.navigate(BillEasyScreens.CREATE_ACCOUNT.name)
+    }
+
+    override fun navigateFromLoginScreenToOTPVerificationScreen() {
+        navHostController.navigate(BillEasyScreens.OTP_VERIFICATION.name)
+    }
+
+    override fun navigateFromCreateAccountToOTPVerificationScreen() {
+        TODO("Not yet implemented")
+    }
 }

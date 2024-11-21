@@ -1,19 +1,20 @@
 package com.gravity.billeasy
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.gravity.billeasy.loginscreen.LoginScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.gravity.billeasy.loginscreens.LoginScreen
+import com.gravity.billeasy.presentation_layer.AppNavigationControllerImpl
+import com.gravity.billeasy.presentation_layer.NavigationSetup
 import com.gravity.billeasy.ui.theme.BillEasyTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,8 +26,13 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
+            val navHostController: NavHostController = rememberNavController()
+            val appNavigationImpl = AppNavigationControllerImpl(navHostController)
             BillEasyTheme {
-                LoginScreen()
+                Scaffold { innerPadding ->
+                    val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
+                    navigationSetup.setupNavgation(innerPadding = innerPadding)
+                }
             }
         }
     }
