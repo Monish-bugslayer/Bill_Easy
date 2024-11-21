@@ -35,6 +35,6 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
     }
 
     override fun navigateFromCreateAccountToOTPVerificationScreen() {
-        TODO("Not yet implemented")
+        navHostController.navigate(BillEasyScreens.OTP_VERIFICATION.name)
     }
 }

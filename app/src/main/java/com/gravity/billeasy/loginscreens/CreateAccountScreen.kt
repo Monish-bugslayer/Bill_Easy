@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,10 +37,12 @@ const val OWNER_MOBILE_NUMBER = "Owner mobile number"
 const val SHOP_EMAIL = "Shop email"
 const val OWNER_EMAIL = "Owner email"
 const val SHOP_ADDRESS = "Shop address"
+const val PROCEED = "Proceed"
 
 
 @Composable
-fun CreateAccountScreen() {
+fun CreateAccountScreen(onClickProceed: () -> Unit) {
+
     val ownerFirstName = remember { mutableStateOf("") }
     val ownerLastName = remember { mutableStateOf("") }
     val shopName = remember { mutableStateOf("") }
@@ -86,7 +89,12 @@ fun CreateAccountScreen() {
             fontWeight = FontWeight.Bold
         )
 
-        LazyColumn(Modifier.padding(top = 15.dp).align(Alignment.CenterHorizontally).imePadding()) {
+        LazyColumn(
+            Modifier
+                .padding(top = 15.dp)
+                .align(Alignment.CenterHorizontally)
+                .imePadding()
+        ) {
 
             items(createAccountFieldsMap.toList()) { fieldValue ->
                 OutlinedTextField(
@@ -99,9 +107,20 @@ fun CreateAccountScreen() {
                         keyboardType = if (fieldValue.first.contains("number")) KeyboardType.Number
                         else KeyboardType.Text
                     ),
-                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp, end = 20.dp, start = 20.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, end = 20.dp, start = 20.dp)
                 )
             }
+        }
+
+        ElevatedButton(
+            onClick = { onClickProceed() },
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(text = PROCEED)
         }
 
     }

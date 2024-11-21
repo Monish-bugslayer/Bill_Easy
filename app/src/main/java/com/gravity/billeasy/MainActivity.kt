@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
             BillEasyTheme {
                 Scaffold { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
-                    navigationSetup.setupNavgation(innerPadding = innerPadding)
+                    navigationSetup.SetupNavgation(innerPadding = innerPadding)
                 }
             }
         }
