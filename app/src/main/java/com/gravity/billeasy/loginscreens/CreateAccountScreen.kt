@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
-import com.gravity.billeasy.presentation_layer.BillEasyScreens
+import com.gravity.billeasy.navigationsetup.BillEasyScreens
 
 /* TODO: Need to do field validation */
 
@@ -42,7 +42,7 @@ const val PROCEED = "Proceed"
 
 
 @Composable
-fun CreateAccountScreen(onClickProceed: () -> Unit) {
+fun CreateAccountScreen(onClickProceed: (String, String) -> Unit) {
 
     val ownerFirstName = remember { mutableStateOf("") }
     val ownerLastName = remember { mutableStateOf("") }
@@ -116,7 +116,7 @@ fun CreateAccountScreen(onClickProceed: () -> Unit) {
         }
 
         ElevatedButton(
-            onClick = { onClickProceed() },
+            onClick = { onClickProceed(shopMobileNumber.value, BillEasyScreens.CREATE_ACCOUNT.name) },
             modifier = Modifier
                 .padding(top = 10.dp)
                 .align(Alignment.CenterHorizontally)

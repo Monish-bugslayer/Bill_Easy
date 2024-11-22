@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.gravity.billeasy.R
-import com.gravity.billeasy.presentation_layer.BillEasyScreens
+import com.gravity.billeasy.navigationsetup.BillEasyScreens
 
 
 fun checkIsValidMobileNumber(number: String): Boolean = number.length == 10
@@ -42,6 +42,7 @@ const val PHONE_NUMBER = "Phone number"
 const val WELCOME_TO_BILL_EASY = "Welcome to Bill Easy"
 const val CREATE_ACCOUNT = "Create account"
 const val LOGIN = "Login"
+
 /**
  * When keyboard is open i tried to scroll the screen upward so that my buttons that are hidden by
  * the keyboard becomes visible but what happens is it is scrolling up as expected but it is again
@@ -63,7 +64,10 @@ fun keyboardAsState(): State<Boolean> {
 }
 
 @Composable
-fun LoginScreen(onLoginButtonClicked: () -> Unit, onCreateAccountButtonClicked: () -> Unit) {
+fun LoginScreen(
+    onLoginButtonClicked: (String, String) -> Unit,
+    onCreateAccountButtonClicked: () -> Unit
+) {
 
     val mobileNumber = remember { mutableStateOf("") }
     val isNeedToEnableLogin by remember {
@@ -100,8 +104,7 @@ fun LoginScreen(onLoginButtonClicked: () -> Unit, onCreateAccountButtonClicked: 
 
         Image(painter = painterResource(id = R.drawable.login_image), "")
 
-        OutlinedTextField(
-            value = mobileNumber.value,
+        OutlinedTextField(value = mobileNumber.value,
             onValueChange = { mobileNumber.value = it },
             label = { Text(text = PHONE_NUMBER) },
             maxLines = 1,
@@ -110,7 +113,12 @@ fun LoginScreen(onLoginButtonClicked: () -> Unit, onCreateAccountButtonClicked: 
         )
 
         ElevatedButton(
-            onClick = { onLoginButtonClicked() },
+            onClick = {
+                if (isNeedToEnableLogin) onLoginButtonClicked(
+                    mobileNumber.value,
+                    BillEasyScreens.LOGIN.name
+                )
+            },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 20.dp)
