@@ -29,7 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val window = (context as Activity).window
-            window.statusBarColor = context.resources.getColor(R.color.pink_light)
+            window.statusBarColor = context.resources.getColor(R.color.white)
             window.navigationBarColor = context.resources.getColor(R.color.pink)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
@@ -68,9 +71,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BottomNavigationBar() {
-    BottomAppBar(containerColor = Color(LocalContext.current.resources.getColor(R.color.pink))) {
+    BottomAppBar(containerColor = Color(LocalContext.current.resources.getColor(R.color.pink ))) {
 
-        val isHomeClicked = remember { mutableStateOf(false) }
+        val isHomeClicked = remember { mutableStateOf(true) }
         val isMyProductsClicked = remember { mutableStateOf(false) }
         val isSalesClicked = remember { mutableStateOf(false) }
 
@@ -138,12 +141,13 @@ fun BottomNavigationIcon(
     bottomTextViewHeight: Dp,
     boxSize: Dp
 ) {
+    val context = LocalContext.current
     Box(contentAlignment = Alignment.Center, modifier = Modifier
-        .size(boxSize) // Circle size
+        .size(boxSize)
         .clip(CircleShape)
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
-            indication = rememberRipple(bounded = true, radius = 100.dp) // Ripple size
+            indication = rememberRipple(bounded = true, radius = 100.dp)
         ) { onIconClick() }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -158,7 +162,19 @@ fun BottomNavigationIcon(
                 contentAlignment = Alignment.Center
             ) {
                 if (isNeedToDisplayText.value) {
-                    Text(text = displayText, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+                    Text(
+                        text = displayText,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                        modifier = Modifier.drawBehind {
+                            drawLine(
+                                strokeWidth = Stroke.DefaultMiter,
+                                start = Offset(x = -10f, y = size.height + 5),
+                                end = Offset(x = size.width + 10, size.height + 5),
+                                color = Color(context.resources.getColor(R.color.black))
+                            )
+                        }
+                    )
                 }
             }
         }

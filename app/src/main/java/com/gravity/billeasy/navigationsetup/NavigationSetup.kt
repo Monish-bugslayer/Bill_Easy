@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,7 +12,7 @@ import com.gravity.billeasy.loginscreens.CreateAccountScreen
 import com.gravity.billeasy.loginscreens.LoginScreen
 import com.gravity.billeasy.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.loginscreens.Otp
-import com.gravity.billeasy.presentation_layer.Home
+import com.gravity.billeasy.ui_layer.Home
 
 class NavigationSetup(
     private val navHostController: NavHostController,
