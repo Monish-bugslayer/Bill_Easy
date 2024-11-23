@@ -18,12 +18,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -59,8 +65,9 @@ class MainActivity : ComponentActivity() {
             window.navigationBarColor = context.resources.getColor(R.color.pink)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
+            val isNeedFab = remember { derivedStateOf { mutableStateOf(true) } }
             BillEasyTheme {
-                Scaffold(bottomBar = { BottomNavigationBar() }) { innerPadding ->
+                Scaffold(bottomBar = { BottomNavigationBar(isNeedFab.value) }, floatingActionButton = { if(isNeedFab.value.value) AddProductFab() }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
                     navigationSetup.SetupNavgation(innerPadding = innerPadding)
                 }
@@ -70,7 +77,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun AddProductFab(){
+    FloatingActionButton(
+        onClick = { /* TODO navigate to add product screen*/},
+        containerColor = Color(LocalContext.current.resources.getColor(R.color.pink ))
+    ) {
+        Icon(Icons.Filled.Add, contentDescription = "add product")
+    }
+}
+
+@Composable
+fun BottomNavigationBar(isNeedFab: MutableState<Boolean>) {
     BottomAppBar(containerColor = Color(LocalContext.current.resources.getColor(R.color.pink ))) {
 
         val isHomeClicked = remember { mutableStateOf(true) }
@@ -89,6 +106,7 @@ fun BottomNavigationBar() {
                     isHomeClicked.value = !isHomeClicked.value
                     isSalesClicked.value = false
                     isMyProductsClicked.value = false
+                    isNeedFab.value = true
                 },
                 isNeedToDisplayText = isHomeClicked,
                 displayText = "Home",
@@ -103,6 +121,7 @@ fun BottomNavigationBar() {
                     isMyProductsClicked.value = !isMyProductsClicked.value
                     isSalesClicked.value = false
                     isHomeClicked.value = false
+                    isNeedFab.value = true
                 },
                 isNeedToDisplayText = isMyProductsClicked,
                 displayText = "My products",
@@ -117,6 +136,7 @@ fun BottomNavigationBar() {
                     isSalesClicked.value = !isSalesClicked.value
                     isHomeClicked.value = false
                     isMyProductsClicked.value = false
+                    isNeedFab.value = false
                 },
                 isNeedToDisplayText = isSalesClicked,
                 displayText = "Sales",
