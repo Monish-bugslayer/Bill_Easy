@@ -11,6 +11,7 @@ lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.9.1"
 composeBom = "2024.04.01"
 lottieCompose = "4.0.0"
+material = "1.7.5"
 navVersion = "2.8.3"
 protobufJavalite = "3.22.3"
 toolsCore = "1.0.0-alpha10"
@@ -19,6 +20,7 @@ toolsCore = "1.0.0-alpha10"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navVersion" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }

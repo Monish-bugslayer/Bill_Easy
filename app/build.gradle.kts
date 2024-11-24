@@ -106,6 +106,6 @@ dependencies {
 
     //serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-
+    // material dependency for bottom navigation
+    implementation (libs.androidx.material)
 }

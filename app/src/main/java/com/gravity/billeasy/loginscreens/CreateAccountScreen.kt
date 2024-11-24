@@ -52,17 +52,7 @@ fun CreateAccountScreen(onClickProceed: (String, String) -> Unit) {
     val shopEmail = remember { mutableStateOf("") }
     val ownerEmail = remember { mutableStateOf("") }
     val shopAddress = remember { mutableStateOf("") }
-    val accountFields = mutableListOf<MutableState<String>>()
-    accountFields.apply {
-        add(shopName)
-        add(shopMobileNumber)
-        add(shopAddress)
-        add(shopEmail)
-        add(ownerFirstName)
-        add(ownerLastName)
-        add(ownerMobileNumber)
-        add(ownerEmail)
-    }
+
     val createAccountFieldsMap = mutableMapOf<String, MutableState<String>>()
     createAccountFieldsMap.apply {
         put(SHOP_NAME, shopName)
@@ -123,7 +113,6 @@ fun CreateAccountScreen(onClickProceed: (String, String) -> Unit) {
         ) {
             Text(text = PROCEED)
         }
-
     }
 
 }

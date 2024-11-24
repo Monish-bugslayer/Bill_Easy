@@ -23,7 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -96,7 +96,7 @@ fun ShopNameEditable() {
             .clip(CircleShape)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = true, radius = 100.dp)
+                indication = ripple(bounded = true, radius = 100.dp)
             ) { /* Todo edit shop name and shop description in seperate screen */ }) {
 
             Image(
@@ -171,11 +171,15 @@ fun SalesChart(screenHeight: Int) {
     val imagePosX = (screenHeight/6).dp
     val textX = (screenHeight/18).dp
     val textY = (screenHeight/24).dp
-    Box(modifier = Modifier.fillMaxWidth().height(screenHeight.dp)){
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(screenHeight.dp)){
         Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
             Text(
                 text = "Sales Chart",
-                modifier = Modifier.fillMaxWidth().padding(start = 10.dp, top = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, top = 10.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W500
             )
@@ -183,7 +187,10 @@ fun SalesChart(screenHeight: Int) {
             Image(
                 painter = painterResource(R.drawable.chart),
                 contentDescription = "Sales chart",
-                modifier = Modifier.size(imageSize).offset(imagePosX, imagePosY).alpha(0.5f)
+                modifier = Modifier
+                    .size(imageSize)
+                    .offset(imagePosX, imagePosY)
+                    .alpha(0.5f)
             )
 
             Text(text = "This feature yet to be implemented", modifier = Modifier.offset(textX, textY))

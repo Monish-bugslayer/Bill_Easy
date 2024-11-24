@@ -12,7 +12,10 @@ import com.gravity.billeasy.loginscreens.CreateAccountScreen
 import com.gravity.billeasy.loginscreens.LoginScreen
 import com.gravity.billeasy.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.loginscreens.Otp
+import com.gravity.billeasy.ui_layer.AddProduct
 import com.gravity.billeasy.ui_layer.Home
+import com.gravity.billeasy.ui_layer.MyProducts
+import com.gravity.billeasy.ui_layer.Sales
 
 class NavigationSetup(
     private val navHostController: NavHostController,
@@ -20,12 +23,13 @@ class NavigationSetup(
 ) {
 
     @Composable
-    fun SetupNavgation(innerPadding: PaddingValues) {
+    fun SetupNavigation(innerPadding: PaddingValues) {
         NavHost(
             navController = navHostController,
             startDestination = BillEasyScreens.HOME.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+
             composable(route = BillEasyScreens.LOGIN.name) {
                 LoginScreen(onLoginButtonClicked = { mobileNumber, fromScreen ->
                     navigationControllerImpl.navigateToOTPVerificationScreen(mobileNumber, fromScreen)
@@ -42,22 +46,12 @@ class NavigationSetup(
                     navigationControllerImpl.navigateToOTPVerificationScreen(mobileNumber, fromScreen)
                 })
             }
-            composable(route = BillEasyScreens.HOME.name) {
-                Home()
-            }
-            composable(route = BillEasyScreens.ALL_PRODUCTS.name) {
-
-            }
-            composable(route = BillEasyScreens.ADD_PRODUCT.name) {
-
-            }
-            composable(route = BillEasyScreens.GENERATE_BILL.name) {
-
-            }
-            composable(route = BillEasyScreens.EDIT_PRODUCT.name) {
-
-            }
-
+            composable(route = BillEasyScreens.HOME.name) { Home() }
+            composable(route = BillEasyScreens.ALL_PRODUCTS.name) { MyProducts() }
+            composable(route = BillEasyScreens.ADD_PRODUCT.name) { AddProduct() }
+            composable(route = BillEasyScreens.SALES.name) { Sales() }
+            composable(route = BillEasyScreens.GENERATE_BILL.name) {}
+            composable(route = BillEasyScreens.EDIT_PRODUCT.name) {}
         }
     }
 }
