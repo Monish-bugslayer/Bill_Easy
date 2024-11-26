@@ -1,7 +1,7 @@
 package com.gravity.billeasy.ui_layer
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.Utils.Spinner
@@ -40,12 +41,14 @@ Wholesale price
 */
 
 const val ADD_PRODUCT = "Add product"
-const val ALPHA_DISABLED = 0.5f
-const val ALPHA_FULL = 1f
-
-enum class AddProductFields {
-    PRODUCT_NAME, PRODUCT_CATEGORY, UNIT, AVAILABLE_STOCK, QUANTITY, BUYING_PRICE, RETAIL_PRICE, WHOLESALE_PRICE
-}
+const val PRODUCT_NAME = "Product name"
+const val PRODUCT_CATEGORY = "Product category"
+const val UNIT = "Unit"
+const val AVAILABLE_STOCK = "Available stock"
+const val QUANTITY = "Quantity"
+const val BUYING_PRICE = "Buying price"
+const val RETAIL_PRICE = "Retail price"
+const val WHOLESALE_PRICE = "Wholesale price"
 
 enum class QuantityUnit {
     GRAMS, KILOGRAMS, PIECE, LOT, BOX, ROLL, DOZEN, SHEET, PACK, BAG, SET, LITER, MILLILITER, BUNDLE
@@ -66,6 +69,7 @@ data class Product(
     val wholeSalePrice: Float
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddProduct() {
 
@@ -77,97 +81,140 @@ fun AddProduct() {
     val buyingPrice = remember { mutableStateOf("") }
     val retailPrice = remember { mutableStateOf("") }
     val wholeSalePrice = remember { mutableStateOf("") }
-    val addProductFieldsMap = mutableMapOf<AddProductFields, MutableState<String>>()
+    val addProductFieldsMap = mutableMapOf<String, MutableState<String>>()
+    var selectedUnit by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("") }
 
     addProductFieldsMap.apply {
-        put(AddProductFields.PRODUCT_NAME, productName)
-        put(AddProductFields.PRODUCT_CATEGORY, productCategory)
-        put(AddProductFields.UNIT, unit)
-        put(AddProductFields.AVAILABLE_STOCK, availableStock)
-        put(AddProductFields.QUANTITY, quantity)
-        put(AddProductFields.BUYING_PRICE, buyingPrice)
-        put(AddProductFields.RETAIL_PRICE, retailPrice)
-        put(AddProductFields.WHOLESALE_PRICE, wholeSalePrice)
+        put(PRODUCT_NAME, productName)
+        put(PRODUCT_CATEGORY, productCategory)
+        put(UNIT, unit)
+        put(AVAILABLE_STOCK, availableStock)
+        put(QUANTITY, quantity)
+        put(BUYING_PRICE, buyingPrice)
+        put(RETAIL_PRICE, retailPrice)
+        put(WHOLESALE_PRICE, wholeSalePrice)
     }
 
-    Column(
+    val unitOptions: List<String> = listOf(
+        QuantityUnit.BAG.name,
+        QuantityUnit.BOX.name,
+        QuantityUnit.LOT.name,
+        QuantityUnit.SET.name,
+        QuantityUnit.PACK.name,
+        QuantityUnit.BUNDLE.name,
+        QuantityUnit.DOZEN.name,
+        QuantityUnit.GRAMS.name,
+        QuantityUnit.KILOGRAMS.name,
+        QuantityUnit.LITER.name,
+        QuantityUnit.MILLILITER.name,
+        QuantityUnit.PIECE.name,
+        QuantityUnit.ROLL.name,
+        QuantityUnit.SHEET.name
+    )
+
+    val categoryOptions: List<String> = listOf(
+        ProductCategory.CEREALS.name,
+        ProductCategory.OIL.name,
+        ProductCategory.BISCATES.name,
+        ProductCategory.SOAP.name,
+        ProductCategory.SPICES.name,
+        ProductCategory.SHAMPOO.name,
+        ProductCategory.CHIPS.name,
+        ProductCategory.CHOCOLATES.name,
+        ProductCategory.CIGARETTES.name,
+        ProductCategory.COFFEE_AND_TEA.name,
+        ProductCategory.PLASTIC_ITEMS.name,
+        ProductCategory.POOJA.name,
+        ProductCategory.OTHER.name,
+        ProductCategory.FLOUR.name,
+        ProductCategory.RICE.name,
+        ProductCategory.MASALA.name,
+    )
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = "Add your product",
-            modifier = Modifier.padding(top = 15.dp),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.W500
-        )
+        stickyHeader {
+            Text(
+                text = "Add your product",
+                modifier = Modifier.fillMaxWidth().background(Color.White).padding(top = 15.dp),
+                fontWeight = FontWeight.W500,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        }
 
-        val options: List<String> = listOf(
-            QuantityUnit.BAG.name,
-            QuantityUnit.BOX.name,
-            QuantityUnit.LOT.name,
-            QuantityUnit.SET.name,
-            QuantityUnit.PACK.name,
-            QuantityUnit.BUNDLE.name,
-            QuantityUnit.DOZEN.name,
-            QuantityUnit.GRAMS.name,
-            QuantityUnit.KILOGRAMS.name,
-            QuantityUnit.LITER.name,
-            QuantityUnit.MILLILITER.name,
-            QuantityUnit.PIECE.name,
-            QuantityUnit.ROLL.name,
-            QuantityUnit.SHEET.name
-        )
-
-        // completed spinner TODO need to arrange it in the desire position in lazy column
-        var t by remember { mutableStateOf("") }
-        Spinner(selectedValue = t, options = options, label = "Lable", onValueChangedEvent = {
-            t = it
-        })
-
-        LazyColumn {
-
-            items(addProductFieldsMap.toList()) { field ->
-                OutlinedTextField(value = field.second.value,
-                    onValueChange = { field.second.value = it },
-                    label = { Text(text = field.first.name) },
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences,
-                        keyboardType = decideKeyboardType(field.first)
-                    ),
+        items(addProductFieldsMap.toList()) { field ->
+            when (field.first) {
+                UNIT -> {
+                    Spinner (
+                    selectedValue = selectedUnit,
+                    options = unitOptions,
+                    label = UNIT,
+                    onValueChangedEvent = { selectedUnit = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp, end = 20.dp, start = 20.dp)
-                )
+                    )
+                }
+                PRODUCT_CATEGORY -> {
+                    Spinner (
+                        selectedValue = selectedCategory,
+                        options = categoryOptions,
+                        label = PRODUCT_CATEGORY,
+                        onValueChangedEvent = { selectedCategory = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, end = 20.dp, start = 20.dp)
+                    )
+                }
+                else -> {
+                    OutlinedTextField(
+                        value = field.second.value,
+                        onValueChange = { field.second.value = it },
+                        label = { Text(text = field.first) },
+                        maxLines = 1,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = decideKeyboardType(field.first)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, end = 20.dp, start = 20.dp)
+                    )
+                }
             }
         }
 
-        ElevatedButton(
-            onClick = { /* TODO validate empty fields and ask confirmation and add product in DB */ },
-            // TODO need to change color of button
-            modifier = Modifier
-                .padding(top = 10.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Text(text = ADD_PRODUCT)
+        item {
+            ElevatedButton(
+                onClick = { /* TODO validate empty fields and ask confirmation and add product in DB */ },
+                // TODO need to change color of button
+                modifier = Modifier.padding(top = 10.dp)
+            ) {
+                Text(text = ADD_PRODUCT)
+            }
         }
-
     }
 }
 
-fun decideKeyboardType(fieldType: AddProductFields): KeyboardType {
+
+fun decideKeyboardType(fieldType: String): KeyboardType {
     return when (fieldType) {
-        AddProductFields.PRODUCT_NAME -> KeyboardType.Text
-        AddProductFields.PRODUCT_CATEGORY -> KeyboardType.Text
-        AddProductFields.UNIT -> KeyboardType.Text
-        AddProductFields.AVAILABLE_STOCK -> KeyboardType.Number
-        AddProductFields.QUANTITY -> KeyboardType.Number
-        AddProductFields.BUYING_PRICE -> KeyboardType.Number
-        AddProductFields.RETAIL_PRICE -> KeyboardType.Number
-        AddProductFields.WHOLESALE_PRICE -> KeyboardType.Number
+        PRODUCT_NAME -> KeyboardType.Text
+        PRODUCT_CATEGORY -> KeyboardType.Text
+        UNIT -> KeyboardType.Text
+        AVAILABLE_STOCK -> KeyboardType.Number
+        QUANTITY -> KeyboardType.Number
+        BUYING_PRICE -> KeyboardType.Number
+        RETAIL_PRICE -> KeyboardType.Number
+        WHOLESALE_PRICE -> KeyboardType.Number
+        else -> KeyboardType.Text
     }
 }
 

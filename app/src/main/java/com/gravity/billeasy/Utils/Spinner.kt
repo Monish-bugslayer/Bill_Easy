@@ -1,7 +1,14 @@
 package com.gravity.billeasy.Utils
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -13,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,25 +37,43 @@ fun Spinner(
     ExposedDropdownMenuBox(
         expanded = expanded, onExpandedChange = { expanded = !expanded }, modifier = modifier
     ) {
-        OutlinedTextField(
-            readOnly = true,
-            value = selectedValue,
-            onValueChange = { },
-            label = { Text(text = label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
+        Column {
+            OutlinedTextField(
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                readOnly = true,
+                value = selectedValue,
+                onValueChange = { },
+                label = { Text(text = label) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+            )
 
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option: String ->
-                DropdownMenuItem(text = { Text(text = option) }, onClick = {
-                    expanded = false
-                    onValueChangedEvent(option)
-                })
+            if (expanded) {
+                Card(modifier = Modifier.padding(top = 2.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .menuAnchor()
+                            .padding(top = 5.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        items(options) { option ->
+                            Text(
+                                text = option,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 5.dp)
+                                    .clickable {
+                                        expanded = false
+                                        onValueChangedEvent(option)
+                                    })
+                        }
+                    }
+                }
             }
         }
     }
