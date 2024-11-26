@@ -1,5 +1,7 @@
 package com.gravity.billeasy
 
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Activity
 import android.os.Bundle
 import android.view.Window
@@ -9,9 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigation
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,7 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -47,22 +46,21 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val window = (context as Activity).window
             window.statusBarColor = context.resources.getColor(R.color.white)
-            //TODO Need to chnage navigation bar color where nav bar is not visible
             val navHostController: NavHostController = rememberNavController()
-            val appNavigationImpl = remember { AppNavigationControllerImpl(navHostController) }
-            println()
+            val appNavigationImpl = AppNavigationControllerImpl(navHostController)
+
             BillEasyTheme {
-                Scaffold(
-                    // TODO do not show bottom bar when in add product screen
-                    bottomBar = { BottomNavigationBar(appNavigationImpl, window) },
-                    floatingActionButton = {
-                        when (appNavigationImpl.getCurrentRoute()) {
-
-                            BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
-                            BillEasyScreens.ALL_PRODUCTS.name -> AddProductFab(appNavigationImpl)
-
-                        }
-                    }) { innerPadding ->
+                Scaffold(bottomBar = {
+                    if (appNavigationImpl.getCurrentRoute() != BillEasyScreens.ADD_PRODUCT.name) BottomNavigationBar(
+                        appNavigationImpl, window
+                    )
+                    else window.navigationBarColor = context.resources.getColor(R.color.white)
+                }, floatingActionButton = {
+                    when (appNavigationImpl.getCurrentRoute()) {
+                        BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
+                        BillEasyScreens.ALL_PRODUCTS.name -> AddProductFab(appNavigationImpl)
+                    }
+                }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
                 }
@@ -101,7 +99,10 @@ fun BottomNavigationBar(
             "My products",
             "My Products"
         ), BottomNavigationScreens(
-            name = BillEasyScreens.SALES.name, icon = R.drawable.invoice, "Sales", "Sales"
+            name = BillEasyScreens.SALES.name,
+            icon = R.drawable.invoice,
+            contentDescription = "Sales",
+            label = "Sales"
         )
     )
 
