@@ -28,8 +28,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gravity.billeasy.ProductCategory
+import com.gravity.billeasy.QuantityUnit
 import com.gravity.billeasy.R
 import com.gravity.billeasy.Utils.Spinner
+import com.gravity.billeasy.appColor
 
 /*
 Fields:
@@ -45,6 +48,7 @@ Wholesale price
 
 const val ADD_PRODUCT = "Add product"
 const val PRODUCT_NAME = "Product name"
+const val PRODUCT_ID = "Product name"
 const val PRODUCT_CATEGORY = "Product category"
 const val UNIT = "Unit"
 const val AVAILABLE_STOCK = "Available stock"
@@ -52,14 +56,6 @@ const val QUANTITY = "Quantity"
 const val BUYING_PRICE = "Buying price"
 const val RETAIL_PRICE = "Retail price"
 const val WHOLESALE_PRICE = "Wholesale price"
-
-enum class QuantityUnit {
-    GRAMS, KILOGRAMS, PIECE, LOT, BOX, ROLL, DOZEN, SHEET, PACK, BAG, SET, LITER, MILLILITER, BUNDLE
-}
-
-enum class ProductCategory {
-    CEREALS, BISCATES, CHOCOLATES, SHAMPOO, RICE, CIGARETTES, OIL, PLASTIC_ITEMS, COFFEE_AND_TEA, SOAP, SPICES, MASALA, CHIPS, FLOUR, POOJA, OTHER
-}
 
 data class AddProductField(val fieldName: MutableState<String>, var isError: MutableState<Boolean>)
 
@@ -186,7 +182,7 @@ fun AddProduct() {
                 else -> {
                     OutlinedTextField(
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(R.color.purple_200),
+                            focusedBorderColor = appColor,
                             focusedLabelColor = colorResource(R.color.black),
                             cursorColor = colorResource(R.color.black)
                         ),
@@ -214,7 +210,7 @@ fun AddProduct() {
 
         item {
             ElevatedButton(
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.purple_200)),
+                colors = ButtonDefaults.buttonColors(containerColor = appColor),
                 onClick = { validateAddProductField(addProductFieldsMap.toList()) },
             ) {
                 Text(text = ADD_PRODUCT, color = Color.Black)

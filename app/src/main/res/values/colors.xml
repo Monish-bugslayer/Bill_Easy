@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_200">#CDC1FF</color>
     <color name="purple_dark">#9d00ff</color>
     <color name="lavendar">#E6E6FA</color>
     <color name="purple_500">#FF6200EE</color>
@@ -13,4 +13,9 @@
     <color name="sandle">#FBDFC9</color>
     <color name="sandle_light">#e5e2df</color>
     <color name="pink_light">#f9e8f9</color>
+    <color name="yellow_light">#F6F7C4</color>
+    <color name="yellow_dark">#FBFFB1</color>
+    <color name="orange">#FFDDAE</color>
+    <color name="orange_light">#FDE7BB</color>
+    <color name="orange_dim">#FFF5E1</color>
 </resources>

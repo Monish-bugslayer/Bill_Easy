@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
     FloatingActionButton(
         onClick = { appNavigationControllerImpl.navigateToAddProductScreen() },
-        containerColor = Color(LocalContext.current.resources.getColor(R.color.purple_200))
+        containerColor = appColor
     ) {
         Icon(Icons.Filled.Add, contentDescription = "add product")
     }
@@ -85,7 +85,7 @@ fun BottomNavigationBar(
     appNavigationControllerImpl: AppNavigationControllerImpl, window: Window
 ) {
     val context = LocalContext.current
-    window.navigationBarColor = context.resources.getColor(R.color.purple_200)
+    window.navigationBarColor = context.resources.getColor(appColorInt)
 
     val topLevelRoutes = listOf(
         BottomNavigationScreens(
@@ -106,7 +106,7 @@ fun BottomNavigationBar(
         )
     )
 
-    BottomNavigation(backgroundColor = Color(context.resources.getColor(R.color.purple_200))) {
+    BottomNavigation(backgroundColor = appColor) {
         topLevelRoutes.forEach {
             BottomNavigationItem(
                 modifier = Modifier

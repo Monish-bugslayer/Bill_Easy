@@ -1,6 +1,7 @@
 package com.gravity.billeasy.data.model
 
 data class Product(
+    val productId: Int,
     val productName: String,
     val productCategory: String,
     val unit: String,
