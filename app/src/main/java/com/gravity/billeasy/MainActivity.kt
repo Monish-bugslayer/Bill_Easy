@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +58,7 @@ class MainActivity : ComponentActivity() {
                     when (appNavigationImpl.getCurrentRoute()) {
                         BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
                         BillEasyScreens.ALL_PRODUCTS.name -> AddProductFab(appNavigationImpl)
+                        BillEasyScreens.BILLS.name -> AddProductFab(appNavigationImpl)
                     }
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
@@ -99,7 +99,7 @@ fun BottomNavigationBar(
             "My products",
             "My Products"
         ), BottomNavigationScreens(
-            name = BillEasyScreens.SALES.name,
+            name = BillEasyScreens.BILLS.name,
             icon = R.drawable.invoice,
             contentDescription = "Sales",
             label = "Sales"
@@ -131,7 +131,7 @@ fun BottomNavigationBar(
                             appNavigationControllerImpl.navigateToMyProducts()
                         }
 
-                        BillEasyScreens.SALES.name -> {
+                        BillEasyScreens.BILLS.name -> {
                             appNavigationControllerImpl.navigateToSales()
                         }
                     }

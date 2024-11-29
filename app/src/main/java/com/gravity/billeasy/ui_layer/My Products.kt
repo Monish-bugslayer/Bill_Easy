@@ -3,6 +3,7 @@ package com.gravity.billeasy.ui_layer
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ripple
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,21 +36,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gravity.billeasy.appColor
 import com.gravity.billeasy.data.model.Product
 import com.gravity.billeasy.viewmodel.SearchViewModel
 
 @Composable
 fun MyProducts() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)) {
-//        SearchState()
-//        ProductCardList()
+    val searchViewModel by remember { mutableStateOf(SearchViewModel()) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        SearchProduct(searchViewModel)
     }
 }
 
@@ -58,56 +61,87 @@ states and state updates and passing the data to the stateless function
 */
 
 @Composable
-fun SearchState(viewModel: SearchViewModel) {
+fun SearchProduct(viewModel: SearchViewModel) {
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
 
-    Search(searchQuery = viewModel.searchQuery,
+    SearchableColumn(searchQuery = viewModel.searchQuery,
         searchResults = searchResults,
         onSearchQueryChange = { viewModel.onSearchQueryChange(it) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Search(
+fun SearchableColumn(
     searchQuery: String, searchResults: List<Product>, onSearchQueryChange: (String) -> Unit
 ) {
-    SearchBar(query = searchQuery,
+    var expandedProductId by remember { mutableStateOf<Int?>(null) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    SearchBar(
+        query = searchQuery,
         onQueryChange = onSearchQueryChange,
-        onSearch = {},
+        onSearch = { keyboardController?.hide() },
         placeholder = {
-            Text(text = "Search movies")
+            Text(text = "Search your product")
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search, contentDescription = ""
+                imageVector = Icons.Default.Search, contentDescription = "Search"
             )
         },
-        trailingIcon = {},
-        content = {},
+        trailingIcon = {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(onClick = { onSearchQueryChange("") }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        contentDescription = "Clear search"
+                    )
+                }
+            }
+        },
+        content = {
+            if (searchResults.isEmpty()) {
+                ProductNotAvailable()
+            }
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(count = searchResults.size, key = { searchResults[it].productId }) {
+                    val product = searchResults[it]
+                    ProductCard(product = product,
+                        isExpanded = expandedProductId == product.productId,
+                        onCardClick = {
+                            expandedProductId =
+                                if (expandedProductId == product.productId) null else product.productId
+                        })
+                }
+            }
+        },
         active = true,
         onActiveChange = {},
         tonalElevation = 0.dp,
-        colors = SearchBarDefaults.colors(containerColor = appColor)
+        colors = SearchBarDefaults.colors(containerColor = Color.White)
     )
 }
 
 @Composable
-fun ProductCardList(products: List<Product>) {
-    var expandedProductId by remember { mutableStateOf<Int?>(null) }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+fun ProductNotAvailable() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(products) { product ->
-            ProductCard(product = product,
-                isExpanded = expandedProductId == product.productId,
-                onCardClick = {
-                    expandedProductId =
-                        if (expandedProductId == product.productId) null else product.productId
-                })
-        }
+        Text(
+            text = "No products found", style = MaterialTheme.typography.titleSmall
+        )
+        Text(
+            text = "Try adjusting your search or add a new product",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -116,7 +150,9 @@ fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCardClick() },
+            .clickable(onClick = { onCardClick() },
+                indication = ripple(bounded = true),
+                interactionSource = remember { MutableInteractionSource() }),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
     ) {
@@ -145,7 +181,7 @@ fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) 
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = "$${product.retailPrice}",
+                    text = "₹ ${product.retailPrice}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f),
@@ -167,29 +203,15 @@ fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) 
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Buying Price: $${product.buyingPrice}",
+                    text = "Buying Price: ₹ ${product.buyingPrice}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Wholesale Price: $${product.wholeSalePrice}",
+                    text = "Wholesale Price: ₹ ${product.wholeSalePrice}",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun PreviewProductCardList() {
-    MaterialTheme(colorScheme = lightColorScheme()) {
-        val sampleProducts = listOf(
-            Product(1, "Laptop", "Electronics", "pcs", 50, 10, 14.99f, 19.99f, 17.49f),
-            Product(2, "Headphonescvbhjhgfghj", "Accessories", "pcs", 30, 5, 7.99f, 12.49f, 10.99f),
-            Product(3, "Mouse", "Electronics", "pcs", 100, 25, 3.99f, 5.99f, 4.99f)
-        )
-        ProductCardList(products = sampleProducts)
     }
 }

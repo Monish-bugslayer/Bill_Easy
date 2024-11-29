@@ -49,7 +49,7 @@ class NavigationSetup(
             composable(route = BillEasyScreens.HOME.name) { Home() }
             composable(route = BillEasyScreens.ALL_PRODUCTS.name) { MyProducts() }
             composable(route = BillEasyScreens.ADD_PRODUCT.name) { AddProduct() }
-            composable(route = BillEasyScreens.SALES.name) { Sales() }
+            composable(route = BillEasyScreens.BILLS.name) { Sales() }
             composable(route = BillEasyScreens.GENERATE_BILL.name) {}
             composable(route = BillEasyScreens.EDIT_PRODUCT.name) {}
         }

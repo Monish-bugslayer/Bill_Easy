@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-inline val appColorInt get() = R.color.purple_200
+inline val appColorInt get() = R.color.orange_light
 
 inline val appColor @Composable
 get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))

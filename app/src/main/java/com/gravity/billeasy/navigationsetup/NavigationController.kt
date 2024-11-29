@@ -10,7 +10,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gravity.billeasy.loginscreens.Otp
 
 enum class BillEasyScreens {
-    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, ALL_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, SALES
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, ALL_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, BILLS
 }
 
 interface AppNavigationController {
@@ -46,7 +46,7 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
     }
 
     override fun navigateToSales() {
-        navHostController.navigate(route = BillEasyScreens.SALES.name) {
+        navHostController.navigate(route = BillEasyScreens.BILLS.name) {
             applyNavigationConfiguration(navHostController)
         }
     }

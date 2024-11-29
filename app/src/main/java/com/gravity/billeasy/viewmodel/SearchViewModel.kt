@@ -12,8 +12,10 @@ import com.gravity.billeasy.data.model.Product
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 class SearchViewModel: ViewModel() {
@@ -41,8 +43,7 @@ class SearchViewModel: ViewModel() {
     }
 
 
-    fun generateProductList(): Flow<List<Product>> {
-        return flow {
+    fun generateProductList() = flowOf(
             listOf(
                 Product(
                     productId = 0,
@@ -210,6 +211,5 @@ class SearchViewModel: ViewModel() {
                     buyingPrice = 108f
                 ),
             )
-        }
-    }
+    )
 }
