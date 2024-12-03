@@ -40,7 +40,7 @@ class SearchViewModel: ViewModel() {
     }
 
 
-    fun generateProductList() = flowOf(
+    private fun generateProductList() = flowOf(
             listOf(
                 Product(
                     productId = 0,
