@@ -4,8 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gravity.billeasy.domain_layer.CategoryEntity
-import com.gravity.billeasy.domain_layer.UnitEntity
 import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.data_layer.models.Product
 import kotlinx.coroutines.launch
