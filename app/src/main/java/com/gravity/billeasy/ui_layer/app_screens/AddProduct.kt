@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer
+package com.gravity.billeasy.ui_layer.app_screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
 import com.gravity.billeasy.Spinner
 import com.gravity.billeasy.appColor
+import com.gravity.billeasy.ui_layer.ProductCategory
+import com.gravity.billeasy.ui_layer.QuantityUnit
 
 /*
 Fields:

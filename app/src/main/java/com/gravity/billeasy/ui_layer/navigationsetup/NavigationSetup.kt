@@ -8,14 +8,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.gravity.billeasy.ui_layer.loginscreens.CreateAccountScreen
-import com.gravity.billeasy.ui_layer.loginscreens.LoginScreen
-import com.gravity.billeasy.ui_layer.loginscreens.OTPVerificationScreen
-import com.gravity.billeasy.ui_layer.loginscreens.Otp
-import com.gravity.billeasy.ui_layer.AddProduct
-import com.gravity.billeasy.ui_layer.Home
-import com.gravity.billeasy.ui_layer.MyProducts
-import com.gravity.billeasy.ui_layer.Sales
+import com.gravity.billeasy.ui_layer.app_screens.loginscreens.CreateAccountScreen
+import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
+import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen
+import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
+import com.gravity.billeasy.ui_layer.app_screens.AddProduct
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.Home
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.MyProducts
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.Sales
 
 class NavigationSetup(
     private val navHostController: NavHostController,

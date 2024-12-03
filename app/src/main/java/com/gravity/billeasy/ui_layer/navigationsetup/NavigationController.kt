@@ -7,7 +7,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.gravity.billeasy.ui_layer.loginscreens.Otp
+import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 
 enum class BillEasyScreens {
     LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, ALL_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, BILLS

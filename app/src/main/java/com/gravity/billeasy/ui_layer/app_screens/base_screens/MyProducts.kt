@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer
+package com.gravity.billeasy.ui_layer.app_screens.base_screens
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
