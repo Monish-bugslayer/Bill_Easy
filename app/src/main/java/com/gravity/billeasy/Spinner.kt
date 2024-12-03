@@ -1,4 +1,4 @@
-package com.gravity.billeasy.Utils
+package com.gravity.billeasy
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.gravity.billeasy.R
-import com.gravity.billeasy.appColor
 
 
 @OptIn(ExperimentalMaterial3Api::class)

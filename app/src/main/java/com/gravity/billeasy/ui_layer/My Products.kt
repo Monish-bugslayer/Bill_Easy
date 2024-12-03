@@ -40,8 +40,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gravity.billeasy.data.model.Product
-import com.gravity.billeasy.viewmodel.SearchViewModel
+import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.ui_layer.viewmodel.SearchViewModel
 
 @Composable
 fun MyProducts() {

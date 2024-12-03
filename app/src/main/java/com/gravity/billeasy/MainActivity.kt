@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,10 +31,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.gravity.billeasy.navigationsetup.AppNavigationControllerImpl
-import com.gravity.billeasy.navigationsetup.BillEasyScreens
-import com.gravity.billeasy.navigationsetup.NavigationSetup
+import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
+import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
+import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+
+inline val appColorInt get() = R.color.orange_light
+inline val appColor @Composable
+get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
 
 class MainActivity : ComponentActivity() {
 

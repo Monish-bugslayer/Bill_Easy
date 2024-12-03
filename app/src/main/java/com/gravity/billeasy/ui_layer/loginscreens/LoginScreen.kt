@@ -1,4 +1,4 @@
-package com.gravity.billeasy.loginscreens
+package com.gravity.billeasy.ui_layer.loginscreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.gravity.billeasy.R
-import com.gravity.billeasy.navigationsetup.BillEasyScreens
+import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 
 
 fun checkIsValidMobileNumber(number: String): Boolean = number.length == 10

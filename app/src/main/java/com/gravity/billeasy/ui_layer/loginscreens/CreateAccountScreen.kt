@@ -1,4 +1,4 @@
-package com.gravity.billeasy.loginscreens
+package com.gravity.billeasy.ui_layer.loginscreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
-import com.gravity.billeasy.navigationsetup.BillEasyScreens
+import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 
 /* TODO: Need to do field validation */
 

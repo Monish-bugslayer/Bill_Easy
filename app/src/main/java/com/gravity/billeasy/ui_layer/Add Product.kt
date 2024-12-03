@@ -28,10 +28,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gravity.billeasy.ProductCategory
-import com.gravity.billeasy.QuantityUnit
 import com.gravity.billeasy.R
-import com.gravity.billeasy.Utils.Spinner
+import com.gravity.billeasy.Spinner
 import com.gravity.billeasy.appColor
 
 /*

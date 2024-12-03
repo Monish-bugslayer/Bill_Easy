@@ -1,4 +1,4 @@
-package com.gravity.billeasy.loginscreens
+package com.gravity.billeasy.ui_layer.loginscreens
 
 import kotlinx.serialization.Serializable
 

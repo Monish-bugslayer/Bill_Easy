@@ -1,4 +1,4 @@
-package com.gravity.billeasy.loginscreens
+package com.gravity.billeasy.ui_layer.loginscreens
 
 import android.app.Activity
 import android.widget.Toast

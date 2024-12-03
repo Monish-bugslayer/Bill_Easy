@@ -1,4 +1,4 @@
-package com.gravity.billeasy.navigationsetup
+package com.gravity.billeasy.ui_layer.navigationsetup
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -8,10 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.gravity.billeasy.loginscreens.CreateAccountScreen
-import com.gravity.billeasy.loginscreens.LoginScreen
-import com.gravity.billeasy.loginscreens.OTPVerificationScreen
-import com.gravity.billeasy.loginscreens.Otp
+import com.gravity.billeasy.ui_layer.loginscreens.CreateAccountScreen
+import com.gravity.billeasy.ui_layer.loginscreens.LoginScreen
+import com.gravity.billeasy.ui_layer.loginscreens.OTPVerificationScreen
+import com.gravity.billeasy.ui_layer.loginscreens.Otp
 import com.gravity.billeasy.ui_layer.AddProduct
 import com.gravity.billeasy.ui_layer.Home
 import com.gravity.billeasy.ui_layer.MyProducts
