@@ -74,7 +74,7 @@ fun SearchProduct(viewModel: SearchViewModel) {
 fun SearchableColumn(
     searchQuery: String, searchResults: List<Product>, onSearchQueryChange: (String) -> Unit
 ) {
-    var expandedProductId by remember { mutableStateOf<Int?>(null) }
+    var expandedProductId by remember { mutableStateOf<Long?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     SearchBar(
