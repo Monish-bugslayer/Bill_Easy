@@ -21,21 +21,21 @@ class ProductViewModel(private val appUseCase: UseCase): ViewModel() {
     val allProducts: MutableState<List<Product>> get() = _allProducts
     private var _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
 
-    suspend fun getUnitId(unitName: String): Long { return appUseCase.getUnitId(unitName) }
+    private suspend fun getAllProducts() { _allProducts.value = appUseCase.getAllProducts() }
 
-    suspend fun getCategoryId(categoryName: String): Long {
-        return appUseCase.getCategoryId(categoryName)
-    }
+    private fun addCategory() = viewModelScope.launch { appUseCase.addCategory() }
+
+    private fun addUnit() = viewModelScope.launch { appUseCase.addUnit() }
+
+    suspend fun getUnitId(unitName: String): Long { return appUseCase.getUnitId(unitName) }
 
     suspend fun getCategoryFromId(id: Long): String { return appUseCase.getCategoryFromId(id) }
 
     suspend fun getUnitFromId(id: Long): String { return appUseCase.getUnitFromId(id) }
 
-    suspend fun getAllProducts() { _allProducts.value = appUseCase.getAllProducts() }
-
     fun addProduct(product: Product) = viewModelScope.launch { appUseCase.addProduct(product) }
 
-    fun addCategory() = viewModelScope.launch { appUseCase.addCategory() }
-
-    fun addUnit() = viewModelScope.launch { appUseCase.addUnit() }
+    suspend fun getCategoryId(categoryName: String): Long {
+        return appUseCase.getCategoryId(categoryName)
+    }
 }

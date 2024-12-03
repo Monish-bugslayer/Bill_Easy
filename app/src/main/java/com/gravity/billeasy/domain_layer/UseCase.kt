@@ -4,10 +4,7 @@ import com.gravity.billeasy.data_layer.Repository
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class UseCase(private val repository: Repository) {
 
