@@ -5,3 +5,7 @@ option java_multiple_files = true;
 message Login {
     string login_user_id = 1;
 }
+
+message DatabaseTablePreferences {
+    bool tableCreated = 1;
+}

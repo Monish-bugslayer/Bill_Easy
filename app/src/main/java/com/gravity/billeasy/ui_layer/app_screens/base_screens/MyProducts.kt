@@ -36,22 +36,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStoreFile
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
+import com.gravity.billeasy.data_layer.DatabaseInstance
+import com.gravity.billeasy.data_layer.Repository
 import com.gravity.billeasy.data_layer.models.Product
-import com.gravity.billeasy.ui_layer.viewmodel.SearchViewModel
+import com.gravity.billeasy.domain_layer.UseCase
+import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 
 @Composable
 fun MyProducts() {
-    val searchViewModel by remember { mutableStateOf(SearchViewModel()) }
+    val context = LocalContext.current
+    val database = DatabaseInstance.getDatabase(context)
+    val productDao = database.productDao()
+    val repository = Repository(productDao)
+    val useCase = UseCase(repository)
+    val myProductsViewModel = ProductViewModel(useCase, context.databasePreferenceDataStore)
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        SearchProduct(searchViewModel)
+        SearchProduct(myProductsViewModel)
     }
 }
 
@@ -61,12 +73,12 @@ states and state updates and passing the data to the stateless function
 */
 
 @Composable
-fun SearchProduct(viewModel: SearchViewModel) {
-    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+fun SearchProduct(myProductsViewModel: ProductViewModel) {
+    val searchResults by myProductsViewModel.searchResults.collectAsStateWithLifecycle()
 
-    SearchableColumn(searchQuery = viewModel.searchQuery,
+    SearchableColumn(searchQuery = myProductsViewModel.searchQuery,
         searchResults = searchResults,
-        onSearchQueryChange = { viewModel.onSearchQueryChange(it) })
+        onSearchQueryChange = { myProductsViewModel.onSearchQueryChange(it) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

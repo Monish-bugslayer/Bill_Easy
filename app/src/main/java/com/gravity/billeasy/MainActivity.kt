@@ -33,10 +33,15 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
+import com.gravity.billeasy.data_layer.DatabaseInstance
+import com.gravity.billeasy.data_layer.Repository
+import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable
