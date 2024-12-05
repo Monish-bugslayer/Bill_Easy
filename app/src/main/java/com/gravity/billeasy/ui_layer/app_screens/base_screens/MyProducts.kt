@@ -2,13 +2,16 @@ package com.gravity.billeasy.ui_layer.app_screens.base_screens
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,15 +23,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,64 +43,64 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
-import com.gravity.billeasy.data_layer.DatabaseInstance
-import com.gravity.billeasy.data_layer.Repository
+import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Product
-import com.gravity.billeasy.domain_layer.UseCase
+import com.gravity.billeasy.ui_layer.CustomSearchBar
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 
+const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
+const val SEARCH_RESULT_NOT_FOUND_STRING_2 = "Try adjusting your search or add a new product"
+const val NO_PRODUCTS_STRING_1 = "Your shop is empty"
+const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop with products"
+
 @Composable
-fun MyProducts() {
-    val context = LocalContext.current
-    val database = DatabaseInstance.getDatabase(context)
-    val productDao = database.productDao()
-    val repository = Repository(productDao)
-    val useCase = UseCase(repository)
-    val myProductsViewModel = ProductViewModel(useCase, context.databasePreferenceDataStore)
+fun MyProducts(viewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        SearchProduct(myProductsViewModel)
+        viewModel.getAllProducts()
+        SearchProduct(viewModel, onEditProduct)
     }
 }
-
 /*
 Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
 */
-
 @Composable
-fun SearchProduct(myProductsViewModel: ProductViewModel) {
+fun SearchProduct(myProductsViewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
     val searchResults by myProductsViewModel.searchResults.collectAsStateWithLifecycle()
-
-    SearchableColumn(searchQuery = myProductsViewModel.searchQuery,
+    SearchableColumn(products = myProductsViewModel.allProducts.value,
+        searchQuery = myProductsViewModel.searchQuery,
         searchResults = searchResults,
-        onSearchQueryChange = { myProductsViewModel.onSearchQueryChange(it) })
+        onSearchQueryChange = { myProductsViewModel.onSearchQueryChange(it) },
+        onDelete = {  },
+        onEdit = onEditProduct
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableColumn(
-    searchQuery: String, searchResults: List<Product>, onSearchQueryChange: (String) -> Unit
+    products: List<Product>,
+    searchQuery: String,
+    searchResults: List<Product>,
+    onSearchQueryChange: (String) -> Unit,
+    onDelete : (Product) -> Unit,
+    onEdit: (Product) -> Unit
 ) {
     var expandedProductId by remember { mutableStateOf<Long?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    SearchBar(
-        query = searchQuery,
-        onQueryChange = onSearchQueryChange,
+    CustomSearchBar(productsList = products,
+        searchQuery = searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
         onSearch = { keyboardController?.hide() },
-        placeholder = {
-            Text(text = "Search your product")
-        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search, contentDescription = "Search"
@@ -110,13 +117,15 @@ fun SearchableColumn(
                 }
             }
         },
-        content = {
-            if (searchResults.isEmpty()) {
-                ProductNotAvailable()
-            }
+        placeHolderText = { Text(text = "Search your product") }) {
+        if (products.isEmpty()) {
+            ProductNotAvailable(NO_PRODUCTS_STRING_1, NO_PRODUCTS_STRING_2)
+        } else if (searchResults.isEmpty()) {
+            ProductNotAvailable(SEARCH_RESULT_NOT_FOUND_STRING_1, SEARCH_RESULT_NOT_FOUND_STRING_2)
+        } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(count = searchResults.size, key = { searchResults[it].productId }) {
@@ -126,37 +135,79 @@ fun SearchableColumn(
                         onCardClick = {
                             expandedProductId =
                                 if (expandedProductId == product.productId) null else product.productId
-                        })
+                        },
+                        onDelete,
+                        onEdit
+                    )
                 }
             }
-        },
-        active = true,
-        onActiveChange = {},
-        tonalElevation = 0.dp,
-        colors = SearchBarDefaults.colors(containerColor = Color.White)
-    )
+        }
+    }
 }
 
 @Composable
-fun ProductNotAvailable() {
+fun ProductNotAvailable(header: String, footer: String) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = "No products found", style = MaterialTheme.typography.titleSmall
+            text = header, style = MaterialTheme.typography.titleSmall
         )
         Text(
-            text = "Try adjusting your search or add a new product",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
+            text = footer, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) {
+fun ProductCard(
+    product: Product,
+    isExpanded: Boolean,
+    onCardClick: () -> Unit,
+    onDelete: (Product) -> Unit,
+    onEdit: (Product) -> Unit
+) {
+    val dismissState = rememberSwipeToDismissBoxState()
+    val dismissDirection = remember { derivedStateOf { dismissState.dismissDirection } }
+    SwipeToDismissBox(
+        state = dismissState, backgroundContent = {
+            Card {
+                if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
+                    SwipeToDismissBoxBackground(
+                        contentAlignment = Alignment.CenterStart,
+                        actionIcon = R.drawable.edit,
+                        actionText = "Edit product",
+                        actionColor = Color.Blue
+                    )
+                } else {
+                    SwipeToDismissBoxBackground(
+                        contentAlignment = Alignment.CenterEnd,
+                        actionIcon = R.drawable.delete,
+                        actionText = "Delete product",
+                        actionColor = Color.Red
+                    )
+                }
+            }
+        }, enableDismissFromEndToStart = true, enableDismissFromStartToEnd = true
+    ) {
+        SwipeToDismissBoxContent(product, onCardClick, isExpanded)
+    }
+
+    if(dismissDirection.value == SwipeToDismissBoxValue.StartToEnd) {
+        println("start to end")
+        // TODO navigation is occuring but it is calling multiple times and causes infinite loop of creation of the edit screen
+        onEdit(product)
+    } else if(dismissDirection.value == SwipeToDismissBoxValue.EndToStart) {
+        println("end to start")
+        onDelete(product)
+    }
+}
+
+@Composable
+fun SwipeToDismissBoxContent(product: Product, onCardClick: () -> Unit, isExpanded: Boolean) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +258,9 @@ fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) 
                     text = "Category: ${product.productCategory}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text(text = "Unit: ${product.unit}", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "Unit: ${product.unit}", style = MaterialTheme.typography.bodyMedium
+                )
                 Text(
                     text = "Available Stock: ${product.availableStock}",
                     style = MaterialTheme.typography.bodyMedium
@@ -222,6 +275,35 @@ fun ProductCard(product: Product, isExpanded: Boolean, onCardClick: () -> Unit) 
                 )
 
             }
+        }
+    }
+}
+
+@Composable
+fun SwipeToDismissBoxBackground(
+    contentAlignment: Alignment,
+    actionText: String,
+    actionIcon: Int,
+    actionColor: Color
+){
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentAlignment = contentAlignment
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+            Text(
+                text = actionText,
+                textAlign = TextAlign.Center,
+                color = actionColor,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+            Icon(
+                painter = painterResource(actionIcon),
+                contentDescription = actionText,
+                tint = actionColor,
+            )
         }
     }
 }

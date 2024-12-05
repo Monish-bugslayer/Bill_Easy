@@ -33,15 +33,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
-import com.gravity.billeasy.data_layer.DatabaseInstance
-import com.gravity.billeasy.data_layer.Repository
-import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui.theme.BillEasyTheme
-import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable
@@ -69,11 +64,12 @@ class MainActivity : ComponentActivity() {
                 }, floatingActionButton = {
                     when (appNavigationImpl.getCurrentRoute()) {
                         BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
-                        BillEasyScreens.ALL_PRODUCTS.name -> AddProductFab(appNavigationImpl)
+                        BillEasyScreens.MY_PRODUCTS.name -> AddProductFab(appNavigationImpl)
                         BillEasyScreens.BILLS.name -> AddProductFab(appNavigationImpl)
                     }
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
+                    navigationSetup.InitViewModel()
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
                 }
             }
@@ -84,7 +80,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
     FloatingActionButton(
-        onClick = { appNavigationControllerImpl.navigateToAddProductScreen() },
+        onClick = { appNavigationControllerImpl.navigateToAddProductScreen(
+            screenTitle = "Add your product",
+        ) },
         containerColor = appColor
     ) {
         Icon(Icons.Filled.Add, contentDescription = "add product")
@@ -106,7 +104,7 @@ fun BottomNavigationBar(
             contentDescription = "Home",
             "Home"
         ), BottomNavigationScreens(
-            name = BillEasyScreens.ALL_PRODUCTS.name,
+            name = BillEasyScreens.MY_PRODUCTS.name,
             icon = R.drawable.products,
             "My products",
             "My Products"
@@ -139,7 +137,7 @@ fun BottomNavigationBar(
                             appNavigationControllerImpl.navigateToHomeScreen()
                         }
 
-                        BillEasyScreens.ALL_PRODUCTS.name -> {
+                        BillEasyScreens.MY_PRODUCTS.name -> {
                             appNavigationControllerImpl.navigateToMyProducts()
                         }
 

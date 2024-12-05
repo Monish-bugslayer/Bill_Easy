@@ -14,6 +14,10 @@ class Repository(private val dao: AppDao) {
 
     suspend fun addUnit(unitEntity: UnitEntity) = dao.addUnit(unitEntity)
 
+    suspend fun updateProduct(productEntity: ProductEntity) = dao.updateProduct(productEntity)
+
+    suspend fun deleteProduct(productEntity: ProductEntity) = dao.deleteProduct(productEntity)
+
     fun getUnitFromId(unitId: Long): Flow<String> { return dao.getUnitFromId(unitId) }
 
     fun getUnitId(unit: String): Flow<Long> { return dao.getUnitId(unit) }

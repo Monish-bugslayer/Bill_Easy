@@ -85,8 +85,6 @@ fun ShopNameEditable() {
         )
         Box(modifier = Modifier
             .padding(start = 10.dp)
-            .width(24.dp)
-            .height(24.dp)
             .clip(CircleShape)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },

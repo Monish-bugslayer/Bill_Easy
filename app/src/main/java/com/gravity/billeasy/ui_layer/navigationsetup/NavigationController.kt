@@ -7,17 +7,19 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEdit
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 
 enum class BillEasyScreens {
-    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, ALL_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, BILLS
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, BILLS
 }
 
 interface AppNavigationController {
 
     fun navigateToCreateAccountScreen()
     fun navigateToOTPVerificationScreen(mobileNumber: String, fromScreen: String)
-    fun navigateToAddProductScreen()
+    fun navigateToAddProductScreen(screenTitle: String)
     fun navigateToMyProducts()
     fun navigateToSales()
     fun navigateToHomeScreen()
@@ -35,12 +37,12 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
         navHostController.navigate(route = Otp(mobileNumber, fromScreen))
     }
 
-    override fun navigateToAddProductScreen() {
-        navHostController.navigate(route = BillEasyScreens.ADD_PRODUCT.name)
+    override fun navigateToAddProductScreen(screenTitle: String) {
+        navHostController.navigate(route = ProductAddOrEdit(screenTitle))
     }
 
     override fun navigateToMyProducts() {
-        navHostController.navigate(route = BillEasyScreens.ALL_PRODUCTS.name) {
+        navHostController.navigate(route = BillEasyScreens.MY_PRODUCTS.name) {
             applyNavigationConfiguration(navHostController)
         }
     }

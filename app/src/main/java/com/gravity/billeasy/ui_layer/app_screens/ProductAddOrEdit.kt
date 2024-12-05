@@ -31,8 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
 import com.gravity.billeasy.Spinner
 import com.gravity.billeasy.appColor
+import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
+import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import kotlinx.serialization.Serializable
 
 /*
 Fields:
@@ -48,7 +51,7 @@ Wholesale price
 
 const val ADD_PRODUCT = "Add product"
 const val PRODUCT_NAME = "Product name"
-const val PRODUCT_ID = "Product name"
+const val PRODUCT_ID = "Product Id"
 const val PRODUCT_CATEGORY = "Product category"
 const val UNIT = "Unit"
 const val AVAILABLE_STOCK = "Available stock"
@@ -59,27 +62,37 @@ const val WHOLESALE_PRICE = "Wholesale price"
 
 data class AddProductField(val fieldName: MutableState<String>, var isError: MutableState<Boolean>)
 
-fun validateAddProductField(fields: List<Pair<String, AddProductField>>) {
+fun validateAddProductField(fields: List<Pair<String, AddProductField>>):Boolean {
     fields.forEach { field ->
         if (field.second.fieldName.value.isEmpty()) {
             field.second.isError.value = true
+            return false
+        } else {
+            return true
         }
     }
+    return true
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AddProduct() {
-
-    val productName = remember { mutableStateOf("") }
-    val productCategory = remember { mutableStateOf("") }
-    val unit = remember { mutableStateOf("") }
-    val availableStock = remember { mutableStateOf("") }
-    val quantity = remember { mutableStateOf("") }
-    val buyingPrice = remember { mutableStateOf("") }
-    val retailPrice = remember { mutableStateOf("") }
-    val wholeSalePrice = remember { mutableStateOf("") }
+fun ProductAddOrEditScreen(
+    screenTitle: String,
+    viewModel: ProductViewModel,
+    product: Product?,
+    navigateBackAfterAddProduct: () -> Unit
+) {
+    val productId = remember { mutableStateOf(product?.productId ?: "") }
+    val productName = remember { mutableStateOf(product?.productName ?: "") }
+    val productCategory = remember { mutableStateOf(product?.productCategory ?: "") }
+    val unit = remember { mutableStateOf(product?.unit ?: "") }
+    val availableStock = remember { mutableStateOf(product?.availableStock.toString()) }
+    val quantity = remember { mutableStateOf(product?.quantity.toString()) }
+    val buyingPrice = remember { mutableStateOf(product?.buyingPrice.toString()) }
+    val retailPrice = remember { mutableStateOf(product?.retailPrice.toString()) }
+    val wholeSalePrice = remember { mutableStateOf(product?.wholeSalePrice.toString()) }
     val addProductFieldsMap = mutableMapOf<String, AddProductField>()
+    viewModel.initUnitAndCategoryTable()
 
     addProductFieldsMap.apply {
         put(PRODUCT_NAME, AddProductField(productName, remember { mutableStateOf(false) }))
@@ -138,7 +151,7 @@ fun AddProduct() {
 
         stickyHeader {
             Text(
-                text = "Add your product",
+                text = screenTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
@@ -211,7 +224,22 @@ fun AddProduct() {
         item {
             ElevatedButton(
                 colors = ButtonDefaults.buttonColors(containerColor = appColor),
-                onClick = { validateAddProductField(addProductFieldsMap.toList()) },
+                onClick = {
+                    if( validateAddProductField(addProductFieldsMap.toList()) ) {
+                        val product = Product(
+                            productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
+                            productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
+                            unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
+                            availableStock = addProductFieldsMap.getValue(AVAILABLE_STOCK).fieldName.value.toLong(),
+                            quantity = addProductFieldsMap.getValue(QUANTITY).fieldName.value.toLong(),
+                            buyingPrice = addProductFieldsMap.getValue(BUYING_PRICE).fieldName.value.toDouble(),
+                            wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
+                            retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
+                        )
+                        viewModel.addProduct(product)
+                        navigateBackAfterAddProduct()
+                    }
+                }
             ) {
                 Text(text = ADD_PRODUCT, color = Color.Black)
             }
@@ -234,3 +262,8 @@ fun decideKeyboardType(fieldType: String): KeyboardType {
     }
 }
 
+@Serializable
+data class ProductAddOrEdit(
+    val screenTitle: String,
+//    val product: Product?
+)

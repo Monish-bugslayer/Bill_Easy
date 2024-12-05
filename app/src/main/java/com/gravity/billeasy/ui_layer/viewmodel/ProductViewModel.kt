@@ -26,21 +26,6 @@ class ProductViewModel(
     private val dbPreferenceStore: DataStore<DatabaseTablePreferences>
 ): ViewModel() {
 
-    init {
-        viewModelScope.launch {
-            dbPreferenceFlow.collectLatest {
-                if(!it.tableCreated) {
-                    addUnit()
-                    addCategory()
-                    dbPreferenceStore.updateData { preferences->
-                        preferences.toBuilder().setTableCreated(true).build()
-                    }
-                }
-            }
-            getAllProducts()
-        }
-    }
-
     private val dbPreferenceFlow: Flow<DatabaseTablePreferences> = dbPreferenceStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -57,7 +42,7 @@ class ProductViewModel(
         private set
     val searchResults: StateFlow<List<Product>> =
         snapshotFlow { searchQuery }
-            .combine(snapshotFlow { allProducts.value }) { searchQuery, products ->
+            .combine(snapshotFlow { _allProducts.value }) { searchQuery, products ->
                 when {
                     searchQuery.isNotEmpty() -> products.filter { product ->
                         product.productName.contains(searchQuery, ignoreCase = true)
@@ -70,8 +55,6 @@ class ProductViewModel(
                 started = SharingStarted.WhileSubscribed(5_000)
             )
 
-    private suspend fun getAllProducts() { _allProducts.value = appUseCase.getAllProducts() }
-
     private fun addCategory() = viewModelScope.launch { appUseCase.addCategory() }
 
     private fun addUnit() = viewModelScope.launch { appUseCase.addUnit() }
@@ -82,6 +65,16 @@ class ProductViewModel(
 
     suspend fun getUnitFromId(id: Long): String { return appUseCase.getUnitFromId(id) }
 
+    fun getAllProducts() {
+        viewModelScope.launch {
+            _allProducts.value = appUseCase.getAllProducts()
+        }
+    }
+
+    fun deleteProduct(product: Product) = viewModelScope.launch { appUseCase.deleteProduct(product) }
+
+    fun editProduct(product: Product) = viewModelScope.launch { appUseCase.updateProduct(product) }
+
     fun addProduct(product: Product) = viewModelScope.launch { appUseCase.addProduct(product) }
 
     suspend fun getCategoryId(categoryName: String): Long {
@@ -90,5 +83,19 @@ class ProductViewModel(
 
     fun onSearchQueryChange(newQuery: String) {
         searchQuery = newQuery
+    }
+
+    fun initUnitAndCategoryTable() {
+        viewModelScope.launch {
+            dbPreferenceFlow.collectLatest {
+                if(!it.tableCreated) {
+                    addUnit()
+                    addCategory()
+                    dbPreferenceStore.updateData { preferences->
+                        preferences.toBuilder().setTableCreated(true).build()
+                    }
+                }
+            }
+        }
     }
 }

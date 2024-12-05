@@ -1,7 +1,10 @@
 package com.gravity.billeasy.data_layer.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Product(
-    val productId: Long,
+    val productId: Long = 0,
     val productName: String,
     val productCategory: String,
     val unit: String,

@@ -11,8 +11,7 @@ class UseCase(private val repository: Repository) {
     private val categoriesList get() = ProductCategory.entries.toList()
     private val unitsList get() = QuantityUnit.entries.toList()
 
-    suspend fun addProduct(product: Product) {
-        repository.addProduct(ProductEntity(
+    suspend fun addProduct(product: Product) = repository.addProduct(ProductEntity(
             productName = product.productName,
             availableStock = product.availableStock,
             buyingPrice = product.buyingPrice,
@@ -22,7 +21,30 @@ class UseCase(private val repository: Repository) {
             productCategoryId = getCategoryId(product.productCategory),
             productUnitId = getUnitId(product.unit)
         ))
-    }
+
+    suspend fun updateProduct(product: Product) = repository.updateProduct(ProductEntity(
+            productId = product.productId,
+            productName = product.productName,
+            availableStock = product.availableStock,
+            buyingPrice = product.buyingPrice,
+            retailPrice = product.retailPrice,
+            wholeSalePrice = product.wholeSalePrice,
+            quantity = product.quantity,
+            productCategoryId = getCategoryId(product.productCategory),
+            productUnitId = getUnitId(product.unit)
+        ))
+
+    suspend fun deleteProduct(product: Product) = repository.deleteProduct(ProductEntity(
+        productId = product.productId,
+        productName = product.productName,
+        availableStock = product.availableStock,
+        buyingPrice = product.buyingPrice,
+        retailPrice = product.retailPrice,
+        wholeSalePrice = product.wholeSalePrice,
+        quantity = product.quantity,
+        productCategoryId = getCategoryId(product.productCategory),
+        productUnitId = getUnitId(product.unit)
+    ))
 
     suspend fun addCategory() {
         categoriesList.forEach {
@@ -53,9 +75,7 @@ class UseCase(private val repository: Repository) {
     }
 
     suspend fun getAllProducts(): List<Product> {
-        var productsList = emptyList<Product>()
-        repository.getAllProducts().collect { productEntities ->
-            productsList = productEntities.map {
+        return repository.getAllProducts().first().map {
                 Product(
                     productId = it.productId,
                     productName = it.productName,
@@ -67,8 +87,6 @@ class UseCase(private val repository: Repository) {
                     wholeSalePrice = it.wholeSalePrice,
                     retailPrice = it.retailPrice
                 )
-            }
         }
-        return productsList
     }
 }

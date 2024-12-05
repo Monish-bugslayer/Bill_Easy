@@ -1,9 +1,11 @@
 package com.gravity.billeasy.data_layer
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.gravity.billeasy.domain_layer.CategoryEntity
 import com.gravity.billeasy.domain_layer.CategoryWithProduct
 import com.gravity.billeasy.domain_layer.ProductEntity
@@ -21,6 +23,12 @@ interface AppDao {
 
     @Insert
     suspend fun addCategory(categoryEntity: CategoryEntity)
+
+    @Update
+    suspend fun updateProduct(productEntity: ProductEntity)
+
+    @Delete
+    suspend fun deleteProduct(product: ProductEntity)
 
     @Query("SELECT categoryId FROM categories WHERE category = :category")
     fun getCategoryId(category: String): Flow<Long>
