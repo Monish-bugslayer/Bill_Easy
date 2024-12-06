@@ -71,7 +71,10 @@ class ProductViewModel(
         }
     }
 
-    fun deleteProduct(product: Product) = viewModelScope.launch { appUseCase.deleteProduct(product) }
+    fun deleteProduct(product: Product) = viewModelScope.launch {
+        _allProducts.value.toMutableList().remove(product)
+        appUseCase.deleteProduct(product)
+    }
 
     fun editProduct(product: Product) = viewModelScope.launch { appUseCase.updateProduct(product) }
 

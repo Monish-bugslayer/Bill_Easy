@@ -50,6 +50,7 @@ Wholesale price
 */
 
 const val ADD_PRODUCT = "Add product"
+const val EDIT_PRODUCT = "Update product"
 const val PRODUCT_NAME = "Product name"
 const val PRODUCT_ID = "Product Id"
 const val PRODUCT_CATEGORY = "Product category"
@@ -62,7 +63,7 @@ const val WHOLESALE_PRICE = "Wholesale price"
 
 data class AddProductField(val fieldName: MutableState<String>, var isError: MutableState<Boolean>)
 
-fun validateAddProductField(fields: List<Pair<String, AddProductField>>):Boolean {
+fun validateAddProductField(fields: List<Pair<String, AddProductField>>): Boolean {
     fields.forEach { field ->
         if (field.second.fieldName.value.isEmpty()) {
             field.second.isError.value = true
@@ -77,24 +78,56 @@ fun validateAddProductField(fields: List<Pair<String, AddProductField>>):Boolean
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProductAddOrEditScreen(
+    isForAdd: Boolean,
     screenTitle: String,
     viewModel: ProductViewModel,
     product: Product?,
-    navigateBackAfterAddProduct: () -> Unit
+    navigateBackAfterAddOrEditProduct: () -> Unit
 ) {
-    val productId = remember { mutableStateOf(product?.productId ?: "") }
+    val productId = remember {
+        mutableStateOf(
+            if (product?.productId == null) ""
+            else product.productId.toString()
+        )
+    }
     val productName = remember { mutableStateOf(product?.productName ?: "") }
     val productCategory = remember { mutableStateOf(product?.productCategory ?: "") }
     val unit = remember { mutableStateOf(product?.unit ?: "") }
-    val availableStock = remember { mutableStateOf(product?.availableStock.toString()) }
-    val quantity = remember { mutableStateOf(product?.quantity.toString()) }
-    val buyingPrice = remember { mutableStateOf(product?.buyingPrice.toString()) }
-    val retailPrice = remember { mutableStateOf(product?.retailPrice.toString()) }
-    val wholeSalePrice = remember { mutableStateOf(product?.wholeSalePrice.toString()) }
+    val availableStock = remember {
+        mutableStateOf(
+            if (product?.availableStock == null) ""
+            else product.availableStock.toString()
+        )
+    }
+    val quantity = remember {
+        mutableStateOf(
+            if (product?.quantity == null) ""
+            else product.quantity.toString()
+        )
+    }
+    val buyingPrice = remember {
+        mutableStateOf(
+            if (product?.buyingPrice == null) ""
+            else product.buyingPrice.toString()
+        )
+    }
+    val retailPrice = remember {
+        mutableStateOf(
+            if (product?.retailPrice == null) ""
+            else product.retailPrice.toString()
+        )
+    }
+    val wholeSalePrice = remember {
+        mutableStateOf(
+            if (product?.wholeSalePrice == null) ""
+            else product.wholeSalePrice.toString()
+        )
+    }
     val addProductFieldsMap = mutableMapOf<String, AddProductField>()
     viewModel.initUnitAndCategoryTable()
 
     addProductFieldsMap.apply {
+        put(PRODUCT_ID, AddProductField(productId, remember { mutableStateOf(false) }))
         put(PRODUCT_NAME, AddProductField(productName, remember { mutableStateOf(false) }))
         put(PRODUCT_CATEGORY, AddProductField(productCategory, remember { mutableStateOf(false) }))
         put(UNIT, AddProductField(unit, remember { mutableStateOf(false) }))
@@ -105,6 +138,7 @@ fun ProductAddOrEditScreen(
         put(WHOLESALE_PRICE, AddProductField(wholeSalePrice, remember { mutableStateOf(false) }))
     }
 
+    // TODO need to find how to write extension of Enum to get this list
     val unitOptions: List<String> = listOf(
         QuantityUnit.BAG.name,
         QuantityUnit.BOX.name,
@@ -145,8 +179,8 @@ fun ProductAddOrEditScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .imePadding()
-            , horizontalAlignment = Alignment.CenterHorizontally
+            .imePadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         stickyHeader {
@@ -222,11 +256,11 @@ fun ProductAddOrEditScreen(
         }
 
         item {
-            ElevatedButton(
-                colors = ButtonDefaults.buttonColors(containerColor = appColor),
+            ElevatedButton(colors = ButtonDefaults.buttonColors(containerColor = appColor),
                 onClick = {
-                    if( validateAddProductField(addProductFieldsMap.toList()) ) {
-                        val product = Product(
+                    if (validateAddProductField(addProductFieldsMap.toList())) {
+                        val newProduct = Product(
+                            productId = if(isForAdd) 0 else addProductFieldsMap.getValue(PRODUCT_ID).fieldName.value.toLong() ,
                             productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
                             productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
                             unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
@@ -236,12 +270,11 @@ fun ProductAddOrEditScreen(
                             wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
                             retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
                         )
-                        viewModel.addProduct(product)
-                        navigateBackAfterAddProduct()
+                        if(isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
+                        navigateBackAfterAddOrEditProduct()
                     }
-                }
-            ) {
-                Text(text = ADD_PRODUCT, color = Color.Black)
+                }) {
+                Text(text = if(isForAdd) ADD_PRODUCT else EDIT_PRODUCT, color = Color.Black)
             }
         }
     }
@@ -264,6 +297,5 @@ fun decideKeyboardType(fieldType: String): KeyboardType {
 
 @Serializable
 data class ProductAddOrEdit(
-    val screenTitle: String,
-//    val product: Product?
+    val screenTitle: String, val product: Product?, val isForAdd: Boolean
 )

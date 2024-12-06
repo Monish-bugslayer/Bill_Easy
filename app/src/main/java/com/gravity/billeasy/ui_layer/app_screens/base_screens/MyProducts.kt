@@ -1,8 +1,11 @@
 package com.gravity.billeasy.ui_layer.app_screens.base_screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -11,12 +14,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.DismissValue
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -52,6 +55,7 @@ import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import kotlinx.coroutines.delay
 
 const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
 const val SEARCH_RESULT_NOT_FOUND_STRING_2 = "Try adjusting your search or add a new product"
@@ -69,6 +73,7 @@ fun MyProducts(viewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
         SearchProduct(viewModel, onEditProduct)
     }
 }
+
 /*
 Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
@@ -76,11 +81,12 @@ states and state updates and passing the data to the stateless function
 @Composable
 fun SearchProduct(myProductsViewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
     val searchResults by myProductsViewModel.searchResults.collectAsStateWithLifecycle()
-    SearchableColumn(products = myProductsViewModel.allProducts.value,
+    SearchableColumn(
+        products = myProductsViewModel.allProducts.value,
         searchQuery = myProductsViewModel.searchQuery,
         searchResults = searchResults,
         onSearchQueryChange = { myProductsViewModel.onSearchQueryChange(it) },
-        onDelete = {  },
+        onDelete = { myProductsViewModel.deleteProduct(it) },
         onEdit = onEditProduct
     )
 }
@@ -91,7 +97,7 @@ fun SearchableColumn(
     searchQuery: String,
     searchResults: List<Product>,
     onSearchQueryChange: (String) -> Unit,
-    onDelete : (Product) -> Unit,
+    onDelete: (Product) -> Unit,
     onEdit: (Product) -> Unit
 ) {
     var expandedProductId by remember { mutableStateOf<Long?>(null) }
@@ -130,7 +136,8 @@ fun SearchableColumn(
             ) {
                 items(count = searchResults.size, key = { searchResults[it].productId }) {
                     val product = searchResults[it]
-                    ProductCard(product = product,
+                    ProductCard(
+                        product = product,
                         isExpanded = expandedProductId == product.productId,
                         onCardClick = {
                             expandedProductId =
@@ -170,39 +177,62 @@ fun ProductCard(
     onDelete: (Product) -> Unit,
     onEdit: (Product) -> Unit
 ) {
-    val dismissState = rememberSwipeToDismissBoxState()
-    val dismissDirection = remember { derivedStateOf { dismissState.dismissDirection } }
-    SwipeToDismissBox(
-        state = dismissState, backgroundContent = {
-            Card {
-                if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
-                    SwipeToDismissBoxBackground(
-                        contentAlignment = Alignment.CenterStart,
-                        actionIcon = R.drawable.edit,
-                        actionText = "Edit product",
-                        actionColor = Color.Blue
-                    )
-                } else {
-                    SwipeToDismissBoxBackground(
-                        contentAlignment = Alignment.CenterEnd,
-                        actionIcon = R.drawable.delete,
-                        actionText = "Delete product",
-                        actionColor = Color.Red
-                    )
-                }
-            }
-        }, enableDismissFromEndToStart = true, enableDismissFromStartToEnd = true
-    ) {
-        SwipeToDismissBoxContent(product, onCardClick, isExpanded)
+    var isRemoved by remember { mutableStateOf(false) }
+    var isEdit by remember { mutableStateOf(false) }
+    val animationDuration = 500
+    val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = {
+        if(it == SwipeToDismissBoxValue.EndToStart) {
+            isRemoved = true
+            true
+        } else if(it == SwipeToDismissBoxValue.StartToEnd) {
+            isEdit = true
+            true
+        } else {
+            false
+        }
+    })
+
+    LaunchedEffect(isRemoved) {
+        if(isRemoved) {
+            delay(animationDuration.toLong())
+            onDelete(product)
+        }
     }
 
-    if(dismissDirection.value == SwipeToDismissBoxValue.StartToEnd) {
-        println("start to end")
-        // TODO navigation is occuring but it is calling multiple times and causes infinite loop of creation of the edit screen
-        onEdit(product)
-    } else if(dismissDirection.value == SwipeToDismissBoxValue.EndToStart) {
-        println("end to start")
-        onDelete(product)
+    LaunchedEffect(isEdit) {
+        if(isEdit) {
+            onEdit(product)
+            dismissState.reset()
+        }
+    }
+    AnimatedVisibility(
+        visible = !isRemoved,
+        exit = shrinkVertically(animationSpec = tween(animationDuration), shrinkTowards = Alignment.Top)+ fadeOut()
+    ) {
+
+        SwipeToDismissBox(
+            state = dismissState, backgroundContent = {
+                Card {
+                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
+                        SwipeToDismissBoxBackground(
+                            contentAlignment = Alignment.CenterStart,
+                            actionIcon = R.drawable.edit,
+                            actionText = "Edit product",
+                            actionColor = Color.Blue
+                        )
+                    } else {
+                        SwipeToDismissBoxBackground(
+                            contentAlignment = Alignment.CenterEnd,
+                            actionIcon = R.drawable.delete,
+                            actionText = "Delete product",
+                            actionColor = Color.Red
+                        )
+                    }
+                }
+            }, enableDismissFromEndToStart = true, enableDismissFromStartToEnd = true
+        ) {
+            SwipeToDismissBoxContent(product, onCardClick, isExpanded)
+        }
     }
 }
 
@@ -281,11 +311,8 @@ fun SwipeToDismissBoxContent(product: Product, onCardClick: () -> Unit, isExpand
 
 @Composable
 fun SwipeToDismissBoxBackground(
-    contentAlignment: Alignment,
-    actionText: String,
-    actionIcon: Int,
-    actionColor: Color
-){
+    contentAlignment: Alignment, actionText: String, actionIcon: Int, actionColor: Color
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()

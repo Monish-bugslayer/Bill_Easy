@@ -3,6 +3,7 @@ package com.gravity.billeasy
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -33,10 +34,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable
@@ -80,8 +84,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
     FloatingActionButton(
-        onClick = { appNavigationControllerImpl.navigateToAddProductScreen(
+        onClick = {
+            appNavigationControllerImpl.navigateToAddProductScreen(
             screenTitle = "Add your product",
+            productJson = null,
+            isForAdd = true
         ) },
         containerColor = appColor
     ) {

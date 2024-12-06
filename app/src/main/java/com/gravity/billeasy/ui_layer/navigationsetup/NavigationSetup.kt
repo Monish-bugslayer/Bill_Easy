@@ -1,13 +1,16 @@
 package com.gravity.billeasy.ui_layer.navigationsetup
 
+import android.net.Uri
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.util.fastCbrt
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
 import com.gravity.billeasy.data_layer.DatabaseInstance
@@ -23,6 +26,10 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.Home
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.MyProducts
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.Sales
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+const val EDIT_SCREEN_TITLE = "Edit your product"
 
 class NavigationSetup(
     private val navHostController: NavHostController,
@@ -75,9 +82,11 @@ class NavigationSetup(
                 MyProducts(
                     viewModel = productViewModel,
                     onEditProduct = {
-                        println("na")
+                        val productJson = Uri.encode(Json.encodeToString(it))
                         navigationControllerImpl.navigateToAddProductScreen(
-                            screenTitle = "Edit Product"
+                            screenTitle = EDIT_SCREEN_TITLE,
+                            productJson = productJson,
+                            isForAdd = false
                     ) }
             ) }
 
@@ -85,11 +94,16 @@ class NavigationSetup(
                 val productAddOrEdit = backstackEntry.toRoute() as ProductAddOrEdit
                 // TODO when adding Product model in param, an crash is occuring, need to find the root cause and fix it.
                 ProductAddOrEditScreen(
+                    isForAdd = productAddOrEdit.isForAdd,
                     screenTitle = productAddOrEdit.screenTitle,
-                    product = null,
+                    product = productAddOrEdit.product,
                     viewModel = productViewModel,
-                    navigateBackAfterAddProduct = {
-                        navigationControllerImpl.navigateToMyProducts()
+                    navigateBackAfterAddOrEditProduct = {
+                        if(productAddOrEdit.isForAdd) {
+                            navigationControllerImpl.navigateToMyProducts()
+                        } else {
+                            navHostController.navigateUp()
+                        }
                     }
                 )
             }
