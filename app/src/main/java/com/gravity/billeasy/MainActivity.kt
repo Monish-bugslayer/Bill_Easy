@@ -58,10 +58,12 @@ class MainActivity : ComponentActivity() {
             window.statusBarColor = context.resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
+            val addOrEditProductRoute = "productAddOrEdit"
 
             BillEasyTheme {
                 Scaffold(bottomBar = {
-                    if (appNavigationImpl.getCurrentRoute() != BillEasyScreens.ADD_PRODUCT.name) BottomNavigationBar(
+                    // TODO need to hide bottomBar when in add product. The condition is not working
+                    if (appNavigationImpl.getCurrentRoute() != addOrEditProductRoute) BottomNavigationBar(
                         appNavigationImpl, window
                     )
                     else window.navigationBarColor = context.resources.getColor(R.color.white)
@@ -69,7 +71,6 @@ class MainActivity : ComponentActivity() {
                     when (appNavigationImpl.getCurrentRoute()) {
                         BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
                         BillEasyScreens.MY_PRODUCTS.name -> AddProductFab(appNavigationImpl)
-                        BillEasyScreens.BILLS.name -> AddProductFab(appNavigationImpl)
                     }
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
@@ -85,11 +86,7 @@ class MainActivity : ComponentActivity() {
 fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
     FloatingActionButton(
         onClick = {
-            appNavigationControllerImpl.navigateToAddProductScreen(
-            screenTitle = "Add your product",
-            productJson = null,
-            isForAdd = true
-        ) },
+            appNavigationControllerImpl.navigateToAddProductScreen(productJson = null) },
         containerColor = appColor
     ) {
         Icon(Icons.Filled.Add, contentDescription = "add product")
@@ -101,6 +98,7 @@ fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
 fun BottomNavigationBar(
     appNavigationControllerImpl: AppNavigationControllerImpl, window: Window
 ) {
+    println(appNavigationControllerImpl.getCurrentRoute())
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
 

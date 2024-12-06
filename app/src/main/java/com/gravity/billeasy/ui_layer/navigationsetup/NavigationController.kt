@@ -9,20 +9,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gravity.billeasy.data_layer.models.Product
-import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEdit
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 enum class BillEasyScreens {
-    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, ADD_PRODUCT, EDIT_PRODUCT, BILLS
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, PRODUCT_ADD_OR_EDIT, EDIT_PRODUCT, BILLS
 }
 
 interface AppNavigationController {
 
     fun navigateToCreateAccountScreen()
     fun navigateToOTPVerificationScreen(mobileNumber: String, fromScreen: String)
-    fun navigateToAddProductScreen(screenTitle: String, productJson: String?, isForAdd: Boolean)
+    fun navigateToAddProductScreen(productJson: String?)
     fun navigateToMyProducts()
     fun navigateToSales()
     fun navigateToHomeScreen()
@@ -40,15 +38,19 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
         navHostController.navigate(route = Otp(mobileNumber, fromScreen))
     }
 
-    override fun navigateToAddProductScreen(
-        screenTitle: String,
-        productJson: String?,
-        isForAdd: Boolean
-    ) {
+    override fun navigateToAddProductScreen(productJson: String?) {
         val product = productJson?.let {
             Json.decodeFromString<Product>(Uri.decode(it))
         }
-        navHostController.navigate(route = ProductAddOrEdit(screenTitle, product, isForAdd))
+
+        val route = if (product != null) {
+            "productAddOrEdit?product=${Uri.encode(productJson)}"
+        } else {
+            "productAddOrEdit"
+        }
+        navHostController.navigate(route = route) {
+            applyNavigationConfiguration(navHostController)
+        }
     }
 
     override fun navigateToMyProducts() {

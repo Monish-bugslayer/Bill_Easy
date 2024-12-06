@@ -65,7 +65,7 @@ data class AddProductField(val fieldName: MutableState<String>, var isError: Mut
 
 fun validateAddProductField(fields: List<Pair<String, AddProductField>>): Boolean {
     fields.forEach { field ->
-        if (field.second.fieldName.value.isEmpty()) {
+        if (field.second.fieldName.value.isEmpty() && field.first != PRODUCT_ID) {
             field.second.isError.value = true
             return false
         } else {
@@ -227,30 +227,32 @@ fun ProductAddOrEditScreen(
                 }
 
                 else -> {
-                    OutlinedTextField(
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = appColor,
-                            focusedLabelColor = colorResource(R.color.black),
-                            cursorColor = colorResource(R.color.black)
-                        ),
-                        value = field.second.fieldName.value,
-                        onValueChange = { field.second.fieldName.value = it },
-                        label = { Text(text = field.first) },
-                        maxLines = 1,
-                        isError = field.second.isError.value,
-                        supportingText = {
-                            if (field.second.isError.value) {
-                                Text(text = "${field.first} should not be empty")
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            keyboardType = decideKeyboardType(field.first)
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp, end = 20.dp, start = 20.dp)
-                    )
+                    if(field.first != PRODUCT_ID) {
+                        OutlinedTextField(
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = appColor,
+                                focusedLabelColor = colorResource(R.color.black),
+                                cursorColor = colorResource(R.color.black)
+                            ),
+                            value = field.second.fieldName.value,
+                            onValueChange = { field.second.fieldName.value = it },
+                            label = { Text(text = field.first) },
+                            maxLines = 1,
+                            isError = field.second.isError.value,
+                            supportingText = {
+                                if (field.second.isError.value) {
+                                    Text(text = "${field.first} should not be empty")
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = decideKeyboardType(field.first)
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp, end = 20.dp, start = 20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -270,6 +272,7 @@ fun ProductAddOrEditScreen(
                             wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
                             retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
                         )
+                        println(newProduct.toString())
                         if(isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
                         navigateBackAfterAddOrEditProduct()
                     }
@@ -294,8 +297,3 @@ fun decideKeyboardType(fieldType: String): KeyboardType {
         else -> KeyboardType.Text
     }
 }
-
-@Serializable
-data class ProductAddOrEdit(
-    val screenTitle: String, val product: Product?, val isForAdd: Boolean
-)
