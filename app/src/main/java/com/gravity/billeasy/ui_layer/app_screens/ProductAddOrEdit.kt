@@ -65,7 +65,7 @@ data class AddProductField(val fieldName: MutableState<String>, var isError: Mut
 
 fun validateAddProductField(fields: List<Pair<String, AddProductField>>): Boolean {
     fields.forEach { field ->
-        if (field.second.fieldName.value.isEmpty() && field.first != PRODUCT_ID) {
+        if (field.second.fieldName.value.isEmpty()) {
             field.second.isError.value = true
             return false
         } else {
@@ -127,7 +127,6 @@ fun ProductAddOrEditScreen(
     viewModel.initUnitAndCategoryTable()
 
     addProductFieldsMap.apply {
-        put(PRODUCT_ID, AddProductField(productId, remember { mutableStateOf(false) }))
         put(PRODUCT_NAME, AddProductField(productName, remember { mutableStateOf(false) }))
         put(PRODUCT_CATEGORY, AddProductField(productCategory, remember { mutableStateOf(false) }))
         put(UNIT, AddProductField(unit, remember { mutableStateOf(false) }))
@@ -262,7 +261,7 @@ fun ProductAddOrEditScreen(
                 onClick = {
                     if (validateAddProductField(addProductFieldsMap.toList())) {
                         val newProduct = Product(
-                            productId = if(isForAdd) 0 else addProductFieldsMap.getValue(PRODUCT_ID).fieldName.value.toLong() ,
+                            productId = if(isForAdd) 0 else productId.value.toLong() ,
                             productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
                             productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
                             unit = addProductFieldsMap.getValue(UNIT).fieldName.value,

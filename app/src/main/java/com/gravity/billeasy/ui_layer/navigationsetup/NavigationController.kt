@@ -42,15 +42,12 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
         val product = productJson?.let {
             Json.decodeFromString<Product>(Uri.decode(it))
         }
-
         val route = if (product != null) {
-            "productAddOrEdit?product=${Uri.encode(productJson)}"
+            "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product=${Uri.encode(productJson)}"
         } else {
-            "productAddOrEdit"
+            "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product=${null}"
         }
-        navHostController.navigate(route = route) {
-            applyNavigationConfiguration(navHostController)
-        }
+        navHostController.navigate(route = route)
     }
 
     override fun navigateToMyProducts() {

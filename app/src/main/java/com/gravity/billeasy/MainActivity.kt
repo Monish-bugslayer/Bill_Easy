@@ -2,6 +2,8 @@ package com.gravity.billeasy
 
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
@@ -9,12 +11,14 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigation
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,6 +28,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,16 +42,15 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.ui.theme.BillEasyTheme
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
-import com.gravity.billeasy.ui.theme.BillEasyTheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 inline val appColorInt get() = R.color.orange_light
-inline val appColor @Composable
-get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
+inline val appColor @Composable get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
 
 class MainActivity : ComponentActivity() {
 
@@ -58,20 +64,32 @@ class MainActivity : ComponentActivity() {
             window.statusBarColor = context.resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
-            val addOrEditProductRoute = "productAddOrEdit"
-
+            val showBottomBar = remember { mutableStateOf(true) }
             BillEasyTheme {
                 Scaffold(bottomBar = {
-                    // TODO need to hide bottomBar when in add product. The condition is not working
-                    if (appNavigationImpl.getCurrentRoute() != addOrEditProductRoute) BottomNavigationBar(
-                        appNavigationImpl, window
-                    )
-                    else window.navigationBarColor = context.resources.getColor(R.color.white)
-                }, floatingActionButton = {
-                    when (appNavigationImpl.getCurrentRoute()) {
-                        BillEasyScreens.HOME.name -> AddProductFab(appNavigationImpl)
-                        BillEasyScreens.MY_PRODUCTS.name -> AddProductFab(appNavigationImpl)
+                    AnimatedVisibility(
+                        visible = showBottomBar.value,
+                        enter = slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(durationMillis = 150)
+                        ),
+                        exit = slideOutVertically(
+                            targetOffsetY = { it },
+                            animationSpec = tween(durationMillis = 150)
+                        )
+                    ) {
+                        BottomNavigationBar(
+                            window = window,
+                            navigateToHomeScreen = { appNavigationImpl.navigateToHomeScreen() },
+                            navigateToMyProductsScreen = { appNavigationImpl.navigateToMyProducts() },
+                            navigateToBillScreen = { appNavigationImpl.navigateToSales() }
+                        )
                     }
+                }, floatingActionButton = {
+                    AddProductFab(onClick = {
+                        appNavigationImpl.navigateToAddProductScreen(productJson = null)
+                        showBottomBar.value = false
+                    })
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
                     navigationSetup.InitViewModel()
@@ -83,11 +101,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
+fun AddProductFab(onClick: () -> Unit) {
     FloatingActionButton(
-        onClick = {
-            appNavigationControllerImpl.navigateToAddProductScreen(productJson = null) },
-        containerColor = appColor
+        onClick = { onClick() }, containerColor = appColor
     ) {
         Icon(Icons.Filled.Add, contentDescription = "add product")
     }
@@ -96,12 +112,14 @@ fun AddProductFab(appNavigationControllerImpl: AppNavigationControllerImpl) {
 @Stable
 @Composable
 fun BottomNavigationBar(
-    appNavigationControllerImpl: AppNavigationControllerImpl, window: Window
+    window: Window,
+    navigateToHomeScreen: () -> Unit,
+    navigateToMyProductsScreen: () -> Unit,
+    navigateToBillScreen: () -> Unit,
 ) {
-    println(appNavigationControllerImpl.getCurrentRoute())
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
-
+    val currentRoot = remember { mutableStateOf(BillEasyScreens.HOME.name) }
     val topLevelRoutes = listOf(
         BottomNavigationScreens(
             name = BillEasyScreens.HOME.name,
@@ -120,14 +138,13 @@ fun BottomNavigationBar(
             label = "Sales"
         )
     )
-
     BottomNavigation(backgroundColor = appColor) {
         topLevelRoutes.forEach {
             BottomNavigationItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp),
-                selected = appNavigationControllerImpl.getCurrentRoute() == it.name,
+                selected = currentRoot.value == it.name,
                 icon = {
                     Icon(
                         painter = painterResource(it.icon),
@@ -139,15 +156,18 @@ fun BottomNavigationBar(
                 onClick = {
                     when (it.name) {
                         BillEasyScreens.HOME.name -> {
-                            appNavigationControllerImpl.navigateToHomeScreen()
+                            navigateToHomeScreen()
+                            currentRoot.value = BillEasyScreens.HOME.name
                         }
 
                         BillEasyScreens.MY_PRODUCTS.name -> {
-                            appNavigationControllerImpl.navigateToMyProducts()
+                            navigateToMyProductsScreen()
+                            currentRoot.value = BillEasyScreens.MY_PRODUCTS.name
                         }
 
                         BillEasyScreens.BILLS.name -> {
-                            appNavigationControllerImpl.navigateToSales()
+                            navigateToBillScreen()
+                            currentRoot.value = BillEasyScreens.BILLS.name
                         }
                     }
                 },
