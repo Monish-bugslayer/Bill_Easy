@@ -5,10 +5,10 @@ package com.gravity.billeasy
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Activity
-import android.net.Uri
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -22,13 +22,14 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,17 +44,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEditBottomSheet
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
 
 class MainActivity : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -65,38 +67,60 @@ class MainActivity : ComponentActivity() {
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
             val showBottomBar = remember { mutableStateOf(true) }
+            val isNeedToShowBottomSheet = remember { mutableStateOf(false) }
             BillEasyTheme {
                 Scaffold(bottomBar = {
                     AnimatedVisibility(
-                        visible = showBottomBar.value,
-                        enter = slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(durationMillis = 150)
-                        ),
-                        exit = slideOutVertically(
-                            targetOffsetY = { it },
-                            animationSpec = tween(durationMillis = 150)
+                        visible = showBottomBar.value, enter = slideInVertically(
+                            initialOffsetY = { it }, animationSpec = tween(durationMillis = 150)
+                        ), exit = slideOutVertically(
+                            targetOffsetY = { it }, animationSpec = tween(durationMillis = 150)
                         )
                     ) {
-                        BottomNavigationBar(
-                            window = window,
-                            navigateToHomeScreen = { appNavigationImpl.navigateToHomeScreen() },
-                            navigateToMyProductsScreen = { appNavigationImpl.navigateToMyProducts() },
-                            navigateToBillScreen = { appNavigationImpl.navigateToSales() }
-                        )
+                        appNavigationImpl.getCurrentRoute()?.let {
+                            BottomNavigationBar(
+                                window = window,
+                                currentRoot = it,
+                                navigateToHomeScreen = { appNavigationImpl.navigateToHomeScreen() },
+                                navigateToMyProductsScreen = { appNavigationImpl.navigateToMyProducts() },
+                                navigateToBillScreen = { appNavigationImpl.navigateToSales() })
+                        }
                     }
                 }, floatingActionButton = {
                     AddProductFab(onClick = {
-                        appNavigationImpl.navigateToAddProductScreen(productJson = null)
-                        showBottomBar.value = false
+                        isNeedToShowBottomSheet.value = true
+//                        appNavigationImpl.navigateToAddProductScreen(productJson = null)
+//                        showBottomBar.value = false
                     })
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
-                    navigationSetup.InitViewModel()
+                    val productViewModel = navigationSetup.initViewModel()
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
+                    ShowOrHideBottomSheet(
+                        isNeedToShowBottomSheet = isNeedToShowBottomSheet,
+                        isForAdd = true,
+                        productViewModel = productViewModel,
+                        product = null
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ShowOrHideBottomSheet(
+    isNeedToShowBottomSheet: MutableState<Boolean>,
+    productViewModel: ProductViewModel,
+    isForAdd: Boolean,
+    product: Product?,
+) {
+    if (isNeedToShowBottomSheet.value) {
+        ProductAddOrEditBottomSheet(
+            isForAdd = isForAdd,
+            viewModel = productViewModel,
+            product = product
+        ) { isNeedToShowBottomSheet.value = false }
     }
 }
 
@@ -113,13 +137,13 @@ fun AddProductFab(onClick: () -> Unit) {
 @Composable
 fun BottomNavigationBar(
     window: Window,
+    currentRoot: String,
     navigateToHomeScreen: () -> Unit,
     navigateToMyProductsScreen: () -> Unit,
     navigateToBillScreen: () -> Unit,
 ) {
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
-    val currentRoot = remember { mutableStateOf(BillEasyScreens.HOME.name) }
     val topLevelRoutes = listOf(
         BottomNavigationScreens(
             name = BillEasyScreens.HOME.name,
@@ -144,7 +168,7 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp),
-                selected = currentRoot.value == it.name,
+                selected = currentRoot == it.name,
                 icon = {
                     Icon(
                         painter = painterResource(it.icon),
@@ -157,17 +181,14 @@ fun BottomNavigationBar(
                     when (it.name) {
                         BillEasyScreens.HOME.name -> {
                             navigateToHomeScreen()
-                            currentRoot.value = BillEasyScreens.HOME.name
                         }
 
                         BillEasyScreens.MY_PRODUCTS.name -> {
                             navigateToMyProductsScreen()
-                            currentRoot.value = BillEasyScreens.MY_PRODUCTS.name
                         }
 
                         BillEasyScreens.BILLS.name -> {
                             navigateToBillScreen()
-                            currentRoot.value = BillEasyScreens.BILLS.name
                         }
                     }
                 },

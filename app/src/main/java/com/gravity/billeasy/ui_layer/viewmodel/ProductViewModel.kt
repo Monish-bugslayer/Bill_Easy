@@ -76,7 +76,10 @@ class ProductViewModel(
         appUseCase.deleteProduct(product)
     }
 
-    fun editProduct(product: Product) = viewModelScope.launch { appUseCase.updateProduct(product) }
+    fun editProduct(product: Product) = viewModelScope.launch {
+        appUseCase.updateProduct(product)
+        getAllProducts()
+    }
 
     fun addProduct(product: Product) = viewModelScope.launch { appUseCase.addProduct(product) }
 

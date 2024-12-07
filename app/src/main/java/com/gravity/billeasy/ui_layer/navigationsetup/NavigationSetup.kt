@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,7 +40,7 @@ class NavigationSetup(
     private lateinit var productViewModel: ProductViewModel
 
     @Composable
-    fun InitViewModel() {
+    fun initViewModel(): ProductViewModel {
         if (!::productViewModel.isInitialized) {
             val context = LocalContext.current
             val database = DatabaseInstance.getDatabase(context)
@@ -47,7 +48,9 @@ class NavigationSetup(
             val repository = Repository(productDao)
             val useCase = UseCase(repository)
             productViewModel = ProductViewModel(useCase, context.databasePreferenceDataStore)
+            return productViewModel
         }
+        return productViewModel
     }
 
     @Composable
@@ -86,33 +89,30 @@ class NavigationSetup(
             composable(route = BillEasyScreens.HOME.name) { Home() }
 
             composable(route = BillEasyScreens.MY_PRODUCTS.name) {
-                MyProducts(viewModel = productViewModel, onEditProduct = {
-                    val productJson = Uri.encode(Json.encodeToString(it))
-                    navigationControllerImpl.navigateToAddProductScreen(productJson = productJson)
-                })
+                MyProducts(viewModel = productViewModel)
             }
 
-            composable(route = "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product={product}",
-                arguments = listOf(navArgument("product") {
-                    // Here is the problem of the bottom navigation navigation back to home screen after clicking add product
-                    type = ProductNavType()
-                    nullable = true
-                })) { backstackEntry ->
-
-                val productArg = backstackEntry.arguments?.getParcelable<Product>("product")
-                ProductAddOrEditScreen(
-                    isForAdd = productArg == null,
-                    screenTitle = if (productArg == null) ADD_SCREEN_TITLE else EDIT_SCREEN_TITLE,
-                    product = productArg,
-                    viewModel = productViewModel,
-                    navigateBackAfterAddOrEditProduct = {
-                        if (productArg == null) {
-                            navigationControllerImpl.navigateToMyProducts()
-                        } else {
-                            navHostController.navigateUp()
-                        }
-                    })
-            }
+//            composable(route = "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product={product}",
+//                arguments = listOf(navArgument("product") {
+//                    // Here is the problem of the bottom navigation navigation back to home screen after clicking add product
+//                    type = ProductNavType()
+//                    nullable = true
+//                })) { backstackEntry ->
+//
+//                val productArg = backstackEntry.arguments?.getParcelable<Product>("product")
+//                ProductAddOrEditScreen(
+//                    isForAdd = productArg == null,
+//                    screenTitle = if (productArg == null) ADD_SCREEN_TITLE else EDIT_SCREEN_TITLE,
+//                    product = productArg,
+//                    viewModel = productViewModel,
+//                    navigateBackAfterAddOrEditProduct = {
+//                        if (productArg == null) {
+//                            navigationControllerImpl.navigateToMyProducts()
+//                        } else {
+//                            navHostController.navigateUp()
+//                        }
+//                    })
+//            }
 
             composable(route = BillEasyScreens.BILLS.name) { Sales() }
 

@@ -61,81 +61,8 @@ const val BUYING_PRICE = "Buying price"
 const val RETAIL_PRICE = "Retail price"
 const val WHOLESALE_PRICE = "Wholesale price"
 
-data class AddProductField(val fieldName: MutableState<String>, var isError: MutableState<Boolean>)
-
-fun validateAddProductField(fields: List<Pair<String, AddProductField>>): Boolean {
-    fields.forEach { field ->
-        if (field.second.fieldName.value.isEmpty()) {
-            field.second.isError.value = true
-            return false
-        } else {
-            return true
-        }
-    }
-    return true
-}
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProductAddOrEditScreen(
-    isForAdd: Boolean,
-    screenTitle: String,
-    viewModel: ProductViewModel,
-    product: Product?,
-    navigateBackAfterAddOrEditProduct: () -> Unit
-) {
-    val productId = remember {
-        mutableStateOf(
-            if (product?.productId == null) ""
-            else product.productId.toString()
-        )
-    }
-    val productName = remember { mutableStateOf(product?.productName ?: "") }
-    val productCategory = remember { mutableStateOf(product?.productCategory ?: "") }
-    val unit = remember { mutableStateOf(product?.unit ?: "") }
-    val availableStock = remember {
-        mutableStateOf(
-            if (product?.availableStock == null) ""
-            else product.availableStock.toString()
-        )
-    }
-    val quantity = remember {
-        mutableStateOf(
-            if (product?.quantity == null) ""
-            else product.quantity.toString()
-        )
-    }
-    val buyingPrice = remember {
-        mutableStateOf(
-            if (product?.buyingPrice == null) ""
-            else product.buyingPrice.toString()
-        )
-    }
-    val retailPrice = remember {
-        mutableStateOf(
-            if (product?.retailPrice == null) ""
-            else product.retailPrice.toString()
-        )
-    }
-    val wholeSalePrice = remember {
-        mutableStateOf(
-            if (product?.wholeSalePrice == null) ""
-            else product.wholeSalePrice.toString()
-        )
-    }
-    val addProductFieldsMap = mutableMapOf<String, AddProductField>()
-    viewModel.initUnitAndCategoryTable()
-
-    addProductFieldsMap.apply {
-        put(PRODUCT_NAME, AddProductField(productName, remember { mutableStateOf(false) }))
-        put(PRODUCT_CATEGORY, AddProductField(productCategory, remember { mutableStateOf(false) }))
-        put(UNIT, AddProductField(unit, remember { mutableStateOf(false) }))
-        put(AVAILABLE_STOCK, AddProductField(availableStock, remember { mutableStateOf(false) }))
-        put(QUANTITY, AddProductField(quantity, remember { mutableStateOf(false) }))
-        put(BUYING_PRICE, AddProductField(buyingPrice, remember { mutableStateOf(false) }))
-        put(RETAIL_PRICE, AddProductField(retailPrice, remember { mutableStateOf(false) }))
-        put(WHOLESALE_PRICE, AddProductField(wholeSalePrice, remember { mutableStateOf(false) }))
-    }
+fun ProductAddOrEditScreen(productFieldMapper: MutableMap<String, AddOrEditProductField>) {
 
     // TODO need to find how to write extension of Enum to get this list
     val unitOptions: List<String> = listOf(
@@ -182,20 +109,7 @@ fun ProductAddOrEditScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        stickyHeader {
-            Text(
-                text = screenTitle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(top = 15.dp),
-                fontWeight = FontWeight.W500,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-
-        items(addProductFieldsMap.toList()) { field ->
+        items(productFieldMapper.toList()) { field ->
             when (field.first) {
                 UNIT -> {
                     Spinner(
@@ -257,27 +171,27 @@ fun ProductAddOrEditScreen(
         }
 
         item {
-            ElevatedButton(colors = ButtonDefaults.buttonColors(containerColor = appColor),
-                onClick = {
-                    if (validateAddProductField(addProductFieldsMap.toList())) {
-                        val newProduct = Product(
-                            productId = if(isForAdd) 0 else productId.value.toLong() ,
-                            productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
-                            productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
-                            unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
-                            availableStock = addProductFieldsMap.getValue(AVAILABLE_STOCK).fieldName.value.toLong(),
-                            quantity = addProductFieldsMap.getValue(QUANTITY).fieldName.value.toLong(),
-                            buyingPrice = addProductFieldsMap.getValue(BUYING_PRICE).fieldName.value.toDouble(),
-                            wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
-                            retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
-                        )
-                        println(newProduct.toString())
-                        if(isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
-                        navigateBackAfterAddOrEditProduct()
-                    }
-                }) {
-                Text(text = if(isForAdd) ADD_PRODUCT else EDIT_PRODUCT, color = Color.Black)
-            }
+//            ElevatedButton(colors = ButtonDefaults.buttonColors(containerColor = appColor),
+//                onClick = {
+//                    if (validateAddProductField(addProductFieldsMap.toList())) {
+//                        val newProduct = Product(
+//                            productId = if(isForAdd) 0 else productId.value.toLong() ,
+//                            productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
+//                            productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
+//                            unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
+//                            availableStock = addProductFieldsMap.getValue(AVAILABLE_STOCK).fieldName.value.toLong(),
+//                            quantity = addProductFieldsMap.getValue(QUANTITY).fieldName.value.toLong(),
+//                            buyingPrice = addProductFieldsMap.getValue(BUYING_PRICE).fieldName.value.toDouble(),
+//                            wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
+//                            retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
+//                        )
+//                        println(newProduct.toString())
+//                        if(isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
+//                        navigateBackAfterAddOrEditProduct()
+//                    }
+//                }) {
+//                Text(text = if(isForAdd) ADD_PRODUCT else EDIT_PRODUCT, color = Color.Black)
+//            }
         }
     }
 }

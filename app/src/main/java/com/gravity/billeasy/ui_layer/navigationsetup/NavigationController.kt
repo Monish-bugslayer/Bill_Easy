@@ -1,6 +1,5 @@
 package com.gravity.billeasy.ui_layer.navigationsetup
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -8,19 +7,16 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
-import kotlinx.serialization.json.Json
 
 enum class BillEasyScreens {
-    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, PRODUCT_ADD_OR_EDIT, EDIT_PRODUCT, BILLS
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, BILLS
 }
 
 interface AppNavigationController {
 
     fun navigateToCreateAccountScreen()
     fun navigateToOTPVerificationScreen(mobileNumber: String, fromScreen: String)
-    fun navigateToAddProductScreen(productJson: String?)
     fun navigateToMyProducts()
     fun navigateToSales()
     fun navigateToHomeScreen()
@@ -36,18 +32,6 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
 
     override fun navigateToOTPVerificationScreen(mobileNumber: String, fromScreen: String) {
         navHostController.navigate(route = Otp(mobileNumber, fromScreen))
-    }
-
-    override fun navigateToAddProductScreen(productJson: String?) {
-        val product = productJson?.let {
-            Json.decodeFromString<Product>(Uri.decode(it))
-        }
-        val route = if (product != null) {
-            "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product=${Uri.encode(productJson)}"
-        } else {
-            "${BillEasyScreens.PRODUCT_ADD_OR_EDIT.name}?product=${null}"
-        }
-        navHostController.navigate(route = route)
     }
 
     override fun navigateToMyProducts() {

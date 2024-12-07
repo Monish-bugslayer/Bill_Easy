@@ -51,19 +51,6 @@ const val LOGIN = "Login"
  * **/
 
 @Composable
-fun keyboardAsState(): State<Boolean> {
-    val keyboardState = remember { mutableStateOf(false) }
-    val view = LocalView.current
-    LaunchedEffect(view) {
-        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            keyboardState.value = insets.isVisible(WindowInsetsCompat.Type.ime())
-            insets
-        }
-    }
-    return keyboardState
-}
-
-@Composable
 fun LoginScreen(
     onLoginButtonClicked: (String, String) -> Unit,
     onCreateAccountButtonClicked: () -> Unit

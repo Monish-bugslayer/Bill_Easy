@@ -19,8 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.DismissValue
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Divider
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,7 +30,6 @@ import androidx.compose.material.ripple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gravity.billeasy.R
+import com.gravity.billeasy.ShowOrHideBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
@@ -63,14 +63,28 @@ const val NO_PRODUCTS_STRING_1 = "Your shop is empty"
 const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop with products"
 
 @Composable
-fun MyProducts(viewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
+fun MyProducts(viewModel: ProductViewModel) {
+    val bottomSheetVisibility = remember { mutableStateOf(false) }
+    val product = remember { mutableStateOf<Product?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
         viewModel.getAllProducts()
-        SearchProduct(viewModel, onEditProduct)
+        SearchProduct(viewModel, onEditProduct = {
+            bottomSheetVisibility.value = true
+            product.value = it
+        })
+
+        if(bottomSheetVisibility.value) {
+            ShowOrHideBottomSheet(
+                isNeedToShowBottomSheet = bottomSheetVisibility,
+                isForAdd = false,
+                productViewModel = viewModel,
+                product = product.value
+            )
+        }
     }
 }
 
@@ -143,8 +157,8 @@ fun SearchableColumn(
                             expandedProductId =
                                 if (expandedProductId == product.productId) null else product.productId
                         },
-                        onDelete,
-                        onEdit
+                        onDelete = onDelete,
+                        onEdit = onEdit
                     )
                 }
             }
@@ -168,7 +182,6 @@ fun ProductNotAvailable(header: String, footer: String) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCard(
     product: Product,
@@ -181,14 +194,18 @@ fun ProductCard(
     var isEdit by remember { mutableStateOf(false) }
     val animationDuration = 500
     val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = {
-        if(it == SwipeToDismissBoxValue.EndToStart) {
-            isRemoved = true
-            true
-        } else if(it == SwipeToDismissBoxValue.StartToEnd) {
-            isEdit = true
-            true
-        } else {
-            false
+        when(it) {
+            SwipeToDismissBoxValue.EndToStart -> {
+                isRemoved = true
+                return@rememberSwipeToDismissBoxState  true
+            }
+            SwipeToDismissBoxValue.StartToEnd -> {
+                isEdit = true
+                return@rememberSwipeToDismissBoxState true
+            }
+            else -> {
+                return@rememberSwipeToDismissBoxState false
+            }
         }
     })
 
@@ -203,8 +220,10 @@ fun ProductCard(
         if(isEdit) {
             onEdit(product)
             dismissState.reset()
+            isEdit = false
         }
     }
+
     AnimatedVisibility(
         visible = !isRemoved,
         exit = shrinkVertically(animationSpec = tween(animationDuration), shrinkTowards = Alignment.Top)+ fadeOut()
