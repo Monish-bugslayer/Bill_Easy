@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,7 +56,6 @@ inline val appColor @Composable get() = Color(LocalContext.current.resources.get
 
 class MainActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -63,7 +63,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val window = (context as Activity).window
-            window.statusBarColor = context.resources.getColor(R.color.white)
+            // Todo status bar color is not changing when dark mode or light mode changes.
+            //  When app start in dark mode the status bar color is black. And when app is alive
+            //  and mode changes to light the status bar color is not changing
+            window.statusBarColor = resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
             val showBottomBar = remember { mutableStateOf(true) }
@@ -87,11 +90,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }, floatingActionButton = {
-                    AddProductFab(onClick = {
-                        isNeedToShowBottomSheet.value = true
-//                        appNavigationImpl.navigateToAddProductScreen(productJson = null)
-//                        showBottomBar.value = false
-                    })
+                    AddProductFab(onClick = { isNeedToShowBottomSheet.value = true })
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
                     val productViewModel = navigationSetup.initViewModel()
@@ -129,7 +128,7 @@ fun AddProductFab(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = { onClick() }, containerColor = appColor
     ) {
-        Icon(Icons.Filled.Add, contentDescription = "add product")
+        Icon(Icons.Filled.Add, contentDescription = "add product", tint = Color.Black)
     }
 }
 
@@ -173,10 +172,18 @@ fun BottomNavigationBar(
                     Icon(
                         painter = painterResource(it.icon),
                         contentDescription = it.contentDescription,
-                        modifier = Modifier.size(25.dp)
+                        modifier = Modifier.size(25.dp),
+                        tint = Color.Black
                     )
                 },
-                label = { Text(text = it.label, fontWeight = FontWeight.Medium, fontSize = 12.sp) },
+                label = {
+                    Text(
+                        text = it.label,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                        color = Color.Black
+                    )
+                },
                 onClick = {
                     when (it.name) {
                         BillEasyScreens.HOME.name -> {

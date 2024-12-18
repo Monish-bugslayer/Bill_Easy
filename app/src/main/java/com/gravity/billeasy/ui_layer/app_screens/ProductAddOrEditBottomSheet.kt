@@ -2,6 +2,7 @@ package com.gravity.billeasy.ui_layer.app_screens
 
 import android.view.View
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -24,19 +26,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -55,14 +61,14 @@ fun ProductAddOrEditBottomSheet(
     val bottomSheetScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val keyboardCoroutineScope = rememberCoroutineScope()
+    var isNeedToDismiss by remember { mutableStateOf(false) }
     val currentView = LocalView.current
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
-        confirmValueChange = { listState.firstVisibleItemIndex == 0 })
+        confirmValueChange = { listState.firstVisibleItemIndex == 0 || isNeedToDismiss })
     val isKeyboardVisible by remember {
         mutableStateOf(keyboardAsState(currentView, keyboardCoroutineScope).value)
     }
-    println(isKeyboardVisible)
     val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
     viewModel.initUnitAndCategoryTable()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
@@ -116,12 +122,12 @@ fun ProductAddOrEditBottomSheet(
             AddOrEditProductField(wholeSalePrice, remember { mutableStateOf(false) })
         )
     }
-    ModalBottomSheet(sheetState = sheetState,
-        containerColor = Color.White,
+    ModalBottomSheet(
+        sheetState = sheetState,
+        containerColor = colorResource(R.color.white),
         onDismissRequest = {
             bottomSheetScope.launch {
                 if(isKeyboardVisible) {
-                    println("YEah")
                     keyboardController?.hide()
                     delay(200)
                     onDismiss()
@@ -147,9 +153,11 @@ fun ProductAddOrEditBottomSheet(
                     Text(
                         text = if (isForAdd) ADD_YOUR_PRODUCT else EDIT_YOUR_PRODUCT,
                         fontWeight = FontWeight.W500,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Image(imageVector = Icons.Default.Check,
+                        colorFilter = ColorFilter.tint(colorResource(R.color.black)),
                         contentDescription = "",
                         alignment = Alignment.CenterEnd,
                         modifier = Modifier
@@ -177,6 +185,7 @@ fun ProductAddOrEditBottomSheet(
                                         newProduct
                                     )
                                     bottomSheetScope.launch {
+                                        isNeedToDismiss = true
                                         if (isKeyboardVisible) {
                                             println("YEah")
                                             keyboardController?.hide()
@@ -193,7 +202,9 @@ fun ProductAddOrEditBottomSheet(
                                 }
                             })
                 }
-                ProductAddOrEditScreen(productFieldMapper = addProductFieldsMap)
+                ProductAddOrEditScreen(
+                    productFieldMapper = addProductFieldsMap, listState = listState
+                )
             }
         }
     }

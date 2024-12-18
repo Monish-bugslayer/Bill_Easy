@@ -21,7 +21,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -42,7 +44,7 @@ fun Home() {
     val screenHeight = LocalConfiguration.current.screenHeightDp
     Column(modifier = Modifier
         .fillMaxSize()
-        .background(Color.White)
+        .background(colorResource(R.color.white))
     ) {
         HomeQuickAccessible(screenHeight)
         SalesChart(screenHeight)
@@ -79,6 +81,7 @@ fun ShopNameEditable() {
         /* TODO When cliked shop name need to show shop description by expanding the view */
         Text(
             text = "SK Stores",
+            color = colorResource(R.color.black),
             fontWeight = FontWeight.W700,
             fontSize = 20.sp,
             modifier = Modifier.padding(start = 10.dp)
@@ -120,10 +123,13 @@ fun QuickStockAndCreditDetails() {
 fun QuickStockAndCreditDetailsView(viewDetail: String) {
     Card(modifier = Modifier
         .fillMaxWidth()
-        .height(50.dp)) {
+        .height(50.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+        ) {
         Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 text = viewDetail,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 12.dp, start = 5.dp)
             )
@@ -137,7 +143,8 @@ fun QuickStockAndCreditDetailsView(viewDetail: String) {
             ) {
                 Icon(
                     painter = painterResource(R.drawable.drag_handle),
-                    contentDescription = "drag and drop"
+                    contentDescription = "drag and drop",
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -148,9 +155,10 @@ fun QuickStockAndCreditDetailsView(viewDetail: String) {
 fun QuickStockAndCreditDetailStickyHeader(headerText: String) {
     Text(
         text = headerText,
+        color = colorResource(R.color.black),
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White),
+            .background(colorResource(R.color.white)),
         fontSize = 14.sp,
         fontWeight = FontWeight.W500
     )

@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -47,9 +48,9 @@ fun Spinner(
         Column {
             OutlinedTextField(
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = appColor,
-                    focusedLabelColor = colorResource(R.color.black),
-                    cursorColor = colorResource(R.color.black)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
                 ),
                 modifier = Modifier
                     .menuAnchor()
@@ -85,6 +86,7 @@ fun Spinner(
 
                         items(options) { option ->
                             Text(text = option,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 5.dp)

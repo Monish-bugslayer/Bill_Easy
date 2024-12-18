@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -49,8 +51,6 @@ Retail price
 Wholesale price
 */
 
-const val ADD_PRODUCT = "Add product"
-const val EDIT_PRODUCT = "Update product"
 const val PRODUCT_NAME = "Product name"
 const val PRODUCT_ID = "Product Id"
 const val PRODUCT_CATEGORY = "Product category"
@@ -62,7 +62,10 @@ const val RETAIL_PRICE = "Retail price"
 const val WHOLESALE_PRICE = "Wholesale price"
 
 @Composable
-fun ProductAddOrEditScreen(productFieldMapper: MutableMap<String, AddOrEditProductField>) {
+fun ProductAddOrEditScreen(
+    productFieldMapper: MutableMap<String, AddOrEditProductField>,
+    listState: LazyListState
+) {
 
     // TODO need to find how to write extension of Enum to get this list
     val unitOptions: List<String> = listOf(
@@ -104,9 +107,10 @@ fun ProductAddOrEditScreen(productFieldMapper: MutableMap<String, AddOrEditProdu
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(colorResource(R.color.white))
             .imePadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        state = listState
     ) {
 
         items(productFieldMapper.toList()) { field ->
@@ -143,9 +147,9 @@ fun ProductAddOrEditScreen(productFieldMapper: MutableMap<String, AddOrEditProdu
                     if(field.first != PRODUCT_ID) {
                         OutlinedTextField(
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = appColor,
-                                focusedLabelColor = colorResource(R.color.black),
-                                cursorColor = colorResource(R.color.black)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                cursorColor = MaterialTheme.colorScheme.primary
                             ),
                             value = field.second.fieldName.value,
                             onValueChange = { field.second.fieldName.value = it },
@@ -168,30 +172,6 @@ fun ProductAddOrEditScreen(productFieldMapper: MutableMap<String, AddOrEditProdu
                     }
                 }
             }
-        }
-
-        item {
-//            ElevatedButton(colors = ButtonDefaults.buttonColors(containerColor = appColor),
-//                onClick = {
-//                    if (validateAddProductField(addProductFieldsMap.toList())) {
-//                        val newProduct = Product(
-//                            productId = if(isForAdd) 0 else productId.value.toLong() ,
-//                            productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
-//                            productCategory = addProductFieldsMap.getValue(PRODUCT_CATEGORY).fieldName.value,
-//                            unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
-//                            availableStock = addProductFieldsMap.getValue(AVAILABLE_STOCK).fieldName.value.toLong(),
-//                            quantity = addProductFieldsMap.getValue(QUANTITY).fieldName.value.toLong(),
-//                            buyingPrice = addProductFieldsMap.getValue(BUYING_PRICE).fieldName.value.toDouble(),
-//                            wholeSalePrice = addProductFieldsMap.getValue(WHOLESALE_PRICE).fieldName.value.toDouble(),
-//                            retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
-//                        )
-//                        println(newProduct.toString())
-//                        if(isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
-//                        navigateBackAfterAddOrEditProduct()
-//                    }
-//                }) {
-//                Text(text = if(isForAdd) ADD_PRODUCT else EDIT_PRODUCT, color = Color.Black)
-//            }
         }
     }
 }

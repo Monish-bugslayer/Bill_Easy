@@ -7,8 +7,8 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#FF000000</color>
     <color name="pink">#ffceff</color>
     <color name="sandle">#FBDFC9</color>
     <color name="sandle_light">#e5e2df</color>
@@ -17,6 +17,6 @@
     <color name="yellow_dark">#FBFFB1</color>
     <color name="orange">#FFDDAE</color>
     <color name="orange_light">#FDE7BB</color>
-    <color name="orange_dim">#FFF5E1</color>
+    <color name="orange_dim">#2D2D2D</color>
     <color name="red">#FF0000</color>
 </resources>

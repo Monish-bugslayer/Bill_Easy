@@ -1,24 +1,33 @@
 package com.gravity.billeasy.ui_layer.app_screens.base_screens
 
+import android.icu.number.Scale
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Divider
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -27,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -35,6 +45,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,8 +55,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -69,7 +85,7 @@ fun MyProducts(viewModel: ProductViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(color = colorResource(R.color.white))
     ) {
         viewModel.getAllProducts()
         SearchProduct(viewModel, onEditProduct = {
@@ -123,7 +139,9 @@ fun SearchableColumn(
         onSearch = { keyboardController?.hide() },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search, contentDescription = "Search"
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                tint = colorResource(R.color.black)
             )
         },
         trailingIcon = {
@@ -190,15 +208,11 @@ fun ProductCard(
     onDelete: (Product) -> Unit,
     onEdit: (Product) -> Unit
 ) {
-    var isRemoved by remember { mutableStateOf(false) }
+    val isDeleted by remember { mutableStateOf(false) }
     var isEdit by remember { mutableStateOf(false) }
     val animationDuration = 500
     val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = {
         when(it) {
-            SwipeToDismissBoxValue.EndToStart -> {
-                isRemoved = true
-                return@rememberSwipeToDismissBoxState  true
-            }
             SwipeToDismissBoxValue.StartToEnd -> {
                 isEdit = true
                 return@rememberSwipeToDismissBoxState true
@@ -209,13 +223,6 @@ fun ProductCard(
         }
     })
 
-    LaunchedEffect(isRemoved) {
-        if(isRemoved) {
-            delay(animationDuration.toLong())
-            onDelete(product)
-        }
-    }
-
     LaunchedEffect(isEdit) {
         if(isEdit) {
             onEdit(product)
@@ -225,7 +232,7 @@ fun ProductCard(
     }
 
     AnimatedVisibility(
-        visible = !isRemoved,
+        visible = !isDeleted,
         exit = shrinkVertically(animationSpec = tween(animationDuration), shrinkTowards = Alignment.Top)+ fadeOut()
     ) {
 
@@ -239,24 +246,36 @@ fun ProductCard(
                             actionText = "Edit product",
                             actionColor = Color.Blue
                         )
-                    } else {
-                        SwipeToDismissBoxBackground(
-                            contentAlignment = Alignment.CenterEnd,
-                            actionIcon = R.drawable.delete,
-                            actionText = "Delete product",
-                            actionColor = Color.Red
-                        )
                     }
                 }
-            }, enableDismissFromEndToStart = true, enableDismissFromStartToEnd = true
+            }, enableDismissFromEndToStart = false, enableDismissFromStartToEnd = true
         ) {
-            SwipeToDismissBoxContent(product, onCardClick, isExpanded)
+            SwipeToDismissBoxContent(product, onCardClick, isExpanded, onDelete)
         }
     }
 }
 
 @Composable
-fun SwipeToDismissBoxContent(product: Product, onCardClick: () -> Unit, isExpanded: Boolean) {
+fun SwipeToDismissBoxContent(
+    product: Product,
+    onCardClick: () -> Unit,
+    isExpanded: Boolean,
+    onDelete: (Product) -> Unit
+) {
+    var isNeedToShowDeleteAlertDialogue by remember { mutableStateOf(false) }
+    if(isNeedToShowDeleteAlertDialogue) {
+        showAlertDialogue(
+            dialogTitle = "Delete product",
+            dialogContentText = "Deleted product cannot be retrived, are you sure you want to delete it",
+            confirmButtonText = "Delete",
+            dismissButtonText = "Cancel",
+            onConfirmRequest = {
+                onDelete(product)
+                isNeedToShowDeleteAlertDialogue = false
+            },
+            onDismissRequest = { isNeedToShowDeleteAlertDialogue = false }
+        )
+    }
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -303,30 +322,76 @@ fun SwipeToDismissBoxContent(product: Product, onCardClick: () -> Unit, isExpand
                 Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Category: ${product.productCategory}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Unit: ${product.unit}", style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Available Stock: ${product.availableStock}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Buying Price: ₹ ${product.buyingPrice}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Wholesale Price: ₹ ${product.wholeSalePrice}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
+                Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Box(modifier = Modifier.fillMaxHeight().width(IntrinsicSize.Max)) {
+                        Column {
+                            Text(
+                                text = "Category: ${product.productCategory}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Unit: ${product.unit}", style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Available Stock: ${product.availableStock}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Buying Price: ₹ ${product.buyingPrice}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Wholesale Price: ₹ ${product.wholeSalePrice}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                    Image(
+                        painter = painterResource(R.drawable.delete),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .align(Alignment.CenterVertically)
+                            .clip(CircleShape)
+                            .clickable(indication = ripple(bounded = true),
+                                interactionSource = remember { MutableInteractionSource() }) {
+                                isNeedToShowDeleteAlertDialogue = true
+                            }
+                    )
+                }
             }
         }
     }
 }
+
+@Composable
+fun showAlertDialogue(
+    dialogTitle: String,
+    dialogContentText: String,
+    confirmButtonText: String,
+    dismissButtonText: String,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    AlertDialog(
+        title = { Text(text = dialogTitle) },
+        text = { Text(text = dialogContentText) },
+        onDismissRequest = { onDismissRequest() },
+        confirmButton = {
+            TextButton(onClick = { onConfirmRequest() }) {
+                Text(text = confirmButtonText)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismissRequest() }) {
+                Text(text = dismissButtonText)
+            }
+        }
+    )
+
+}
+
 
 @Composable
 fun SwipeToDismissBoxBackground(
