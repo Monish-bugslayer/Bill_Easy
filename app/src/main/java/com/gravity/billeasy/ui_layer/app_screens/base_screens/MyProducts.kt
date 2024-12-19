@@ -49,6 +49,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,7 +88,6 @@ fun MyProducts(viewModel: ProductViewModel) {
             .fillMaxSize()
             .background(color = colorResource(R.color.white))
     ) {
-        viewModel.getAllProducts()
         SearchProduct(viewModel, onEditProduct = {
             bottomSheetVisibility.value = true
             product.value = it
@@ -208,7 +208,7 @@ fun ProductCard(
     onDelete: (Product) -> Unit,
     onEdit: (Product) -> Unit
 ) {
-    val isDeleted by remember { mutableStateOf(false) }
+    val isDeleted = remember { mutableStateOf(false) }
     var isEdit by remember { mutableStateOf(false) }
     val animationDuration = 500
     val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = {
@@ -232,7 +232,7 @@ fun ProductCard(
     }
 
     AnimatedVisibility(
-        visible = !isDeleted,
+        visible = !isDeleted.value,
         exit = shrinkVertically(animationSpec = tween(animationDuration), shrinkTowards = Alignment.Top)+ fadeOut()
     ) {
 
@@ -250,7 +250,7 @@ fun ProductCard(
                 }
             }, enableDismissFromEndToStart = false, enableDismissFromStartToEnd = true
         ) {
-            SwipeToDismissBoxContent(product, onCardClick, isExpanded, onDelete)
+            SwipeToDismissBoxContent(product, onCardClick, isExpanded, onDelete, isDeleted)
         }
     }
 }
@@ -260,7 +260,8 @@ fun SwipeToDismissBoxContent(
     product: Product,
     onCardClick: () -> Unit,
     isExpanded: Boolean,
-    onDelete: (Product) -> Unit
+    onDelete: (Product) -> Unit,
+    isDeleted: MutableState<Boolean>
 ) {
     var isNeedToShowDeleteAlertDialogue by remember { mutableStateOf(false) }
     if(isNeedToShowDeleteAlertDialogue) {
@@ -272,6 +273,7 @@ fun SwipeToDismissBoxContent(
             onConfirmRequest = {
                 onDelete(product)
                 isNeedToShowDeleteAlertDialogue = false
+                isDeleted.value = true
             },
             onDismissRequest = { isNeedToShowDeleteAlertDialogue = false }
         )

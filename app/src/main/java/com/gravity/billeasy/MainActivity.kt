@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                     AddProductFab(onClick = { isNeedToShowBottomSheet.value = true })
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
-                    val productViewModel = navigationSetup.initViewModel()
+                    val productViewModel = navigationSetup.initViewModel(context)
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
                     ShowOrHideBottomSheet(
                         isNeedToShowBottomSheet = isNeedToShowBottomSheet,

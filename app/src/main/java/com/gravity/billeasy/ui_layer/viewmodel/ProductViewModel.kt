@@ -26,6 +26,27 @@ class ProductViewModel(
     private val dbPreferenceStore: DataStore<DatabaseTablePreferences>
 ): ViewModel() {
 
+    init {
+        viewModelScope.launch {
+            appUseCase.getAllProducts()
+                .collect { productEntity ->
+                    _allProducts.value = productEntity.map {
+                        Product(
+                            productId = it.productId,
+                            productName = it.productName,
+                            productCategory = getCategoryFromId(it.productCategoryId),
+                            unit = getUnitFromId(it.productUnitId),
+                            availableStock = it.availableStock,
+                            quantity = it.quantity,
+                            buyingPrice = it.buyingPrice,
+                            wholeSalePrice = it.wholeSalePrice,
+                            retailPrice = it.retailPrice
+                        )
+                    }
+                }
+        }
+    }
+
     private val dbPreferenceFlow: Flow<DatabaseTablePreferences> = dbPreferenceStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -65,23 +86,17 @@ class ProductViewModel(
 
     suspend fun getUnitFromId(id: Long): String { return appUseCase.getUnitFromId(id) }
 
-    fun getAllProducts() {
-        viewModelScope.launch {
-            _allProducts.value = appUseCase.getAllProducts()
-        }
-    }
-
     fun deleteProduct(product: Product) = viewModelScope.launch {
-        _allProducts.value.toMutableList().remove(product)
         appUseCase.deleteProduct(product)
     }
 
     fun editProduct(product: Product) = viewModelScope.launch {
         appUseCase.updateProduct(product)
-        getAllProducts()
     }
 
-    fun addProduct(product: Product) = viewModelScope.launch { appUseCase.addProduct(product) }
+    fun addProduct(product: Product) = viewModelScope.launch {
+        appUseCase.addProduct(product)
+    }
 
     suspend fun getCategoryId(categoryName: String): Long {
         return appUseCase.getCategoryId(categoryName)

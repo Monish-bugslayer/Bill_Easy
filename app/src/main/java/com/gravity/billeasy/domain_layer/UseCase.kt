@@ -4,6 +4,7 @@ import com.gravity.billeasy.data_layer.Repository
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
 class UseCase(private val repository: Repository) {
@@ -74,19 +75,7 @@ class UseCase(private val repository: Repository) {
         return repository.getCategoryId(category).first()
     }
 
-    suspend fun getAllProducts(): List<Product> {
-        return repository.getAllProducts().first().map {
-                Product(
-                    productId = it.productId,
-                    productName = it.productName,
-                    productCategory = getCategoryFromId(it.productCategoryId),
-                    unit = getUnitFromId(it.productUnitId),
-                    availableStock = it.availableStock,
-                    quantity = it.quantity,
-                    buyingPrice = it.buyingPrice,
-                    wholeSalePrice = it.wholeSalePrice,
-                    retailPrice = it.retailPrice
-                )
-        }
+    suspend fun getAllProducts(): Flow<List<ProductEntity>> {
+        return repository.getAllProducts()
     }
 }
