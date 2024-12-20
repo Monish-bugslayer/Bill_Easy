@@ -20,25 +20,25 @@ import com.gravity.billeasy.ui_layer.app_screens.loginscreens.CreateAccountScree
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
-import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 
 class NavigationSetup(
     private val navHostController: NavHostController,
     private val navigationControllerImpl: AppNavigationControllerImpl
 ) {
 
-    private lateinit var productViewModel: ProductViewModel
+    private lateinit var appViewModel: AppViewModel
 
-    fun initViewModel(context: Context): ProductViewModel {
-        if (!::productViewModel.isInitialized) {
+    fun initViewModel(context: Context): AppViewModel {
+        if (!::appViewModel.isInitialized) {
             val database = DatabaseInstance.getDatabase(context)
             val productDao = database.productDao()
             val repository = Repository(productDao)
             val useCase = UseCase(repository)
-            productViewModel = ProductViewModel(useCase, context.databasePreferenceDataStore)
-            return productViewModel
+            appViewModel = AppViewModel(useCase, context.databasePreferenceDataStore)
+            return appViewModel
         }
-        return productViewModel
+        return appViewModel
     }
 
     @Composable
@@ -77,7 +77,7 @@ class NavigationSetup(
             composable(route = BillEasyScreens.HOME.name) { Home() }
 
             composable(route = BillEasyScreens.MY_PRODUCTS.name) {
-                MyProducts(viewModel = productViewModel)
+                MyProducts(viewModel = appViewModel)
             }
 
             composable(route = BillEasyScreens.BILLS.name) { Sales() }

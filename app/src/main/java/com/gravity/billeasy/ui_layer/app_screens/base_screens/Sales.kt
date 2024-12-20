@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,18 +30,11 @@ fun Sales() {
             modifier = Modifier.background(color = colorResource(R.color.white)),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Image(
-                modifier = Modifier
-                    .alpha(0.5f)
-                    .align(Alignment.CenterHorizontally),
-                painter = painterResource(R.drawable.sales_feature),
-                contentDescription = "Sales feature"
-            )
             Text(
-                text = "This feature yet to be implemented",
+                text = "No sales yet, click the plus button below and create a sale",
                 textAlign = TextAlign.Center,
                 color = colorResource(R.color.black),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }

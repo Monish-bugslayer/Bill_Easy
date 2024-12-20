@@ -65,7 +65,7 @@ import com.gravity.billeasy.R
 import com.gravity.billeasy.ShowOrHideBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
-import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 
 const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
 const val SEARCH_RESULT_NOT_FOUND_STRING_2 = "Try adjusting your search or add a new product"
@@ -73,7 +73,7 @@ const val NO_PRODUCTS_STRING_1 = "Your shop is empty"
 const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop with products"
 
 @Composable
-fun MyProducts(viewModel: ProductViewModel) {
+fun MyProducts(viewModel: AppViewModel) {
     val bottomSheetVisibility = remember { mutableStateOf(false) }
     val product = remember { mutableStateOf<Product?>(null) }
     Column(
@@ -88,9 +88,10 @@ fun MyProducts(viewModel: ProductViewModel) {
 
         if(bottomSheetVisibility.value) {
             ShowOrHideBottomSheet(
-                isNeedToShowBottomSheet = bottomSheetVisibility,
+                isNeedToShowAddSaleBottomSheet = null,
+                isNeedToShowAddProductBottomSheet = bottomSheetVisibility,
                 isForAdd = false,
-                productViewModel = viewModel,
+                appViewModel = viewModel,
                 product = product.value
             )
         }
@@ -102,7 +103,7 @@ Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
 */
 @Composable
-fun SearchProduct(myProductsViewModel: ProductViewModel, onEditProduct: (Product) -> Unit) {
+fun SearchProduct(myProductsViewModel: AppViewModel, onEditProduct: (Product) -> Unit) {
     val searchResults by myProductsViewModel.searchResults.collectAsStateWithLifecycle()
     SearchableColumn(
         products = myProductsViewModel.allProducts.value,

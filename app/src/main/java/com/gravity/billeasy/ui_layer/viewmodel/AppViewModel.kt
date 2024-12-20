@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class ProductViewModel(
+class AppViewModel(
     private val appUseCase: UseCase,
     private val dbPreferenceStore: DataStore<DatabaseTablePreferences>
 ): ViewModel() {

@@ -8,7 +8,6 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -22,7 +21,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -35,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,7 +46,7 @@ import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEditBottomSheet
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
-import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
@@ -70,7 +67,9 @@ class MainActivity : ComponentActivity() {
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
             val showBottomBar = remember { mutableStateOf(true) }
-            val isNeedToShowBottomSheet = remember { mutableStateOf(false) }
+            val isNeedToShowAddProductBottomSheet = remember { mutableStateOf(false) }
+            val isNeedToShowAddBillBottomSheet = remember { mutableStateOf(false) }
+            val currentRoot = appNavigationImpl.getCurrentRoute()
             BillEasyTheme {
                 Scaffold(bottomBar = {
                     AnimatedVisibility(
@@ -90,15 +89,25 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }, floatingActionButton = {
-                    AddProductFab(onClick = { isNeedToShowBottomSheet.value = true })
+                    AddProductAndSaleFab(onClick = {
+                        currentRoot?.let {
+                            when(it) {
+                                BillEasyScreens.HOME.name, BillEasyScreens.MY_PRODUCTS.name -> {
+                                    isNeedToShowAddProductBottomSheet.value = true
+                                }
+                                else -> isNeedToShowAddBillBottomSheet.value = true
+                            }
+                        }
+                    })
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
-                    val productViewModel = navigationSetup.initViewModel(context)
+                    val appViewModel = navigationSetup.initViewModel(context)
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
                     ShowOrHideBottomSheet(
-                        isNeedToShowBottomSheet = isNeedToShowBottomSheet,
+                        isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,
+                        isNeedToShowAddProductBottomSheet = isNeedToShowAddProductBottomSheet,
                         isForAdd = true,
-                        productViewModel = productViewModel,
+                        appViewModel = appViewModel,
                         product = null
                     )
                 }
@@ -109,26 +118,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ShowOrHideBottomSheet(
-    isNeedToShowBottomSheet: MutableState<Boolean>,
-    productViewModel: ProductViewModel,
+    isNeedToShowAddSaleBottomSheet: MutableState<Boolean>?,
+    isNeedToShowAddProductBottomSheet: MutableState<Boolean>?,
+    appViewModel: AppViewModel,
     isForAdd: Boolean,
     product: Product?,
 ) {
-    if (isNeedToShowBottomSheet.value) {
+    if (isNeedToShowAddProductBottomSheet?.value == true) {
         ProductAddOrEditBottomSheet(
             isForAdd = isForAdd,
-            viewModel = productViewModel,
+            viewModel = appViewModel,
             product = product
-        ) { isNeedToShowBottomSheet.value = false }
+        ) { isNeedToShowAddProductBottomSheet.value = false }
     }
 }
 
 @Composable
-fun AddProductFab(onClick: () -> Unit) {
+fun AddProductAndSaleFab(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = { onClick() }, containerColor = appColor
     ) {
-        Icon(Icons.Filled.Add, contentDescription = "add product", tint = Color.Black)
+        Icon(Icons.Filled.Add, contentDescription = "add product or add sale", tint = Color.Black)
     }
 }
 
@@ -141,6 +151,8 @@ fun BottomNavigationBar(
     navigateToMyProductsScreen: () -> Unit,
     navigateToBillScreen: () -> Unit,
 ) {
+    println("Bottom"
+    )
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
     val topLevelRoutes = listOf(
