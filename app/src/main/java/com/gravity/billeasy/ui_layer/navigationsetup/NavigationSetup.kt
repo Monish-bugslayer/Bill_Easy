@@ -1,10 +1,12 @@
 package com.gravity.billeasy.ui_layer.navigationsetup
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +23,7 @@ import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 import com.gravity.billeasy.ui_layer.viewmodel.ProductViewModel
+import com.gravity.billeasy.R
 
 class NavigationSetup(
     private val navHostController: NavHostController,
@@ -46,7 +49,7 @@ class NavigationSetup(
         NavHost(
             navController = navHostController,
             startDestination = BillEasyScreens.HOME.name,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
 
             composable(route = BillEasyScreens.LOGIN.name) {
