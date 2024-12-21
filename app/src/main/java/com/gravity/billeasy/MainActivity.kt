@@ -16,7 +16,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -173,7 +175,7 @@ fun BottomNavigationBar(
             label = "Sales"
         )
     )
-    BottomNavigation(backgroundColor = appColor) {
+    BottomNavigation(backgroundColor = appColor, modifier = Modifier.systemBarsPadding()) {
         topLevelRoutes.forEach {
             BottomNavigationItem(
                 modifier = Modifier

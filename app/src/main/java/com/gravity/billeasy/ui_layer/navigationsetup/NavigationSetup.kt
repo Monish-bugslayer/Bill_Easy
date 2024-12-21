@@ -46,7 +46,7 @@ class NavigationSetup(
         NavHost(
             navController = navHostController,
             startDestination = BillEasyScreens.HOME.name,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
 
             composable(route = BillEasyScreens.LOGIN.name) {
