@@ -69,15 +69,7 @@ fun BillEasyBottomSheet(
     ModalBottomSheet(sheetState = sheetState,
         containerColor = colorResource(R.color.white),
         onDismissRequest = {
-            bottomSheetScope.launch {
-                if (isKeyboardVisible) {
-                    keyboardController?.hide()
-                    delay(200)
-                    onDismiss()
-                } else {
-                    onDismiss()
-                }
-            }
+            onDismiss()
         }) {
         Box(modifier = Modifier.height((LocalConfiguration.current.screenHeightDp * 0.85).dp)) {
             Column {

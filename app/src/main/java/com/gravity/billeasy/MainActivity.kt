@@ -44,6 +44,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+import com.gravity.billeasy.ui_layer.app_screens.AddSaleBottomSheet
 import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEditBottomSheet
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
@@ -133,6 +134,11 @@ fun ShowOrHideBottomSheet(
             product = product
         ) { isNeedToShowAddProductBottomSheet.value = false }
     }
+    else if(isNeedToShowAddSaleBottomSheet?.value == true) {
+        AddSaleBottomSheet(appViewModel = appViewModel) {
+            isNeedToShowAddSaleBottomSheet.value = false
+        }
+    }
 }
 
 @Composable
@@ -153,8 +159,6 @@ fun BottomNavigationBar(
     navigateToMyProductsScreen: () -> Unit,
     navigateToBillScreen: () -> Unit,
 ) {
-    println("Bottom"
-    )
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
     val topLevelRoutes = listOf(

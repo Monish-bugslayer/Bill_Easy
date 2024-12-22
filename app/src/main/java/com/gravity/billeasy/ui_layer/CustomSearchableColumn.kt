@@ -16,7 +16,6 @@ import com.gravity.billeasy.data_layer.models.Product
 
 @Composable
 fun CustomSearchBar(
-    productsList: List<Product>,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     leadingIcon: @Composable (() -> Unit),

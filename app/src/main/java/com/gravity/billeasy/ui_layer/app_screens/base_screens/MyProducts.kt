@@ -71,6 +71,7 @@ const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
 const val SEARCH_RESULT_NOT_FOUND_STRING_2 = "Try adjusting your search or add a new product"
 const val NO_PRODUCTS_STRING_1 = "Your shop is empty"
 const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop with products"
+const val SEARCH_YOUR_PRODUCT = "Search your product"
 
 @Composable
 fun MyProducts(viewModel: AppViewModel) {
@@ -103,14 +104,19 @@ Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
 */
 @Composable
-fun SearchProduct(myProductsViewModel: AppViewModel, onEditProduct: (Product) -> Unit) {
-    val searchResults by myProductsViewModel.searchResults.collectAsStateWithLifecycle()
+fun SearchProduct(appViewModel: AppViewModel, onEditProduct: (Product) -> Unit) {
+    val searchResults by appViewModel.searchResults.collectAsStateWithLifecycle()
+    println("search query ${appViewModel.searchQuery}")
+    println("searchResults $searchResults")
     SearchableColumn(
-        products = myProductsViewModel.allProducts.value,
-        searchQuery = myProductsViewModel.searchQuery,
+        products = appViewModel.allProducts.value,
+        searchQuery = appViewModel.searchQuery,
         searchResults = searchResults,
-        onSearchQueryChange = { myProductsViewModel.onSearchQueryChange(it) },
-        onDelete = { myProductsViewModel.deleteProduct(it) },
+        onSearchQueryChange = {
+            println("it $it")
+            appViewModel.onSearchQueryChange(it)
+                              },
+        onDelete = { appViewModel.deleteProduct(it) },
         onEdit = onEditProduct
     )
 }
@@ -127,7 +133,7 @@ fun SearchableColumn(
     var expandedProductId by remember { mutableStateOf<Long?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    CustomSearchBar(productsList = products,
+    CustomSearchBar(
         searchQuery = searchQuery,
         onSearchQueryChange = onSearchQueryChange,
         onSearch = { keyboardController?.hide() },
@@ -149,7 +155,7 @@ fun SearchableColumn(
                 }
             }
         },
-        placeHolderText = { Text(text = "Search your product") }) {
+        placeHolderText = { Text(text = SEARCH_YOUR_PRODUCT) }) {
         if (products.isEmpty()) {
             ProductNotAvailable(NO_PRODUCTS_STRING_1, NO_PRODUCTS_STRING_2)
         } else if (searchResults.isEmpty()) {
