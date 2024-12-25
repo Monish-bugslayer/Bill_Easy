@@ -106,16 +106,11 @@ states and state updates and passing the data to the stateless function
 @Composable
 fun SearchProduct(appViewModel: AppViewModel, onEditProduct: (Product) -> Unit) {
     val searchResults by appViewModel.searchResults.collectAsStateWithLifecycle()
-    println("search query ${appViewModel.searchQuery}")
-    println("searchResults $searchResults")
     SearchableColumn(
         products = appViewModel.allProducts.value,
         searchQuery = appViewModel.searchQuery,
         searchResults = searchResults,
-        onSearchQueryChange = {
-            println("it $it")
-            appViewModel.onSearchQueryChange(it)
-                              },
+        onSearchQueryChange = { appViewModel.onSearchQueryChange(it) },
         onDelete = { appViewModel.deleteProduct(it) },
         onEdit = onEditProduct
     )

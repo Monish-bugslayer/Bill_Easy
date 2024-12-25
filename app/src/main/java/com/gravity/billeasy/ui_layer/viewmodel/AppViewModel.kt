@@ -103,6 +103,7 @@ class AppViewModel(
     }
 
     fun onSearchQueryChange(newQuery: String) {
+        println("In view model query change")
         searchQuery = newQuery
     }
 

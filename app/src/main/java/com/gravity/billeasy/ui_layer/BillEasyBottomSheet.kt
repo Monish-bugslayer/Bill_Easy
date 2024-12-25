@@ -68,9 +68,9 @@ fun BillEasyBottomSheet(
 
     ModalBottomSheet(sheetState = sheetState,
         containerColor = colorResource(R.color.white),
-        onDismissRequest = {
-            onDismiss()
-        }) {
+        onDismissRequest = { onDismiss() }) {
+        // once nested scrolling implemented for bottom sheet dismiss and lazy colum scrolling
+        // we can remove this 85% screen height
         Box(modifier = Modifier.height((LocalConfiguration.current.screenHeightDp * 0.85).dp)) {
             Column {
                 Row(modifier = Modifier

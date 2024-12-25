@@ -2,6 +2,8 @@ package com.gravity.billeasy.ui_layer.app_screens
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ripple
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -65,39 +69,29 @@ const val CREATE_SALE = "Create sale"
 @Composable
 fun AddSaleBottomSheet(appViewModel: AppViewModel, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
-    val searchResults by appViewModel.searchResults.collectAsStateWithLifecycle()
-    println("appViewModel.searchQuery ${appViewModel.searchQuery}")
-    println("searchResults in sale ${searchResults}")
     BillEasyBottomSheet(
         listState = listState,
         sheetHeader = CREATE_SALE,
         onDoneClick = { true },
         onDismiss = onDismiss
     ) {
-        AddSaleBottomSheetContent(
-            searchQuery = appViewModel.searchQuery,
-            searchResults = searchResults,
-            onSearchQueryChange = {
-                println("it sale ${it}")
-                appViewModel.onSearchQueryChange(it) },
-            products = appViewModel.allProducts.value,
-            listState = listState
-        )
+        AddSaleBottomSheetContent(appViewModel, listState = listState)
     }
 }
 
 
 @Composable
 fun AddSaleBottomSheetContent(
-    searchQuery: String,
-    searchResults: List<Product>,
-    onSearchQueryChange: (String) -> Unit,
-    products: List<Product>,
+    viewModel: AppViewModel,
     listState: LazyListState
 ) {
+    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
-    CustomSearchBar(searchQuery = searchQuery,
-        onSearchQueryChange = { onSearchQueryChange },
+    val searchQuery = viewModel.searchQuery
+    val products = viewModel.allProducts.value
+    CustomSearchBar(
+        searchQuery = searchQuery,
+        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
         onSearch = { keyboardController?.hide() },
         leadingIcon = {
             Icon(
@@ -108,7 +102,7 @@ fun AddSaleBottomSheetContent(
         },
         trailingIcon = {
             if (searchQuery.isNotEmpty()) {
-                IconButton(onClick = { onSearchQueryChange("") }) {
+                IconButton(onClick = { viewModel.onSearchQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         tint = MaterialTheme.colorScheme.onSurface,
@@ -160,18 +154,16 @@ fun SaleProductCard(product: Product) {
                         text = product.productName,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
+                        modifier = Modifier.width(80.dp).padding(end = 8.dp)
                     )
 
                     CounterBox()
 
+                    // TODO: Need to get the selected option price( wholesale or retail )
                     Text(
-                        text = "Total ₹ ${0.00}",
+                        text = "Total ₹ ${product.retailPrice}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.weight(2f),
                         textAlign = TextAlign.End
                     )
                 }
@@ -222,6 +214,7 @@ fun CounterBox(){
         color = MaterialTheme.colorScheme.primary
     )) {
         val iconBorderColor = MaterialTheme.colorScheme.primary
+        var productCount = 0
         Icon(
             painter = painterResource(R.drawable.baseline_remove_24),
             contentDescription = "remove",
@@ -235,9 +228,13 @@ fun CounterBox(){
                         color = iconBorderColor
                     )
             }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(bounded = true, radius = 100.dp)
+                ){ productCount-- }
         )
         Text(
-            text = "0",
+            text = productCount.toString(),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(start = 5.dp, top = 2.dp, bottom = 2.dp, end = 5.dp))
         Icon(
@@ -252,19 +249,26 @@ fun CounterBox(){
                         color = iconBorderColor
                     )
             }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(bounded = true, radius = 100.dp)
+                ){ productCount++ }
         )
     }
 }
 
+// TODO: try to send Map<String, Double> in place of radio option so that by returing the key we
+//  can get the value in total price text
 @Composable
-fun RadioButtonAndText(
-    retailPrice: String, wholeSalePrice: String
-) {
+fun RadioButtonAndText(retailPrice: String, wholeSalePrice: String) {
     val radioOptions = listOf<String>(
-        "Wholesale Price: ₹ $wholeSalePrice", "Retail Price: ₹ $retailPrice"
+        "Retail Price: ₹ $retailPrice", "Wholesale Price: ₹ $wholeSalePrice"
     )
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
-
+//    its equivalent
+//    val state = remember { mutableStateOf(radioOptions[0]) }
+//    val selectedOption = state.value
+//    val onOptionSelected = { newValue: String -> state.value = newValue }
     radioOptions.forEach { text ->
         Row(
             Modifier
@@ -283,5 +287,4 @@ fun RadioButtonAndText(
             )
         }
     }
-
 }
