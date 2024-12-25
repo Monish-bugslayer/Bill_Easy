@@ -203,17 +203,19 @@ fun BottomNavigationBar(
                     )
                 },
                 onClick = {
-                    when (it.name) {
-                        BillEasyScreens.HOME.name -> {
-                            navigateToHomeScreen()
-                        }
+                    if(currentRoot != it.name) {
+                        when (it.name) {
+                            BillEasyScreens.HOME.name -> {
+                                navigateToHomeScreen()
+                            }
 
-                        BillEasyScreens.MY_PRODUCTS.name -> {
-                            navigateToMyProductsScreen()
-                        }
+                            BillEasyScreens.MY_PRODUCTS.name -> {
+                                navigateToMyProductsScreen()
+                            }
 
-                        BillEasyScreens.BILLS.name -> {
-                            navigateToBillScreen()
+                            BillEasyScreens.BILLS.name -> {
+                                navigateToBillScreen()
+                            }
                         }
                     }
                 },
