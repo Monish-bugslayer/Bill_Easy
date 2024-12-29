@@ -23,6 +23,7 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -93,7 +94,13 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }, floatingActionButton = {
-                    AddProductAndSaleFab(onClick = {
+                    AddProductAndSaleFab(
+                        if(currentRoot in setOf(
+                                BillEasyScreens.HOME.name,
+                                BillEasyScreens.MY_PRODUCTS.name
+                        )) "Add Product"
+                        else "Add Sale"
+                    ) {
                         currentRoot?.let {
                             when(it) {
                                 BillEasyScreens.HOME.name, BillEasyScreens.MY_PRODUCTS.name -> {
@@ -102,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                 else -> isNeedToShowAddBillBottomSheet.value = true
                             }
                         }
-                    })
+                    }
                 }) { innerPadding ->
                     val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
                     val appViewModel = navigationSetup.initViewModel(context)
@@ -144,12 +151,22 @@ fun ShowOrHideBottomSheet(
 }
 
 @Composable
-fun AddProductAndSaleFab(onClick: () -> Unit) {
-    FloatingActionButton(
-        onClick = { onClick() }, containerColor = appColor
-    ) {
-        Icon(Icons.Filled.Add, contentDescription = "add product or add sale", tint = Color.Black)
-    }
+fun AddProductAndSaleFab(fabText: String, onClick: () -> Unit) {
+    ExtendedFloatingActionButton(
+        onClick = { onClick() }, containerColor = appColor,
+        icon = {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "add product or add sale",
+                tint = Color.Black
+            )
+        },
+        text = {
+            Text(
+                text = fabText
+            )
+        }
+    )
 }
 
 @Stable
