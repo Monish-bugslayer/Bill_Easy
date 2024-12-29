@@ -1,6 +1,7 @@
 package com.gravity.billeasy.ui_layer.app_screens
 
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +13,13 @@ import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 private const val ADD_YOUR_PRODUCT = "Add your product"
 private const val EDIT_YOUR_PRODUCT = "Edit your product"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductAddOrEditBottomSheet(
-    isForAdd: Boolean, viewModel: AppViewModel, product: Product?, onDismiss: () -> Unit
+    isForAdd: Boolean,
+    viewModel: AppViewModel,
+    product: Product?,
+    onDismiss: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
@@ -72,7 +77,6 @@ fun ProductAddOrEditBottomSheet(
     }
 
     BillEasyBottomSheet(
-        listState = listState,
         sheetHeader = if (isForAdd) ADD_YOUR_PRODUCT else EDIT_YOUR_PRODUCT,
         onDoneClick = {
             if (validateAddOrEditProductField(addProductFieldsMap.toList())) {
@@ -101,8 +105,9 @@ fun ProductAddOrEditBottomSheet(
         onDismiss = onDismiss
     ) {
         ProductAddOrEditScreen(
-            productFieldMapper = addProductFieldsMap, listState = listState
-        )
+            productFieldMapper = addProductFieldsMap,
+            listState = listState
+        ) { viewModel.addProduct(it) }
     }
 }
 

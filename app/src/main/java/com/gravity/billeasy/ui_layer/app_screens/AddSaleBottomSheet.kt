@@ -1,6 +1,8 @@
 package com.gravity.billeasy.ui_layer.app_screens
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,8 +17,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -33,9 +35,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -66,14 +70,14 @@ import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 
 const val CREATE_SALE = "Create sale"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSaleBottomSheet(appViewModel: AppViewModel, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
     BillEasyBottomSheet(
-        listState = listState,
         sheetHeader = CREATE_SALE,
         onDoneClick = { true },
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
     ) {
         AddSaleBottomSheetContent(appViewModel, listState = listState)
     }

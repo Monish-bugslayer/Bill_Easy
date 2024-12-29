@@ -46,7 +46,6 @@ class AppViewModel(
                 }
         }
     }
-
     private val dbPreferenceFlow: Flow<DatabaseTablePreferences> = dbPreferenceStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -58,7 +57,6 @@ class AppViewModel(
 
     val allProducts: MutableState<List<Product>> get() = _allProducts
     private var _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
-    // this means this searchQuery is publicly visible but can be modified within the class
     var searchQuery by mutableStateOf("")
         private set
     val searchResults: StateFlow<List<Product>> =

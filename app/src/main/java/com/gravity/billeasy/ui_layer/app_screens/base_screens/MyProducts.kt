@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -86,6 +87,7 @@ fun MyProducts(viewModel: AppViewModel) {
             bottomSheetVisibility.value = true
             product.value = it
         })
+        println(viewModel.allProducts.value)
 
         if(bottomSheetVisibility.value) {
             ShowOrHideBottomSheet(
@@ -157,7 +159,7 @@ fun SearchableColumn(
             ProductNotAvailable(SEARCH_RESULT_NOT_FOUND_STRING_1, SEARCH_RESULT_NOT_FOUND_STRING_2)
         } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(15.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
                 contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
