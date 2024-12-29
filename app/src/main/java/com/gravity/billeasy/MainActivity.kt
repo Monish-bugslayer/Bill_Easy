@@ -152,21 +152,32 @@ fun ShowOrHideBottomSheet(
 
 @Composable
 fun AddProductAndSaleFab(fabText: String, onClick: () -> Unit) {
-    ExtendedFloatingActionButton(
+    //TODO: This is disturbing the UI, hiding the data, need to make it small while scroll started
+//    ExtendedFloatingActionButton(
+//        onClick = { onClick() }, containerColor = appColor,
+//        icon = {
+//            Icon(
+//                imageVector = Icons.Filled.Add,
+//                contentDescription = "add product or add sale",
+//                tint = Color.Black
+//            )
+//        },
+//        text = {
+//            Text(
+//                text = fabText
+//            )
+//        }
+//    )
+
+    FloatingActionButton(
         onClick = { onClick() }, containerColor = appColor,
-        icon = {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "add product or add sale",
-                tint = Color.Black
-            )
-        },
-        text = {
-            Text(
-                text = fabText
-            )
-        }
-    )
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = "add product or add sale",
+            tint = Color.Black
+        )
+    }
 }
 
 @Stable
