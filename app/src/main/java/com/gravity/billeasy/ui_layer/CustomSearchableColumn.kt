@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -53,7 +57,7 @@ fun CustomSearchBar(
 ) {
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(top = 10.dp, start = 10.dp, end = 10.dp)) {
+        .padding(top = 10.dp)) {
         if (isNeedDownloadDataAction) {
             SearchBarWithCustomActions (
                 searchQuery = searchQuery,
@@ -138,7 +142,6 @@ fun SearchBarWithCustomActions(
                         .show()
                 }
         )
-
         Image(painter = painterResource(R.drawable.import_file),
             contentDescription = "Import products",
             modifier = Modifier
