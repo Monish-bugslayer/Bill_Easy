@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer.app_screens.base_screens
+package com.gravity.billeasy.ui_layer.app_screens.base_screens.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image

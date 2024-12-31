@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer.app_screens
+package com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api

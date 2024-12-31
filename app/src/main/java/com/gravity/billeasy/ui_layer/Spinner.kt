@@ -1,4 +1,4 @@
-package com.gravity.billeasy
+package com.gravity.billeasy.ui_layer
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +29,9 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import com.gravity.billeasy.ui_layer.app_screens.decideKeyboardType
+import com.gravity.billeasy.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -13,7 +13,7 @@ const val DB_NAME = "app_database"
 
 @Database(entities = [ProductEntity::class, CategoryEntity::class, UnitEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun productDao(): AppDao
+    abstract fun productDao(): ProductDao
 }
 
 object DatabaseInstance {

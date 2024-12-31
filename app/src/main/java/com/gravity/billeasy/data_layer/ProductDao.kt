@@ -14,7 +14,7 @@ import com.gravity.billeasy.domain_layer.UnitWithProduct
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface AppDao {
+interface ProductDao {
     @Insert
     suspend fun addProduct(product: ProductEntity)
 

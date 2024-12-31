@@ -6,7 +6,7 @@ import com.gravity.billeasy.domain_layer.UnitEntity
 import kotlinx.coroutines.flow.Flow
 
 
-class Repository(private val dao: AppDao) {
+class Repository(private val dao: ProductDao) {
 
     suspend fun addProduct(productEntity: ProductEntity) = dao.addProduct(productEntity)
 

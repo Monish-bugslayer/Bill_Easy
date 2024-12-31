@@ -1,8 +1,6 @@
-package com.gravity.billeasy.ui_layer.app_screens
+package com.gravity.billeasy.ui_layer.app_screens.base_screens.sales
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,9 +35,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,12 +55,12 @@ import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.CustomSearchBar
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.NO_PRODUCTS_STRING_1
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.NO_PRODUCTS_STRING_2
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.ProductNotAvailable
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.SEARCH_RESULT_NOT_FOUND_STRING_1
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.SEARCH_RESULT_NOT_FOUND_STRING_2
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.SEARCH_YOUR_PRODUCT
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_1
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_2
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.ProductNotAvailable
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_1
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_2
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_YOUR_PRODUCT
 import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
 
 const val CREATE_SALE = "Create sale"

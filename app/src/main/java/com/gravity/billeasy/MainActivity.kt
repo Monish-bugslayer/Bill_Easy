@@ -16,14 +16,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -46,8 +42,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui.theme.BillEasyTheme
-import com.gravity.billeasy.ui_layer.app_screens.AddSaleBottomSheet
-import com.gravity.billeasy.ui_layer.app_screens.ProductAddOrEditBottomSheet
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.AddSaleBottomSheet
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.ProductAddOrEditBottomSheet
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup

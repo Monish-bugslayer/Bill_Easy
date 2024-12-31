@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer.app_screens.base_screens
+package com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -87,8 +86,6 @@ fun MyProducts(viewModel: AppViewModel) {
             bottomSheetVisibility.value = true
             product.value = it
         })
-        println(viewModel.allProducts.value)
-
         if(bottomSheetVisibility.value) {
             ShowOrHideBottomSheet(
                 isNeedToShowAddSaleBottomSheet = null,
@@ -134,6 +131,8 @@ fun SearchableColumn(
         searchQuery = searchQuery,
         onSearchQueryChange = onSearchQueryChange,
         onSearch = { keyboardController?.hide() },
+        isNeedDownloadDataAction = true,
+        allProducts = products,
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,

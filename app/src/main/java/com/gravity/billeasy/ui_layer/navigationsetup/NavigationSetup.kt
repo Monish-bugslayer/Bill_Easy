@@ -13,9 +13,9 @@ import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
 import com.gravity.billeasy.data_layer.DatabaseInstance
 import com.gravity.billeasy.data_layer.Repository
 import com.gravity.billeasy.domain_layer.UseCase
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.Home
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.MyProducts
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.Sales
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.Home
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.MyProducts
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.Sales
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.CreateAccountScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen

@@ -1,4 +1,4 @@
-package com.gravity.billeasy.ui_layer.app_screens
+package com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.gravity.billeasy.R
-import com.gravity.billeasy.Spinner
+import com.gravity.billeasy.ui_layer.Spinner
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
