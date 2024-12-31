@@ -1,6 +1,7 @@
 package com.gravity.billeasy.ui_layer.viewmodel
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -21,10 +22,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+@Stable
 class AppViewModel(
     private val appUseCase: UseCase,
     private val dbPreferenceStore: DataStore<DatabaseTablePreferences>
 ): ViewModel() {
+
+    val allProducts: MutableState<List<Product>> get() = _allProducts
+    private val _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
 
     init {
         viewModelScope.launch {
@@ -55,8 +60,6 @@ class AppViewModel(
             }
         }
 
-    val allProducts: MutableState<List<Product>> get() = _allProducts
-    private var _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
     var searchQuery by mutableStateOf("")
         private set
     val searchResults: StateFlow<List<Product>> =

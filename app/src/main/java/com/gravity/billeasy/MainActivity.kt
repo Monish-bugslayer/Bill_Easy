@@ -111,7 +111,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }) { innerPadding ->
-                    val navigationSetup = NavigationSetup(navHostController, appNavigationImpl)
+                    val navigationSetup = remember {
+                        NavigationSetup(navHostController, appNavigationImpl)
+                    }
                     val appViewModel = navigationSetup.initViewModel(context)
                     navigationSetup.SetupNavigation(innerPadding = innerPadding)
                     ShowOrHideBottomSheet(
