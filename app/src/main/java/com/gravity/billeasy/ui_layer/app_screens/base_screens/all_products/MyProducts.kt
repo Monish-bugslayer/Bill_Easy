@@ -65,7 +65,7 @@ import com.gravity.billeasy.R
 import com.gravity.billeasy.ShowOrHideBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
-import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
 const val SEARCH_RESULT_NOT_FOUND_STRING_2 = "Try adjusting your search or add a new product"
@@ -74,7 +74,7 @@ const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop wi
 const val SEARCH_YOUR_PRODUCT = "Search your product"
 
 @Composable
-fun MyProducts(viewModel: AppViewModel) {
+fun MyProducts(productsViewModel: ProductsViewModel) {
     val bottomSheetVisibility = remember { mutableStateOf(false) }
     val product = remember { mutableStateOf<Product?>(null) }
     Column(
@@ -82,7 +82,7 @@ fun MyProducts(viewModel: AppViewModel) {
             .fillMaxSize()
             .background(color = colorResource(R.color.white))
     ) {
-        SearchProduct(viewModel, onEditProduct = {
+        SearchProduct(productsViewModel, onEditProduct = {
             bottomSheetVisibility.value = true
             product.value = it
         })
@@ -91,7 +91,7 @@ fun MyProducts(viewModel: AppViewModel) {
                 isNeedToShowAddSaleBottomSheet = null,
                 isNeedToShowAddProductBottomSheet = bottomSheetVisibility,
                 isForAdd = false,
-                appViewModel = viewModel,
+                productsViewModel = productsViewModel,
                 product = product.value
             )
         }
@@ -103,14 +103,14 @@ Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
 */
 @Composable
-fun SearchProduct(appViewModel: AppViewModel, onEditProduct: (Product) -> Unit) {
-    val searchResults by appViewModel.searchResults.collectAsStateWithLifecycle()
+fun SearchProduct(productsViewModel: ProductsViewModel, onEditProduct: (Product) -> Unit) {
+    val searchResults by productsViewModel.searchResults.collectAsStateWithLifecycle()
     SearchableColumn(
-        products = appViewModel.allProducts.value,
-        searchQuery = appViewModel.searchQuery,
+        products = productsViewModel.allProducts.value,
+        searchQuery = productsViewModel.searchQuery,
         searchResults = searchResults,
-        onSearchQueryChange = { appViewModel.onSearchQueryChange(it) },
-        onDelete = { appViewModel.deleteProduct(it) },
+        onSearchQueryChange = { productsViewModel.onSearchQueryChange(it) },
+        onDelete = { productsViewModel.deleteProduct(it) },
         onEdit = onEditProduct
     )
 }

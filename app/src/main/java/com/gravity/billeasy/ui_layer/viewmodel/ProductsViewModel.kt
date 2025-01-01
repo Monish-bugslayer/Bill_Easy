@@ -23,18 +23,21 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 @Stable
-class AppViewModel(
+class ProductsViewModel(
     private val appUseCase: UseCase,
     private val dbPreferenceStore: DataStore<DatabaseTablePreferences>
 ): ViewModel() {
 
     val allProducts: MutableState<List<Product>> get() = _allProducts
     private val _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
+    var isDataLoading: MutableState<Boolean> =  mutableStateOf(false)
 
     init {
         viewModelScope.launch {
             appUseCase.getAllProducts()
                 .collect { productEntity ->
+                    println("Loading started")
+                    isDataLoading.value = true
                     _allProducts.value = productEntity.map {
                         Product(
                             productId = it.productId,

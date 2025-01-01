@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
-import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 private const val ADD_YOUR_PRODUCT = "Add your product"
 private const val EDIT_YOUR_PRODUCT = "Edit your product"
@@ -17,13 +17,13 @@ private const val EDIT_YOUR_PRODUCT = "Edit your product"
 @Composable
 fun ProductAddOrEditBottomSheet(
     isForAdd: Boolean,
-    viewModel: AppViewModel,
+    productsViewModel: ProductsViewModel,
     product: Product?,
     onDismiss: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
-    viewModel.initUnitAndCategoryTable()
+    productsViewModel.initUnitAndCategoryTable()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
     val productCategory = remember { mutableStateOf(product?.productCategory ?: "") }
     val unit = remember { mutableStateOf(product?.unit ?: "") }
@@ -97,7 +97,7 @@ fun ProductAddOrEditBottomSheet(
                     ).fieldName.value.toDouble(),
                     retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
                 )
-                if (isForAdd) viewModel.addProduct(newProduct) else viewModel.editProduct(newProduct)
+                if (isForAdd) productsViewModel.addProduct(newProduct) else productsViewModel.editProduct(newProduct)
                 true
             }
             else { false }
@@ -107,7 +107,7 @@ fun ProductAddOrEditBottomSheet(
         ProductAddOrEditScreen(
             productFieldMapper = addProductFieldsMap,
             listState = listState
-        ) { viewModel.addProduct(it) }
+        ) { productsViewModel.addProduct(it) }
     }
 }
 

@@ -61,36 +61,36 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.Produ
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_2
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_YOUR_PRODUCT
-import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 const val CREATE_SALE = "Create sale"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSaleBottomSheet(appViewModel: AppViewModel, onDismiss: () -> Unit) {
+fun AddSaleBottomSheet(productsViewModel: ProductsViewModel, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
     BillEasyBottomSheet(
         sheetHeader = CREATE_SALE,
         onDoneClick = { true },
         onDismiss = onDismiss,
     ) {
-        AddSaleBottomSheetContent(appViewModel, listState = listState)
+        AddSaleBottomSheetContent(productsViewModel, listState = listState)
     }
 }
 
 
 @Composable
 fun AddSaleBottomSheetContent(
-    viewModel: AppViewModel,
+    productsViewModel: ProductsViewModel,
     listState: LazyListState
 ) {
-    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+    val searchResults by productsViewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQuery = viewModel.searchQuery
-    val products = viewModel.allProducts.value
+    val searchQuery = productsViewModel.searchQuery
+    val products = productsViewModel.allProducts.value
     CustomSearchBar(
         searchQuery = searchQuery,
-        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+        onSearchQueryChange = { productsViewModel.onSearchQueryChange(it) },
         onSearch = { keyboardController?.hide() },
         leadingIcon = {
             Icon(
@@ -101,7 +101,7 @@ fun AddSaleBottomSheetContent(
         },
         trailingIcon = {
             if (searchQuery.isNotEmpty()) {
-                IconButton(onClick = { viewModel.onSearchQueryChange("") }) {
+                IconButton(onClick = { productsViewModel.onSearchQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         tint = MaterialTheme.colorScheme.onSurface,

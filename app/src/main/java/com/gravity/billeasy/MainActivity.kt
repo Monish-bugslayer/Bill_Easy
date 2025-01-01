@@ -47,7 +47,7 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.Produ
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
-import com.gravity.billeasy.ui_layer.viewmodel.AppViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                         isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,
                         isNeedToShowAddProductBottomSheet = isNeedToShowAddProductBottomSheet,
                         isForAdd = true,
-                        appViewModel = appViewModel,
+                        productsViewModel = appViewModel,
                         product = null
                     )
                 }
@@ -129,19 +129,19 @@ class MainActivity : ComponentActivity() {
 fun ShowOrHideBottomSheet(
     isNeedToShowAddSaleBottomSheet: MutableState<Boolean>?,
     isNeedToShowAddProductBottomSheet: MutableState<Boolean>?,
-    appViewModel: AppViewModel,
+    productsViewModel: ProductsViewModel,
     isForAdd: Boolean,
     product: Product?,
 ) {
     if (isNeedToShowAddProductBottomSheet?.value == true) {
         ProductAddOrEditBottomSheet(
             isForAdd = isForAdd,
-            viewModel = appViewModel,
+            productsViewModel = productsViewModel,
             product = product
         ) { isNeedToShowAddProductBottomSheet.value = false }
     }
     else if(isNeedToShowAddSaleBottomSheet?.value == true) {
-        AddSaleBottomSheet(appViewModel = appViewModel
+        AddSaleBottomSheet(productsViewModel = productsViewModel
         ) {
             isNeedToShowAddSaleBottomSheet.value = false
         }
