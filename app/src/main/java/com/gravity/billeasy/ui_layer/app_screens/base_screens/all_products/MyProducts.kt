@@ -159,7 +159,7 @@ fun SearchableColumn(
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
-                contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp),
+                contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(count = searchResults.size, key = { searchResults[it].productId }) {

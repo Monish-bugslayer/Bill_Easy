@@ -4,37 +4,38 @@ import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ripple
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.gravity.billeasy.R
+import com.gravity.billeasy.appColor
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.data_import_export.ImportAndExportData
 import kotlinx.coroutines.Dispatchers
@@ -109,7 +110,7 @@ fun SearchBarWithCustomActions(
     ) { uri ->
         uri?.let {
             coroutineScope.launch(Dispatchers.IO) {
-                try { importAndExportData.importFile(uri) } catch (e: Exception) {
+                try { println(importAndExportData.importFile(uri, context)) } catch (e: Exception) {
                     println(e.message)
                 }
             }
@@ -118,6 +119,7 @@ fun SearchBarWithCustomActions(
 
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
+            modifier = Modifier.padding(start = 10.dp),
             value = searchQuery,
             onValueChange = onSearchQueryChange,
             leadingIcon = leadingIcon,
@@ -126,31 +128,62 @@ fun SearchBarWithCustomActions(
             keyboardOptions = keyboardOption,
             keyboardActions = keyboardActions
         )
-        Image(painter = painterResource(R.drawable.export),
-            contentDescription = "Download products",
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(bounded = true, radius = 100.dp)
-                ) {
-                    // TODO need to listen download start and complete to avoid multiple clicks and multiple downloads
-                    val jSonResponse = importAndExportData.convertClassToJson(allProducts)
-                    importAndExportData.writeTextToFile(jSonResponse, coroutineScope)
-                    Toast
-                        .makeText(context, "Download started", Toast.LENGTH_LONG)
-                        .show()
-                }
+        ColumOptions(
+            onImportClick = { filePicker.launch("*/*") },
+            onDownloadClick = {
+                val jSonResponse = importAndExportData.convertClassToJson(allProducts)
+                importAndExportData.writeTextToFile(jSonResponse, coroutineScope)
+                Toast
+                    .makeText(context, "Download started", Toast.LENGTH_LONG)
+                    .show()
+            }
         )
-        Image(painter = painterResource(R.drawable.import_file),
-            contentDescription = "Import products",
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(bounded = true, radius = 100.dp)
-                ) { filePicker.launch("*/*") }
-        )
+    }
+}
 
+@Composable
+fun ColumOptions(onImportClick: () -> Unit, onDownloadClick: () -> Unit) {
+    var expanded = remember { mutableStateOf(false) }
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        IconButton(onClick = { expanded.value = !expanded.value }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+            containerColor = appColor
+        ) {
+            DropdownMenuItem(
+                leadingIcon = { Icon(
+                    painter = painterResource(R.drawable.import_file),
+                    contentDescription = "import data"
+                ) },
+                text = { Text("Import data") },
+                onClick = {
+                    onImportClick()
+                    expanded.value = false
+                }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 5.dp, end = 5.dp),
+                color = colorResource(R.color.white)
+            )
+
+            DropdownMenuItem(
+                leadingIcon = { Icon(
+                    painter = painterResource(R.drawable.baseline_download_24),
+                    contentDescription = "Download data"
+                ) },
+                text = { Text("Download data") },
+                onClick = {
+                    onDownloadClick()
+                    expanded.value = false
+                }
+            )
+        }
     }
 }

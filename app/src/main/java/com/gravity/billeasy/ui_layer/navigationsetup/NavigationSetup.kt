@@ -45,7 +45,7 @@ class NavigationSetup(
     fun SetupNavigation(innerPadding: PaddingValues) {
         NavHost(
             navController = navHostController,
-            startDestination = BillEasyScreens.HOME.name,
+            startDestination = BillEasyScreens.MY_PRODUCTS.name,
             modifier = Modifier.padding(
                 top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding()

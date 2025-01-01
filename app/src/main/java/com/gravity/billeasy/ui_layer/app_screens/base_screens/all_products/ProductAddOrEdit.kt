@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.gravity.billeasy.R
+import com.gravity.billeasy.appColor
 import com.gravity.billeasy.ui_layer.Spinner
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
@@ -194,7 +197,15 @@ fun ProductAddOrEditScreen(
         }
 
         item {
-            ElevatedButton(modifier = Modifier.padding(bottom = 20.dp), onClick = {
+            ElevatedButton(
+                modifier = Modifier.padding(bottom = 20.dp),
+                colors = ButtonColors(
+                    containerColor = appColor,
+                    contentColor = ButtonDefaults.elevatedButtonColors().contentColor,
+                    disabledContentColor = ButtonDefaults.elevatedButtonColors().disabledContentColor,
+                    disabledContainerColor = ButtonDefaults.elevatedButtonColors().disabledContainerColor
+                ),
+                onClick = {
                 var productName = ""
                 var productCategory = ""
                 var unit = ""
