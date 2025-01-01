@@ -110,7 +110,10 @@ fun SearchBarWithCustomActions(
     ) { uri ->
         uri?.let {
             coroutineScope.launch(Dispatchers.IO) {
-                try { println(importAndExportData.importFile(uri, context)) } catch (e: Exception) {
+                try {
+                    val productList = importAndExportData.importFile(uri, context)
+                    println(productList)
+                } catch (e: Exception) {
                     println(e.message)
                 }
             }
@@ -131,8 +134,7 @@ fun SearchBarWithCustomActions(
         ColumOptions(
             onImportClick = { filePicker.launch("*/*") },
             onDownloadClick = {
-                val jSonResponse = importAndExportData.convertClassToJson(allProducts)
-                importAndExportData.writeTextToFile(jSonResponse, coroutineScope)
+                importAndExportData.writeTextToFile(allProducts, coroutineScope)
                 Toast
                     .makeText(context, "Download started", Toast.LENGTH_LONG)
                     .show()

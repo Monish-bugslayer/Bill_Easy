@@ -6,14 +6,15 @@ import android.widget.Toast
 import androidx.compose.runtime.Stable
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonWriter
 import com.gravity.billeasy.data_layer.models.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileOutputStream
+import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -22,60 +23,53 @@ import java.util.Calendar
 
 @Stable
 class ImportAndExportData(var context: Context) {
-    private var gSon: Gson? = GsonBuilder().serializeNulls().setPrettyPrinting().create()
-
-    fun convertClassToJson(product: List<Product>): String? {
-        val allData = ExportProduct(product)
-        return gSon?.toJson(allData)
-    }
+    private var gSon: Gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
 
     private fun getFileName(): String {
         // TODO once seperate DB is created for shop we need to store the name of the shop in pref and get the shop name here
         return "Sk stores products ${Calendar.getInstance().timeInMillis}.json"
     }
 
-    fun writeTextToFile(jsonResponse: String?, coroutineScope: CoroutineScope) {
+    fun writeTextToFile(products: List<Product>, coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.IO) {
-            if (jsonResponse != "") {
-                val dir = File("//sdcard//Download//")
-                val myExternalFile = File(dir, getFileName())
-                var fos: FileOutputStream? = null
-                try {
-                    fos = FileOutputStream(myExternalFile)
-                    fos.write(jsonResponse?.toByteArray())
-                    fos.close()
-                } catch (e: IOException) {
-                    e.printStackTrace()
+            val dir = File("//sdcard//Download//")
+            val myExternalFile = File(dir, getFileName())
+            try {
+                JsonWriter(FileWriter(myExternalFile)).use { writer ->
+                    gSon.toJson(products, List::class.java, writer)
                 }
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        "File downloaded successfully as ${myExternalFile.name}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "File downloaded successfully as ${myExternalFile.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
         }
     }
 
-    suspend fun importFile (uri: Uri, context: Context): String {
+    suspend fun importFile(uri: Uri, context: Context): List<Product>? {
         var inputStream: InputStream? = null
-        val stringBuilder = StringBuilder()
         try {
-            if(validateFile(uri, context)) {
+            if (validateFile(uri, context)) {
                 inputStream = context.contentResolver.openInputStream(uri)
-                val reader = BufferedReader(InputStreamReader(inputStream))
-                var line = reader.readLine()
-                while (line != null) {
-                    stringBuilder.append(line).append('\n')
-                    line = reader.readLine()
-                }
+                val type = object : TypeToken<List<Product>>() {}.type
+                val products = gSon?.fromJson<List<Product>>(
+                    InputStreamReader(inputStream), type
+                )
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Import completed", Toast.LENGTH_LONG).show()
                 }
+                return products
             }
-        } catch (e: IOException) { e.printStackTrace() }
-        return stringBuilder.toString()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     private suspend fun validateFile(uri: Uri, context: Context): Boolean {
@@ -87,7 +81,11 @@ class ImportAndExportData(var context: Context) {
 
         if (!fileName.endsWith(".json", ignoreCase = true)) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, "Only files with .json extension are supported", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    "Only files with .json extension are supported",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             return false
         }
