@@ -52,13 +52,13 @@ class ImportAndExportData(var context: Context) {
         }
     }
 
-    suspend fun importFile(uri: Uri, context: Context): List<Product>? {
+    suspend fun importFile(uri: Uri, context: Context): List<Product> {
         var inputStream: InputStream? = null
         try {
             if (validateFile(uri, context)) {
                 inputStream = context.contentResolver.openInputStream(uri)
                 val type = object : TypeToken<List<Product>>() {}.type
-                val products = gSon?.fromJson<List<Product>>(
+                val products = gSon.fromJson<List<Product>>(
                     InputStreamReader(inputStream), type
                 )
                 withContext(Dispatchers.Main) {
@@ -69,7 +69,7 @@ class ImportAndExportData(var context: Context) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return null
+        return emptyList()
     }
 
     private suspend fun validateFile(uri: Uri, context: Context): Boolean {

@@ -18,6 +18,8 @@ class Repository(private val dao: ProductDao) {
 
     suspend fun deleteProduct(productEntity: ProductEntity) = dao.deleteProduct(productEntity)
 
+    fun checkIsGivenIdExists(id: Long): Boolean = dao.checkIsGivenIdExists(id)
+
     fun getUnitFromId(unitId: Long): Flow<String> { return dao.getUnitFromId(unitId) }
 
     fun getUnitId(unit: String): Flow<Long> { return dao.getUnitId(unit) }

@@ -4,8 +4,10 @@ import com.gravity.billeasy.data_layer.Repository
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 class UseCase(private val repository: Repository) {
 
@@ -75,7 +77,17 @@ class UseCase(private val repository: Repository) {
         return repository.getCategoryId(category).first()
     }
 
-    suspend fun getAllProducts(): Flow<List<ProductEntity>> {
+    fun getAllProducts(): Flow<List<ProductEntity>> {
         return repository.getAllProducts()
+    }
+
+    suspend fun checkIsGivenIdExistsAndAddProduct(importedProducts: List<Product>){
+        withContext(Dispatchers.IO) {
+            importedProducts.forEach { it ->
+                if(repository.checkIsGivenIdExists(it.productId).not()) {
+                    addProduct(it)
+                }
+            }
+        }
     }
 }

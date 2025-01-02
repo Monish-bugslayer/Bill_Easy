@@ -73,6 +73,7 @@ const val NO_PRODUCTS_STRING_1 = "Your shop is empty"
 const val NO_PRODUCTS_STRING_2 = "Click the add icon below and fill your shop with products"
 const val SEARCH_YOUR_PRODUCT = "Search your product"
 
+// TODO all products are getting at single fetch we need to optimize it by using pagination
 @Composable
 fun MyProducts(productsViewModel: ProductsViewModel) {
     val bottomSheetVisibility = remember { mutableStateOf(false) }
@@ -82,7 +83,10 @@ fun MyProducts(productsViewModel: ProductsViewModel) {
             .fillMaxSize()
             .background(color = colorResource(R.color.white))
     ) {
-        SearchProduct(productsViewModel, onEditProduct = {
+        SearchProduct(
+            productsViewModel = productsViewModel,
+            onImportComplete = { it-> productsViewModel.checkIsGivenIdExistsAndAddProduct(it)},
+            onEditProduct = {
             bottomSheetVisibility.value = true
             product.value = it
         })
@@ -103,7 +107,11 @@ Creating two functions one is manages the
 states and state updates and passing the data to the stateless function
 */
 @Composable
-fun SearchProduct(productsViewModel: ProductsViewModel, onEditProduct: (Product) -> Unit) {
+fun SearchProduct(
+    productsViewModel: ProductsViewModel,
+    onEditProduct: (Product) -> Unit,
+    onImportComplete: (List<Product>) -> Unit
+) {
     val searchResults by productsViewModel.searchResults.collectAsStateWithLifecycle()
     SearchableColumn(
         products = productsViewModel.allProducts.value,
@@ -111,7 +119,8 @@ fun SearchProduct(productsViewModel: ProductsViewModel, onEditProduct: (Product)
         searchResults = searchResults,
         onSearchQueryChange = { productsViewModel.onSearchQueryChange(it) },
         onDelete = { productsViewModel.deleteProduct(it) },
-        onEdit = onEditProduct
+        onEdit = onEditProduct,
+        onImportComplete = onImportComplete
     )
 }
 
@@ -122,7 +131,8 @@ fun SearchableColumn(
     searchResults: List<Product>,
     onSearchQueryChange: (String) -> Unit,
     onDelete: (Product) -> Unit,
-    onEdit: (Product) -> Unit
+    onEdit: (Product) -> Unit,
+    onImportComplete: (List<Product>) -> Unit
 ) {
     var expandedProductId by remember { mutableStateOf<Long?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -133,6 +143,7 @@ fun SearchableColumn(
         onSearch = { keyboardController?.hide() },
         isNeedDownloadDataAction = true,
         allProducts = products,
+        onImportComplete = onImportComplete,
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,

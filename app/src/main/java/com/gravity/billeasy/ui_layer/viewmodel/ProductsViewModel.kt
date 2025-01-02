@@ -102,6 +102,11 @@ class ProductsViewModel(
         appUseCase.addProduct(product)
     }
 
+    fun checkIsGivenIdExistsAndAddProduct(importedProducts: List<Product>) = viewModelScope.launch {
+        importedProducts.forEach { println("In viewm model imported products $it") }
+        appUseCase.checkIsGivenIdExistsAndAddProduct(importedProducts)
+    }
+
     suspend fun getCategoryId(categoryName: String): Long {
         return appUseCase.getCategoryId(categoryName)
     }

@@ -92,6 +92,7 @@ fun AddSaleBottomSheetContent(
         searchQuery = searchQuery,
         onSearchQueryChange = { productsViewModel.onSearchQueryChange(it) },
         onSearch = { keyboardController?.hide() },
+        onImportComplete = {},
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,

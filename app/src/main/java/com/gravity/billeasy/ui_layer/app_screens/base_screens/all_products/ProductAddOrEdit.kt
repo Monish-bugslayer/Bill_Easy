@@ -243,7 +243,7 @@ fun ProductAddOrEditScreen(
                 )
                 onAddAnotherQuantity(product)
             }) {
-                Text(text = ADD_ANOTHER_QUANTITY)
+                Text(text = ADD_ANOTHER_QUANTITY, color = colorResource(R.color.black))
             }
         }
     }

@@ -53,8 +53,8 @@ fun CustomSearchBar(
     keyboardActions: KeyboardActions = KeyboardActions(onSearch = { onSearch(searchQuery) }),
     isNeedDownloadDataAction: Boolean = false,
     allProducts: List<Product>? = null,
+    onImportComplete: (List<Product>) -> Unit,
     content: @Composable (ColumnScope.() -> Unit)
-
 ) {
     Column(modifier = Modifier
         .fillMaxSize()
@@ -70,7 +70,8 @@ fun CustomSearchBar(
                 keyboardOption = keyboardOption,
                 keyboardActions = keyboardActions,
                 allProducts = allProducts!!,
-                context = LocalContext.current
+                context = LocalContext.current,
+                onImportComplete = onImportComplete
             )
         } else {
             OutlinedTextField(
@@ -99,7 +100,8 @@ fun SearchBarWithCustomActions(
     keyboardOption: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
     keyboardActions: KeyboardActions = KeyboardActions(onSearch = { onSearch(searchQuery) }),
     allProducts: List<Product>,
-    context: Context
+    context: Context,
+    onImportComplete: (List<Product>) -> Unit
 ) {
 
     val importAndExportData: ImportAndExportData = remember { ImportAndExportData(context) }
@@ -112,7 +114,7 @@ fun SearchBarWithCustomActions(
             coroutineScope.launch(Dispatchers.IO) {
                 try {
                     val productList = importAndExportData.importFile(uri, context)
-                    println(productList)
+                    onImportComplete(productList)
                 } catch (e: Exception) {
                     println(e.message)
                 }
@@ -132,12 +134,10 @@ fun SearchBarWithCustomActions(
             keyboardActions = keyboardActions
         )
         ColumOptions(
-            onImportClick = { filePicker.launch("*/*") },
+            onImportClick = { filePicker.launch("application/json") },
             onDownloadClick = {
                 importAndExportData.writeTextToFile(allProducts, coroutineScope)
-                Toast
-                    .makeText(context, "Download started", Toast.LENGTH_LONG)
-                    .show()
+                Toast.makeText(context, "Download started", Toast.LENGTH_LONG).show()
             }
         )
     }
@@ -156,7 +156,7 @@ fun ColumOptions(onImportClick: () -> Unit, onDownloadClick: () -> Unit) {
         DropdownMenu(
             expanded = expanded.value,
             onDismissRequest = { expanded.value = false },
-            containerColor = appColor
+            containerColor = colorResource(R.color.white)
         ) {
             DropdownMenuItem(
                 leadingIcon = { Icon(

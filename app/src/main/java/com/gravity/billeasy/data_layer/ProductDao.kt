@@ -45,6 +45,9 @@ interface ProductDao {
     @Query("SELECT * FROM products")
     fun getAllProducts(): Flow<List<ProductEntity>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM products WHERE productId = :id)")
+    fun checkIsGivenIdExists(id: Long): Boolean
+
     @Transaction
     @Query("SELECT * FROM categories")
     fun getCategoriesWithProducts(): Flow<List<CategoryWithProduct>>
