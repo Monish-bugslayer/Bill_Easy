@@ -35,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.gravity.billeasy.R
-import com.gravity.billeasy.appColor
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.data_import_export.ImportAndExportData
 import kotlinx.coroutines.Dispatchers
@@ -115,14 +114,12 @@ fun SearchBarWithCustomActions(
                 try {
                     val productList = importAndExportData.importFile(uri, context)
                     onImportComplete(productList)
-                } catch (e: Exception) {
-                    println(e.message)
-                }
+                } catch (e: Exception) { println(e.message) }
             }
         }
     }
 
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
             modifier = Modifier.padding(start = 10.dp),
             value = searchQuery,
@@ -146,10 +143,7 @@ fun SearchBarWithCustomActions(
 @Composable
 fun ColumOptions(onImportClick: () -> Unit, onDownloadClick: () -> Unit) {
     var expanded = remember { mutableStateOf(false) }
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
+    Box( modifier = Modifier) {
         IconButton(onClick = { expanded.value = !expanded.value }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
         }

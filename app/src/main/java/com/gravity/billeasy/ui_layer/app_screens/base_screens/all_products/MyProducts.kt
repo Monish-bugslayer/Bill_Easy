@@ -61,10 +61,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gravity.billeasy.R
 import com.gravity.billeasy.ShowOrHideBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
+import com.gravity.billeasy.ui_layer.ShimmerLayout
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 const val SEARCH_RESULT_NOT_FOUND_STRING_1 = "No products found"
@@ -113,7 +115,9 @@ fun SearchProduct(
     onImportComplete: (List<Product>) -> Unit
 ) {
     val searchResults by productsViewModel.searchResults.collectAsStateWithLifecycle()
+    val isDataLoadingCompleted by productsViewModel.isDataLoadingCompleted.collectAsStateWithLifecycle()
     SearchableColumn(
+        isDataLoadingCompleted = isDataLoadingCompleted,
         products = productsViewModel.allProducts.value,
         searchQuery = productsViewModel.searchQuery,
         searchResults = searchResults,
@@ -122,10 +126,12 @@ fun SearchProduct(
         onEdit = onEditProduct,
         onImportComplete = onImportComplete
     )
+
 }
 
 @Composable
 fun SearchableColumn(
+    isDataLoadingCompleted: Boolean,
     products: List<Product>,
     searchQuery: String,
     searchResults: List<Product>,
@@ -137,54 +143,57 @@ fun SearchableColumn(
     var expandedProductId by remember { mutableStateOf<Long?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    CustomSearchBar(
-        searchQuery = searchQuery,
-        onSearchQueryChange = onSearchQueryChange,
-        onSearch = { keyboardController?.hide() },
-        isNeedDownloadDataAction = true,
-        allProducts = products,
-        onImportComplete = onImportComplete,
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                tint = colorResource(R.color.black)
-            )
-        },
-        trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
-                IconButton(onClick = { onSearchQueryChange("") }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "Clear search"
-                    )
+    if(isDataLoadingCompleted.not()) { ShimmerLayout() }
+    else {
+        CustomSearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = onSearchQueryChange,
+            onSearch = { keyboardController?.hide() },
+            isNeedDownloadDataAction = true,
+            allProducts = products,
+            onImportComplete = onImportComplete,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = colorResource(R.color.black)
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { onSearchQueryChange("") }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "Clear search"
+                        )
+                    }
                 }
-            }
-        },
-        placeHolderText = { Text(text = SEARCH_YOUR_PRODUCT) }) {
-        if (products.isEmpty()) {
-            ProductNotAvailable(NO_PRODUCTS_STRING_1, NO_PRODUCTS_STRING_2)
-        } else if (searchResults.isEmpty()) {
-            ProductNotAvailable(SEARCH_RESULT_NOT_FOUND_STRING_1, SEARCH_RESULT_NOT_FOUND_STRING_2)
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(count = searchResults.size, key = { searchResults[it].productId }) {
-                    val product = searchResults[it]
-                    ProductCard(
-                        product = product,
-                        isExpanded = expandedProductId == product.productId,
-                        onCardClick = {
-                            expandedProductId =
-                                if (expandedProductId == product.productId) null else product.productId
-                        },
-                        onDelete = onDelete,
-                        onEdit = onEdit
-                    )
+            },
+            placeHolderText = { Text(text = SEARCH_YOUR_PRODUCT) }) {
+            if (products.isEmpty()) {
+                ProductNotAvailable(NO_PRODUCTS_STRING_1, NO_PRODUCTS_STRING_2)
+            } else if (searchResults.isEmpty()) {
+                ProductNotAvailable(SEARCH_RESULT_NOT_FOUND_STRING_1, SEARCH_RESULT_NOT_FOUND_STRING_2)
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(count = searchResults.size, key = { searchResults[it].productId }) {
+                        val product = searchResults[it]
+                        ProductCard(
+                            product = product,
+                            isExpanded = expandedProductId == product.productId,
+                            onCardClick = {
+                                expandedProductId =
+                                    if (expandedProductId == product.productId) null else product.productId
+                            },
+                            onDelete = onDelete,
+                            onEdit = onEdit
+                        )
+                    }
                 }
             }
         }

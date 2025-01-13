@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +49,6 @@ fun Spinner(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-
 
     ExposedDropdownMenuBox(
         expanded = expanded, onExpandedChange = { expanded = !expanded }, modifier = modifier
@@ -89,15 +90,16 @@ fun Spinner(
                         )
                     )
                 ) {
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(300.dp)
                             .menuAnchor()
+                            .verticalScroll(rememberScrollState())
                             .padding(top = 5.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
 
-                        items(options) { option ->
+                        options.forEach { option ->
                             Text(text = option,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier

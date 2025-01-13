@@ -7,6 +7,7 @@ import com.gravity.billeasy.ui_layer.QuantityUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 
 class UseCase(private val repository: Repository) {

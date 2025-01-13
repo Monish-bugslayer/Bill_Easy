@@ -19,4 +19,6 @@
     <color name="orange_light">#FDE7BB</color>
     <color name="orange_dim">#FFF5E1</color>
     <color name="red">#FF0000</color>
+    <color name="shrimmer_grey_lite">#A9A9A9</color>
+    <color name="shrimmer_grey_dark">#868585</color>
 </resources>
