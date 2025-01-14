@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
 import com.gravity.billeasy.data_layer.DatabaseInstance
-import com.gravity.billeasy.data_layer.Repository
+import com.gravity.billeasy.data_layer.ProductRepository
 import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.Home
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.MyProducts
@@ -33,8 +33,8 @@ class NavigationSetup(
         if (!::productsViewModel.isInitialized) {
             val database = DatabaseInstance.getDatabase(context)
             val productDao = database.productDao()
-            val repository = Repository(productDao)
-            val useCase = UseCase(repository)
+            val productRepository = ProductRepository(productDao)
+            val useCase = UseCase(productRepository)
             productsViewModel = ProductsViewModel(useCase, context.databasePreferenceDataStore)
             return productsViewModel
         }

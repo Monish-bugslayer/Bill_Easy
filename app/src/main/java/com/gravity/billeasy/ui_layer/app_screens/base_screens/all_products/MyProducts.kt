@@ -61,7 +61,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gravity.billeasy.R
 import com.gravity.billeasy.ShowOrHideBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
@@ -308,6 +307,7 @@ fun SwipeToDismissBoxContent(
                 .padding(16.dp)
                 .animateContentSize()
         ) {
+            // TODO Ui misalignment occurs when enter very large data
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -12,14 +12,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -31,10 +35,17 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -42,6 +53,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui.theme.BillEasyTheme
+import com.gravity.billeasy.ui_layer.ScrollState
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.AddSaleBottomSheet
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.ProductAddOrEditBottomSheet
 import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
@@ -66,13 +78,15 @@ class MainActivity : ComponentActivity() {
             //  and mode changes to light the status bar color is not changing
             window.statusBarColor = resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
-            val appNavigationImpl = AppNavigationControllerImpl(navHostController)
+            val appNavigationImpl = remember { AppNavigationControllerImpl(navHostController) }
             val showBottomBar = remember { mutableStateOf(true) }
             val isNeedToShowAddProductBottomSheet = remember { mutableStateOf(false) }
             val isNeedToShowAddBillBottomSheet = remember { mutableStateOf(false) }
             val currentRoot = appNavigationImpl.getCurrentRoute()
+            val scrollState = rememberScrollAwareState()
+
             BillEasyTheme {
-                Scaffold(bottomBar = {
+                Scaffold(modifier = Modifier.nestedScroll(scrollState.nestedScrollConnection), bottomBar = {
                     AnimatedVisibility(
                         visible = showBottomBar.value, enter = slideInVertically(
                             initialOffsetY = { it }, animationSpec = tween(durationMillis = 150)
@@ -90,19 +104,31 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }, floatingActionButton = {
-                    AddProductAndSaleFab(
-                        if(currentRoot in setOf(
-                                BillEasyScreens.HOME.name,
-                                BillEasyScreens.MY_PRODUCTS.name
-                        )) "Add Product"
-                        else "Add Sale"
-                    ) {
-                        currentRoot?.let {
-                            when(it) {
-                                BillEasyScreens.HOME.name, BillEasyScreens.MY_PRODUCTS.name -> {
-                                    isNeedToShowAddProductBottomSheet.value = true
+                    // TODO When scroll up started the fab icon should become invisible and when
+                    //  scroll down started and reached the first position of the list, the fab icon
+                    //  should become visible
+
+                    AnimatedVisibility(
+                        visible = scrollState.isNeedToShowFab.value, enter = slideInHorizontally(
+                            initialOffsetX = { it }, animationSpec = tween(durationMillis = 150)
+                        ), exit = slideOutHorizontally(
+                            targetOffsetX = { it }, animationSpec = tween(durationMillis = 150)
+                        )
+                    ){
+                        AddProductAndSaleFab(
+                            if(currentRoot in setOf(
+                                    BillEasyScreens.HOME.name,
+                                    BillEasyScreens.MY_PRODUCTS.name
+                                )) "Add Product"
+                            else "Add Sale"
+                        ) {
+                            currentRoot?.let {
+                                when(it) {
+                                    BillEasyScreens.HOME.name, BillEasyScreens.MY_PRODUCTS.name -> {
+                                        isNeedToShowAddProductBottomSheet.value = true
+                                    }
+                                    else -> isNeedToShowAddBillBottomSheet.value = true
                                 }
-                                else -> isNeedToShowAddBillBottomSheet.value = true
                             }
                         }
                     }
@@ -124,6 +150,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@Composable
+fun rememberScrollAwareState() = remember { ScrollState() }
+
 
 @Composable
 fun ShowOrHideBottomSheet(
@@ -149,36 +179,27 @@ fun ShowOrHideBottomSheet(
 }
 
 @Composable
-fun AddProductAndSaleFab(fabText: String, onClick: () -> Unit) {
-    //TODO: This is disturbing the UI, hiding the data, need to make it small while scroll started
-//    ExtendedFloatingActionButton(
-//        onClick = { onClick() }, containerColor = appColor,
-//        icon = {
-//            Icon(
-//                imageVector = Icons.Filled.Add,
-//                contentDescription = "add product or add sale",
-//                tint = Color.Black
-//            )
-//        },
-//        text = {
-//            Text(
-//                text = fabText
-//            )
-//        }
-//    )
-
-    FloatingActionButton(
+fun AddProductAndSaleFab(
+    fabText: String,
+    onClick: () -> Unit
+) {
+    ExtendedFloatingActionButton(
         onClick = { onClick() }, containerColor = appColor,
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = "add product or add sale",
-            tint = Color.Black
-        )
-    }
+        icon = {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "add product or add sale",
+                tint = Color.Black
+            )
+        },
+        text = {
+            Text(
+                text = fabText
+            )
+        }
+    )
 }
 
-@Stable
 @Composable
 fun BottomNavigationBar(
     window: Window,

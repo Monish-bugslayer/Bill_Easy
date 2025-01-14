@@ -54,6 +54,7 @@ class AppNavigationControllerImpl(private val navHostController: NavHostControll
 
     @Composable
     fun getCurrentRoute(): String? {
+        // this function triggers recomposition
         val navBackStackEntry by navHostController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         return currentRoute

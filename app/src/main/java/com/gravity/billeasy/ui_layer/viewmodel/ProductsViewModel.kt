@@ -33,6 +33,7 @@ class ProductsViewModel(
     val allProducts: MutableState<List<Product>> get() = _allProducts
     private val _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
     private val _isDataLoadingCompleted = mutableStateOf(false)
+    private var isFreshLoading = false
     val isDataLoadingCompleted = snapshotFlow { _isDataLoadingCompleted.value }
         .stateIn(
             scope = viewModelScope,
@@ -41,24 +42,42 @@ class ProductsViewModel(
         )
 
     init {
+        isFreshLoading = true
         viewModelScope.launch(Dispatchers.IO) {
             appUseCase.getAllProducts().collectLatest { productEntity ->
-                _isDataLoadingCompleted.value = false
-                delay(2000) // when converting to online this will help
-                _allProducts.value = productEntity.map {
-                    Product(
-                        productId = it.productId,
-                        productName = it.productName,
-                        productCategory = getCategoryFromId(it.productCategoryId),
-                        unit = getUnitFromId(it.productUnitId),
-                        availableStock = it.availableStock,
-                        quantity = it.quantity,
-                        buyingPrice = it.buyingPrice,
-                        wholeSalePrice = it.wholeSalePrice,
-                        retailPrice = it.retailPrice
-                    )
+                if(isFreshLoading) {
+                    _isDataLoadingCompleted.value = false
+                    delay(2000) // when converting to online this will help
+                    _allProducts.value = productEntity.map {
+                        Product(
+                            productId = it.productId,
+                            productName = it.productName,
+                            productCategory = getCategoryFromId(it.productCategoryId),
+                            unit = getUnitFromId(it.productUnitId),
+                            availableStock = it.availableStock,
+                            quantity = it.quantity,
+                            buyingPrice = it.buyingPrice,
+                            wholeSalePrice = it.wholeSalePrice,
+                            retailPrice = it.retailPrice
+                        )
+                    }
+                    _isDataLoadingCompleted.value = true
+                    isFreshLoading = false
+                } else {
+                    _allProducts.value = productEntity.map {
+                        Product(
+                            productId = it.productId,
+                            productName = it.productName,
+                            productCategory = getCategoryFromId(it.productCategoryId),
+                            unit = getUnitFromId(it.productUnitId),
+                            availableStock = it.availableStock,
+                            quantity = it.quantity,
+                            buyingPrice = it.buyingPrice,
+                            wholeSalePrice = it.wholeSalePrice,
+                            retailPrice = it.retailPrice
+                        )
+                    }
                 }
-                _isDataLoadingCompleted.value = true
             }
         }
     }

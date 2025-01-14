@@ -90,13 +90,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
     //proto datastore
     implementation  (libs.protobuf.javalite)
 
     //firebase dependencies
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-
 
     //compose navigation dependency
     val navVersion = "2.8.3"
@@ -111,6 +111,7 @@ dependencies {
 
     //serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
     // material dependency for bottom navigation
     implementation (libs.androidx.material)
 
@@ -125,6 +126,11 @@ dependencies {
     implementation (libs.material)
     implementation (libs.androidx.appcompat)
 
+    // paging dependency
+    implementation (libs.androidx.paging.runtime)
+    implementation (libs.androidx.paging.compose)
+
+    // gson dependency for serialization
     implementation ("com.google.code.gson:gson:2.10.1")
 
 
