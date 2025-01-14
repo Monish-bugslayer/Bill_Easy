@@ -7,5 +7,8 @@ message Login {
 }
 
 message DatabaseTablePreferences {
-    bool tableCreated = 1;
+    bool unitAndCatagoryTableCreated = 1;
+    bool isShopTableCreated = 2;
+    bool isShopOwnerTableCreated = 3;
 }
+

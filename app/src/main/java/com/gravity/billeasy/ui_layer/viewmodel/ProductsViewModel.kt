@@ -138,11 +138,11 @@ class ProductsViewModel(
     fun initUnitAndCategoryTable() {
         viewModelScope.launch(Dispatchers.IO) {
             dbPreferenceStore.data.collectLatest {
-                if(!it.tableCreated) {
+                if(!it.unitAndCatagoryTableCreated) {
                     addUnit()
                     addCategory()
                     dbPreferenceStore.updateData { preferences->
-                        preferences.toBuilder().setTableCreated(true).build()
+                        preferences.toBuilder().setUnitAndCatagoryTableCreated(true).build()
                     }
                 }
             }

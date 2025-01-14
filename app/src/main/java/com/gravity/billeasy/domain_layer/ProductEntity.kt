@@ -29,5 +29,6 @@ data class ProductEntity(
     val wholeSalePrice: Double,
     val quantity: Long,
     val productCategoryId: Long,
-    val productUnitId: Long
+    val productUnitId: Long,
+    val shopId: Long = 0
 )

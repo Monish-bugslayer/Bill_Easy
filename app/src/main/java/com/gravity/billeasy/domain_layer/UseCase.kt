@@ -56,6 +56,7 @@ class UseCase(private val productRepository: ProductRepository) {
     }
 
     suspend fun addUnit() {
+
         unitsList.forEach {
             productRepository.addUnit(UnitEntity(unit = it.name))
         }
