@@ -1,13 +1,11 @@
 package com.gravity.billeasy.ui_layer.viewmodel
 
-import android.R
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +14,6 @@ import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.data_layer.models.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -52,8 +49,8 @@ class ProductsViewModel(
                         Product(
                             productId = it.productId,
                             productName = it.productName,
-                            productCategory = getCategoryFromId(it.productCategoryId),
-                            unit = getUnitFromId(it.productUnitId),
+                            category = it.category,
+                            unit = it.unit,
                             availableStock = it.availableStock,
                             quantity = it.quantity,
                             buyingPrice = it.buyingPrice,
@@ -68,8 +65,8 @@ class ProductsViewModel(
                         Product(
                             productId = it.productId,
                             productName = it.productName,
-                            productCategory = getCategoryFromId(it.productCategoryId),
-                            unit = getUnitFromId(it.productUnitId),
+                            category = it.category,
+                            unit = it.unit,
                             availableStock = it.availableStock,
                             quantity = it.quantity,
                             buyingPrice = it.buyingPrice,
@@ -99,15 +96,15 @@ class ProductsViewModel(
                 started = SharingStarted.WhileSubscribed(5_000)
             )
 
-    private fun addCategory() = viewModelScope.launch { appUseCase.addCategory() }
+//    private fun addCategory() = viewModelScope.launch { appUseCase.addCategory() }
+//
+//    private fun addUnit() = viewModelScope.launch { appUseCase.addUnit() }
 
-    private fun addUnit() = viewModelScope.launch { appUseCase.addUnit() }
+//    suspend fun getUnitId(unitName: String): Long { return appUseCase.getUnitId(unitName) }
 
-    suspend fun getUnitId(unitName: String): Long { return appUseCase.getUnitId(unitName) }
+//    suspend fun getCategoryFromId(id: Long): String { return appUseCase.getCategoryFromId(id) }
 
-    suspend fun getCategoryFromId(id: Long): String { return appUseCase.getCategoryFromId(id) }
-
-    suspend fun getUnitFromId(id: Long): String { return appUseCase.getUnitFromId(id) }
+//    suspend fun getUnitFromId(id: Long): String { return appUseCase.getUnitFromId(id) }
 
     fun deleteProduct(product: Product) = viewModelScope.launch(Dispatchers.IO) {
         appUseCase.deleteProduct(product)
@@ -126,9 +123,9 @@ class ProductsViewModel(
         appUseCase.checkIsGivenIdExistsAndAddProduct(importedProducts)
     }
 
-    suspend fun getCategoryId(categoryName: String): Long {
-        return appUseCase.getCategoryId(categoryName)
-    }
+//    suspend fun getCategoryId(categoryName: String): Long {
+////        return appUseCase.getCategoryId(categoryName)
+//    }
 
     fun onSearchQueryChange(newQuery: String) {
         println("In view model query change")
@@ -139,8 +136,8 @@ class ProductsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             dbPreferenceStore.data.collectLatest {
                 if(!it.unitAndCatagoryTableCreated) {
-                    addUnit()
-                    addCategory()
+//                    addUnit()
+//                    addCategory()
                     dbPreferenceStore.updateData { preferences->
                         preferences.toBuilder().setUnitAndCatagoryTableCreated(true).build()
                     }

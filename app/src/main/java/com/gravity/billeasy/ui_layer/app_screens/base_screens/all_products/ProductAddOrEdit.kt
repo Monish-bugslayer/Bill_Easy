@@ -233,7 +233,7 @@ fun ProductAddOrEditScreen(
                 val product = Product(
                     productId = 0,
                     productName = productName,
-                    productCategory = productCategory,
+                    category = productCategory,
                     unit = unit,
                     availableStock = availableStock,
                     quantity = quantity,

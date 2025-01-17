@@ -182,7 +182,7 @@ fun SaleProductCard(product: Product) {
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         Text(
-                            text = "Category: ${product.productCategory}",
+                            text = "Category: ${product.category}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(

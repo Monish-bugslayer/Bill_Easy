@@ -344,7 +344,7 @@ fun SwipeToDismissBoxContent(
                     Box(modifier = Modifier.fillMaxHeight().width(IntrinsicSize.Max)) {
                         Column {
                             Text(
-                                text = "Category: ${product.productCategory}",
+                                text = "Category: ${product.category}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(

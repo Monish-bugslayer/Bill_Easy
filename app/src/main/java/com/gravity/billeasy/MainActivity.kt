@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
             //  and mode changes to light the status bar color is not changing
             window.statusBarColor = resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
-            val appNavigationImpl = remember { AppNavigationControllerImpl(navHostController) }
+            val appNavigationImpl = AppNavigationControllerImpl(navHostController)
             val showBottomBar = remember { mutableStateOf(true) }
             val isNeedToShowAddProductBottomSheet = remember { mutableStateOf(false) }
             val isNeedToShowAddBillBottomSheet = remember { mutableStateOf(false) }

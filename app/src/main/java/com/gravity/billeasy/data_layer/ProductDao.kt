@@ -18,11 +18,11 @@ interface ProductDao {
     @Insert
     suspend fun addProduct(product: ProductEntity)
 
-    @Insert
-    suspend fun addUnit(unitEntity: UnitEntity)
+//    @Insert
+//    suspend fun addUnit(unitEntity: UnitEntity)
 
-    @Insert
-    suspend fun addCategory(categoryEntity: CategoryEntity)
+//    @Insert
+//    suspend fun addCategory(categoryEntity: CategoryEntity)
 
     @Update
     suspend fun updateProduct(productEntity: ProductEntity)
@@ -30,17 +30,17 @@ interface ProductDao {
     @Delete
     suspend fun deleteProduct(product: ProductEntity)
 
-    @Query("SELECT categoryId FROM categories WHERE category = :category")
-    fun getCategoryId(category: String): Flow<Long>
+//    @Query("SELECT categoryId FROM categories WHERE category = :category")
+//    fun getCategoryId(category: String): Flow<Long>
+//
+//    @Query("SELECT category from categories WHERE categoryId = :categoryId")
+//    fun getCategoryFromId(categoryId: Long): Flow<String>
 
-    @Query("SELECT category from categories WHERE categoryId = :categoryId")
-    fun getCategoryFromId(categoryId: Long): Flow<String>
+//    @Query("SELECT unit from units WHERE unitId = :unitId")
+//    fun getUnitFromId(unitId: Long): Flow<String>
 
-    @Query("SELECT unit from units WHERE unitId = :unitId")
-    fun getUnitFromId(unitId: Long): Flow<String>
-
-    @Query("SELECT unitId FROM units WHERE unit = :unit")
-    fun getUnitId(unit: String): Flow<Long>
+//    @Query("SELECT unitId FROM units WHERE unit = :unit")
+//    fun getUnitId(unit: String): Flow<Long>
 
     @Query("SELECT * FROM products")
     fun getAllProducts(): Flow<List<ProductEntity>>
@@ -48,12 +48,12 @@ interface ProductDao {
     @Query("SELECT EXISTS(SELECT 1 FROM products WHERE productId = :id)")
     fun checkIsGivenIdExists(id: Long): Boolean
 
-    @Transaction
-    @Query("SELECT * FROM categories")
-    fun getCategoriesWithProducts(): Flow<List<CategoryWithProduct>>
-
-    @Transaction
-    @Query("SELECT * FROM units")
-    fun getUnitsWithProducts(): Flow<List<UnitWithProduct>>
+//    @Transaction
+//    @Query("SELECT * FROM categories")
+//    fun getCategoriesWithProducts(): Flow<List<CategoryWithProduct>>
+//
+//    @Transaction
+//    @Query("SELECT * FROM units")
+//    fun getUnitsWithProducts(): Flow<List<UnitWithProduct>>
 
 }

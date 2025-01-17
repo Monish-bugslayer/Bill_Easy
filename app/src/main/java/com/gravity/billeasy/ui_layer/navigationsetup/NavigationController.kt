@@ -13,6 +13,7 @@ enum class BillEasyScreens {
     LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, BILLS
 }
 
+@Stable
 interface AppNavigationController {
 
     fun navigateToCreateAccountScreen()

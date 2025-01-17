@@ -23,9 +23,9 @@ fun ProductAddOrEditBottomSheet(
 ) {
     val listState = rememberLazyListState()
     val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
-    productsViewModel.initUnitAndCategoryTable()
+//    productsViewModel.initUnitAndCategoryTable()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
-    val productCategory = remember { mutableStateOf(product?.productCategory ?: "") }
+    val productCategory = remember { mutableStateOf(product?.category ?: "") }
     val unit = remember { mutableStateOf(product?.unit ?: "") }
     val productId = remember {
         mutableStateOf(if (product?.productId == null) "" else product.productId.toString())
@@ -83,7 +83,7 @@ fun ProductAddOrEditBottomSheet(
                 val newProduct = Product(
                     productId = if (isForAdd) 0 else productId.value.toLong(),
                     productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
-                    productCategory = addProductFieldsMap.getValue(
+                    category = addProductFieldsMap.getValue(
                         PRODUCT_CATEGORY
                     ).fieldName.value,
                     unit = addProductFieldsMap.getValue(UNIT).fieldName.value,
