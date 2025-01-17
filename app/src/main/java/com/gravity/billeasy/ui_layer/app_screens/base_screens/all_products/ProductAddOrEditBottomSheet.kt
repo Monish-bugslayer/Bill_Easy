@@ -23,7 +23,6 @@ fun ProductAddOrEditBottomSheet(
 ) {
     val listState = rememberLazyListState()
     val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
-//    productsViewModel.initUnitAndCategoryTable()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
     val productCategory = remember { mutableStateOf(product?.category ?: "") }
     val unit = remember { mutableStateOf(product?.unit ?: "") }
