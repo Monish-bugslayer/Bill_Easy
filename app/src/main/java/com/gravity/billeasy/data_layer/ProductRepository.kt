@@ -1,8 +1,6 @@
 package com.gravity.billeasy.data_layer
 
-import com.gravity.billeasy.domain_layer.CategoryEntity
 import com.gravity.billeasy.domain_layer.ProductEntity
-import com.gravity.billeasy.domain_layer.UnitEntity
 import kotlinx.coroutines.flow.Flow
 
 

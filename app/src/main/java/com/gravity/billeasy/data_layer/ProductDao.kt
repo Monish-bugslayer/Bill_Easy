@@ -6,11 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.gravity.billeasy.domain_layer.CategoryEntity
-import com.gravity.billeasy.domain_layer.CategoryWithProduct
 import com.gravity.billeasy.domain_layer.ProductEntity
-import com.gravity.billeasy.domain_layer.UnitEntity
-import com.gravity.billeasy.domain_layer.UnitWithProduct
 import kotlinx.coroutines.flow.Flow
 
 @Dao

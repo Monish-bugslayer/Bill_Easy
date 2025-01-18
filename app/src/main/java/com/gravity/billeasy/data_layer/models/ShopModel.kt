@@ -5,6 +5,10 @@ data class Shop(
     val shopName: String,
     val shopAddress: String,
     val shopMobileNumber: String,
-    val GSTNumber: String,
-    val TINNumber: String
+    val shopEmailAddress: String,
+    val gstNumber: String,
+    val tinNumber: String,
+    val ownerName: String,
+    val ownerAddress: String,
+    val ownerMobileNumber: String
 )

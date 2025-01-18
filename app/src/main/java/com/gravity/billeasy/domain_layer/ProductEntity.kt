@@ -4,7 +4,15 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "products")
+@Entity(
+    tableName = "products",
+    foreignKeys = [ForeignKey(
+        parentColumns = ["shopId"],
+        entity = ShopEntity::class,
+        childColumns = ["shopId"],
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true)
     val productId: Long = 0,
@@ -15,5 +23,6 @@ data class ProductEntity(
     val wholeSalePrice: Double,
     val quantity: Long,
     val category: String,
-    val unit: String
+    val unit: String,
+    val shopId: Long = 0
 )
