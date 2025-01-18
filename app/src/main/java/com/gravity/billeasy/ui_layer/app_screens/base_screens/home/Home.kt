@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,6 +39,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
+import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
+import com.gravity.billeasy.ui_layer.EditableFields
+
+const val SHOP_NAME = "Shop name"
+const val SHOP_ADDRESS = "Shop address"
+const val SHOP_MOBILE_NUMBER = "Shop mobile number"
+const val SHOP_EMAIL_ADDRESS = "Shop email address"
+const val GST_NUMBER = "GST number"
+const val TIN_NUMBER = "TIN number"
+const val OWNER_NAME = "Owner name"
+const val OWNER_ADDRESS = "Owner address"
+const val OWNER_MOBILE_NUMBER = "Owner mobile number"
 
 @Composable
 fun Home() {
@@ -65,14 +78,38 @@ fun HomeQuickAccessible(screenHeight: Int) {
                 .background(colorResource(id = R.color.white)),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ShopNameEditable()
+            ShopDetailsEditable()
             QuickStockAndCreditDetails()
         }
     }
 }
 
 @Composable
-fun ShopNameEditable() {
+fun ShopDetailsEditable() {
+    val isNeedToLaunchShopDetailsEditScreen = remember { mutableStateOf(false) }
+    val shopDetailsMapper: HashMap<String, EditableFields> = hashMapOf<String, EditableFields>()
+    val shopName = remember { mutableStateOf("") }
+    val shopAddress = remember { mutableStateOf("") }
+    val shopEmailId = remember { mutableStateOf("") }
+    val shopMobileNumber = remember { mutableStateOf("") }
+    val gstNumber = remember { mutableStateOf("") }
+    val tinNumber = remember { mutableStateOf("") }
+    val ownerName = remember { mutableStateOf("") }
+    val ownerMobileNumber = remember { mutableStateOf("") }
+    val ownerAddress = remember { mutableStateOf("") }
+
+    shopDetailsMapper.apply {
+        put(SHOP_NAME, EditableFields(shopName, remember { mutableStateOf(false) }))
+        put(SHOP_ADDRESS, EditableFields(shopAddress, remember { mutableStateOf(false) }))
+        put(SHOP_EMAIL_ADDRESS, EditableFields(shopEmailId, remember { mutableStateOf(false) }))
+        put(SHOP_MOBILE_NUMBER, EditableFields(shopMobileNumber, remember { mutableStateOf(false) }))
+        put(GST_NUMBER, EditableFields(gstNumber, remember { mutableStateOf(false) }))
+        put(TIN_NUMBER, EditableFields(tinNumber, remember { mutableStateOf(false) }))
+        put(OWNER_NAME, EditableFields(ownerName, remember { mutableStateOf(false) }))
+        put(OWNER_ADDRESS, EditableFields(ownerAddress, remember { mutableStateOf(false) }))
+        put(OWNER_MOBILE_NUMBER, EditableFields(ownerMobileNumber, remember { mutableStateOf(false) }))
+    }
+
     Row(
         modifier = Modifier
             .padding(top = 12.dp)
@@ -92,11 +129,19 @@ fun ShopNameEditable() {
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(bounded = true, radius = 100.dp)
-            ) { /* Todo edit shop name and shop description in seperate screen */ }) {
+            ) { isNeedToLaunchShopDetailsEditScreen.value = true }) {
 
             Image(
                 painter = painterResource(R.drawable.edit), contentDescription = "Edit shop name"
             )
+
+            if(isNeedToLaunchShopDetailsEditScreen.value) {
+                BillEasyBottomSheet(
+                    sheetHeader = "Edit shop",
+                    onDoneClick = { true },
+                    onDismiss = { isNeedToLaunchShopDetailsEditScreen.value = false }
+                ) { EditShop(shopDetailsMapper = shopDetailsMapper) }
+            }
 
         }
     }

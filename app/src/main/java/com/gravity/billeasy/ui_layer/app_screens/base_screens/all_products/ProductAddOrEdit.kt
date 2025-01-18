@@ -35,6 +35,7 @@ import com.gravity.billeasy.R
 import com.gravity.billeasy.appColor
 import com.gravity.billeasy.ui_layer.Spinner
 import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
 import kotlinx.coroutines.delay
@@ -64,7 +65,7 @@ const val ADD_ANOTHER_QUANTITY = "Add another quantity"
 
 @Composable
 fun ProductAddOrEditScreen(
-    productFieldMapper: MutableMap<String, AddOrEditProductField>,
+    productFieldMapper: MutableMap<String, EditableFields>,
     listState: LazyListState,
     onAddAnotherQuantity: (Product) -> Unit
 ) {

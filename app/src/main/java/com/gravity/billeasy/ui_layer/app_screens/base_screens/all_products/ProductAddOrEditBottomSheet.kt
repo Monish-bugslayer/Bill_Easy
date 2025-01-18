@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
+import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
 
 private const val ADD_YOUR_PRODUCT = "Add your product"
@@ -22,7 +23,7 @@ fun ProductAddOrEditBottomSheet(
     onDismiss: () -> Unit
 ) {
     val listState = rememberLazyListState()
-    val addProductFieldsMap = mutableMapOf<String, AddOrEditProductField>()
+    val addProductFieldsMap = mutableMapOf<String, EditableFields>()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
     val productCategory = remember { mutableStateOf(product?.category ?: "") }
     val unit = remember { mutableStateOf(product?.unit ?: "") }
@@ -56,22 +57,22 @@ fun ProductAddOrEditBottomSheet(
     }
 
     addProductFieldsMap.apply {
-        put(PRODUCT_NAME, AddOrEditProductField(productName, remember { mutableStateOf(false) }))
+        put(PRODUCT_NAME, EditableFields(productName, remember { mutableStateOf(false) }))
         put(
             PRODUCT_CATEGORY,
-            AddOrEditProductField(productCategory, remember { mutableStateOf(false) })
+            EditableFields(productCategory, remember { mutableStateOf(false) })
         )
-        put(UNIT, AddOrEditProductField(unit, remember { mutableStateOf(false) }))
+        put(UNIT, EditableFields(unit, remember { mutableStateOf(false) }))
         put(
             AVAILABLE_STOCK,
-            AddOrEditProductField(availableStock, remember { mutableStateOf(false) })
+            EditableFields(availableStock, remember { mutableStateOf(false) })
         )
-        put(QUANTITY, AddOrEditProductField(quantity, remember { mutableStateOf(false) }))
-        put(BUYING_PRICE, AddOrEditProductField(buyingPrice, remember { mutableStateOf(false) }))
-        put(RETAIL_PRICE, AddOrEditProductField(retailPrice, remember { mutableStateOf(false) }))
+        put(QUANTITY, EditableFields(quantity, remember { mutableStateOf(false) }))
+        put(BUYING_PRICE, EditableFields(buyingPrice, remember { mutableStateOf(false) }))
+        put(RETAIL_PRICE, EditableFields(retailPrice, remember { mutableStateOf(false) }))
         put(
             WHOLESALE_PRICE,
-            AddOrEditProductField(wholeSalePrice, remember { mutableStateOf(false) })
+            EditableFields(wholeSalePrice, remember { mutableStateOf(false) })
         )
     }
 
@@ -110,12 +111,7 @@ fun ProductAddOrEditBottomSheet(
     }
 }
 
-data class AddOrEditProductField(
-    val fieldName: MutableState<String>,
-    var isError: MutableState<Boolean>
-)
-
-fun validateAddOrEditProductField(fields: List<Pair<String, AddOrEditProductField>>): Boolean {
+fun validateAddOrEditProductField(fields: List<Pair<String, EditableFields>>): Boolean {
     while(true) {
         fields.forEach { field ->
             if (field.second.fieldName.value.isEmpty()) {

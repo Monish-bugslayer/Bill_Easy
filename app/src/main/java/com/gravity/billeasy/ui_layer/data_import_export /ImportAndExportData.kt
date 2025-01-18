@@ -32,7 +32,7 @@ class ImportAndExportData(var context: Context) {
 
     fun writeTextToFile(products: List<Product>, coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.IO) {
-            val dir = File("//sdcard//Download//")
+            val dir = File("//sdcard//Download//") // TODO need to modify the directory to recents screen
             val myExternalFile = File(dir, getFileName())
             try {
                 JsonWriter(FileWriter(myExternalFile)).use { writer ->
