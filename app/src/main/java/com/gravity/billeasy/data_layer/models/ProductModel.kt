@@ -12,3 +12,12 @@ data class Product(
     val wholeSalePrice: Double,
     val shopId: Long
 )
+
+data class OrderedProduct(
+    val productId: Long,
+    val productName: String,
+    val productCategory: String,
+    val orderedQuantity: Int,
+    val pricePerUnit: Double,
+    val orderTotal: Double,
+)

@@ -19,7 +19,6 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.PRODU
 fun EditShop(shopDetailsMapper: MutableMap<String, EditableFields>) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    println(shopDetailsMapper.toList().toString())
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(shopDetailsMapper.toList()) { field ->
             val focusRequestedModifier =

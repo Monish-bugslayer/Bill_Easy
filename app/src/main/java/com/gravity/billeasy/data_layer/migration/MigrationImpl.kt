@@ -8,6 +8,7 @@ interface DbMigration {
     fun migrateFrom_1_3(): Migration
     fun migrateFrom_3_4(): Migration
     fun migrateFrom_4_5(): Migration
+    fun migrateFrom_5_6(): Migration
 }
 
 class MigrationImpl: DbMigration {
@@ -168,6 +169,29 @@ class MigrationImpl: DbMigration {
 
                 db.execSQL("""DROP TABLE products""")
                 db.execSQL("""ALTER TABLE products_temp RENAME TO products""")
+            }
+        }
+    }
+
+    override fun migrateFrom_5_6(): Migration {
+        return object: Migration(5,6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS sales (
+                        billId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        customerName TEXT NOT NULL,
+                        billingDate TEXT NOT NULL,
+                        productName TEXT NOT NULL,
+                        productId INTEGER NOT NULL,
+                        productCategory TEXT NOT NULL,
+                        orderedQuantity INTEGER NOT NULL,
+                        finalizedPerUnitPrice DOUBLE NOT NULL,
+                        totalPrice DOUBLE NOT NULL,
+                        paymentType TEXT NOT NULL,
+                        shopId INTEGER NOT NULL,
+                        FOREIGN KEY (shopId) REFERENCES shop(shopId) ON DELETE CASCADE
+                    )
+                """)
             }
         }
     }
