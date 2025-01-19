@@ -115,6 +115,7 @@ class ProductsViewModel(
     }
 
     fun addProduct(product: Product) = viewModelScope.launch(Dispatchers.IO) {
+        // TODO  Need to get shop id from from db and add it while adding product
         appUseCase.addProduct(product)
     }
 
