@@ -1,6 +1,5 @@
 package com.gravity.billeasy.ui_layer.navigationsetup
 
-import android.content.Context
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -9,10 +8,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
-import com.gravity.billeasy.data_layer.DatabaseInstance
-import com.gravity.billeasy.data_layer.ProductRepository
-import com.gravity.billeasy.domain_layer.UseCase
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.Home
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.MyProducts
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.Sales
@@ -21,28 +16,19 @@ import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 class NavigationSetup(
     private val navHostController: NavHostController,
     private val navigationControllerImpl: AppNavigationControllerImpl
 ) {
 
-    private lateinit var productsViewModel: ProductsViewModel
-
-    fun initViewModel(context: Context): ProductsViewModel {
-        if (!::productsViewModel.isInitialized) {
-            val database = DatabaseInstance.getDatabase(context)
-            val productDao = database.productDao()
-            val productRepository = ProductRepository(productDao)
-            val useCase = UseCase(productRepository)
-            productsViewModel = ProductsViewModel(useCase, context.databasePreferenceDataStore)
-            return productsViewModel
-        }
-        return productsViewModel
-    }
-
     @Composable
-    fun SetupNavigation(innerPadding: PaddingValues) {
+    fun SetupNavigation(
+        innerPadding: PaddingValues,
+        productsViewModel: ProductsViewModel,
+        shopViewModel: ShopViewModel
+    ) {
         NavHost(
             navController = navHostController,
             startDestination = BillEasyScreens.MY_PRODUCTS.name,
@@ -77,7 +63,7 @@ class NavigationSetup(
                 })
             }
 
-            composable(route = BillEasyScreens.HOME.name) { Home() }
+            composable(route = BillEasyScreens.HOME.name) { Home(shopViewModel = shopViewModel) }
 
             composable(route = BillEasyScreens.MY_PRODUCTS.name) {
                 MyProducts(productsViewModel = productsViewModel)

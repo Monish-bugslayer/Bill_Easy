@@ -16,14 +16,15 @@ import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.PRODUCT_NAME
 
 @Composable
-fun EditShop(shopDetailsMapper: HashMap<String, EditableFields>) {
+fun EditShop(shopDetailsMapper: MutableMap<String, EditableFields>) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+    println(shopDetailsMapper.toList().toString())
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(shopDetailsMapper.toList()) { field ->
             val focusRequestedModifier =
-                if (field.first == PRODUCT_NAME) Modifier.focusRequester(focusRequester) else Modifier
-            BillEasyOutlineTextField(
+                if (field.first == SHOP_NAME) Modifier.focusRequester(focusRequester) else Modifier
+            BillEasyOutlineTextField (
                 label = field.first,
                 value = field.second.fieldName.value,
                 onValueChange = { it ->

@@ -15,7 +15,6 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.decideKeyboardType
 
 @Composable
 fun BillEasyOutlineTextField(

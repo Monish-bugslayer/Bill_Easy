@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +27,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,11 +40,16 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
+import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
+import com.gravity.billeasy.ui_layer.BillEasyDetailsBottomSheet
 import com.gravity.billeasy.ui_layer.EditableFields
+import com.gravity.billeasy.ui_layer.validateField
+import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 const val SHOP_NAME = "Shop name"
 const val SHOP_ADDRESS = "Shop address"
@@ -51,21 +60,23 @@ const val TIN_NUMBER = "TIN number"
 const val OWNER_NAME = "Owner name"
 const val OWNER_ADDRESS = "Owner address"
 const val OWNER_MOBILE_NUMBER = "Owner mobile number"
+const val EDIT_SHOP = "Edit shop"
+const val SHOP_DETAILS = "Shop details"
 
 @Composable
-fun Home() {
+fun Home(shopViewModel: ShopViewModel) {
     val screenHeight = LocalConfiguration.current.screenHeightDp
     Column(modifier = Modifier
         .fillMaxSize()
         .background(colorResource(R.color.white))
     ) {
-        HomeQuickAccessible(screenHeight)
+        HomeQuickAccessible(screenHeight, shopViewModel)
         SalesChart(screenHeight)
     }
 }
 
 @Composable
-fun HomeQuickAccessible(screenHeight: Int) {
+fun HomeQuickAccessible(screenHeight: Int, shopViewModel: ShopViewModel) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,16 +89,55 @@ fun HomeQuickAccessible(screenHeight: Int) {
                 .background(colorResource(id = R.color.white)),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ShopDetailsEditable()
+            ShopDetailsEditable(shopViewModel)
             QuickStockAndCreditDetails()
         }
     }
 }
 
 @Composable
-fun ShopDetailsEditable() {
+fun ShopDetailsEditable(shopViewModel: ShopViewModel) {
     val isNeedToLaunchShopDetailsEditScreen = remember { mutableStateOf(false) }
-    val shopDetailsMapper: HashMap<String, EditableFields> = hashMapOf<String, EditableFields>()
+    val isNeedToLaunchShopDetailsScreen = remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .padding(top = 12.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = shopViewModel.shop.value.shopName,
+            color = colorResource(R.color.black),
+            fontWeight = FontWeight.W700,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(start = 10.dp).clickable {
+                isNeedToLaunchShopDetailsScreen.value = true
+            }.background(colorResource(R.color.white), RoundedCornerShape(2.dp))
+        )
+        Box(modifier = Modifier
+            .padding(start = 10.dp)
+            .clip(CircleShape)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(bounded = true, radius = 100.dp)
+            ) { isNeedToLaunchShopDetailsEditScreen.value = true }) {
+
+            Image(
+                painter = painterResource(R.drawable.edit), contentDescription = "Edit shop name"
+            )
+            OpenEditShopDetailsBottomSheet(shopViewModel, isNeedToLaunchShopDetailsEditScreen)
+            OpenShopDetailsBottomSheet(
+                shopViewModel = shopViewModel,
+                isNeedToLaunchShopDetailsScreen = isNeedToLaunchShopDetailsScreen
+            )
+        }
+
+    }
+}
+
+@Composable
+fun OpenEditShopDetailsBottomSheet(shopViewModel: ShopViewModel, isNeedToLaunchShopDetailsEditScreen: MutableState<Boolean>) {
+    val shopDetailsMapper: MutableMap<String, EditableFields> =
+        mutableMapOf<String, EditableFields>()
     val shopName = remember { mutableStateOf("") }
     val shopAddress = remember { mutableStateOf("") }
     val shopEmailId = remember { mutableStateOf("") }
@@ -102,48 +152,89 @@ fun ShopDetailsEditable() {
         put(SHOP_NAME, EditableFields(shopName, remember { mutableStateOf(false) }))
         put(SHOP_ADDRESS, EditableFields(shopAddress, remember { mutableStateOf(false) }))
         put(SHOP_EMAIL_ADDRESS, EditableFields(shopEmailId, remember { mutableStateOf(false) }))
-        put(SHOP_MOBILE_NUMBER, EditableFields(shopMobileNumber, remember { mutableStateOf(false) }))
+        put(
+            SHOP_MOBILE_NUMBER,
+            EditableFields(shopMobileNumber, remember { mutableStateOf(false) })
+        )
         put(GST_NUMBER, EditableFields(gstNumber, remember { mutableStateOf(false) }))
         put(TIN_NUMBER, EditableFields(tinNumber, remember { mutableStateOf(false) }))
         put(OWNER_NAME, EditableFields(ownerName, remember { mutableStateOf(false) }))
         put(OWNER_ADDRESS, EditableFields(ownerAddress, remember { mutableStateOf(false) }))
-        put(OWNER_MOBILE_NUMBER, EditableFields(ownerMobileNumber, remember { mutableStateOf(false) }))
-    }
-
-    Row(
-        modifier = Modifier
-            .padding(top = 12.dp)
-            .fillMaxWidth()
-    ) {
-        /* TODO When cliked shop name need to show shop description by expanding the view */
-        Text(
-            text = "SK Stores",
-            color = colorResource(R.color.black),
-            fontWeight = FontWeight.W700,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(start = 10.dp)
+        put(
+            OWNER_MOBILE_NUMBER,
+            EditableFields(ownerMobileNumber, remember { mutableStateOf(false) })
         )
-        Box(modifier = Modifier
-            .padding(start = 10.dp)
-            .clip(CircleShape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(bounded = true, radius = 100.dp)
-            ) { isNeedToLaunchShopDetailsEditScreen.value = true }) {
+    }
+    if(isNeedToLaunchShopDetailsEditScreen.value) {
+        BillEasyBottomSheet(
+            sheetHeader = EDIT_SHOP,
+            onDoneClick = {
+                val updatedShop = Shop (
+                    shopId = shopViewModel.shop.value.shopId,
+                    shopName = shopDetailsMapper.getValue(SHOP_NAME).fieldName.value,
+                    shopAddress = shopDetailsMapper.getValue(SHOP_ADDRESS).fieldName.value,
+                    shopMobileNumber = shopDetailsMapper.getValue(SHOP_MOBILE_NUMBER).fieldName.value,
+                    shopEmailAddress = shopDetailsMapper.getValue(SHOP_EMAIL_ADDRESS).fieldName.value,
+                    ownerName = shopDetailsMapper.getValue(OWNER_NAME).fieldName.value,
+                    ownerAddress = shopDetailsMapper.getValue(OWNER_ADDRESS).fieldName.value,
+                    ownerMobileNumber = shopDetailsMapper.getValue(OWNER_MOBILE_NUMBER).fieldName.value,
+                    gstNumber = shopDetailsMapper.getValue(GST_NUMBER).fieldName.value,
+                    tinNumber = shopDetailsMapper.getValue(TIN_NUMBER).fieldName.value
+                )
+                shopViewModel.updateShop(updatedShop)
+                true
+            },
+            onDismiss = { isNeedToLaunchShopDetailsEditScreen.value = false }
+        ) { EditShop(shopDetailsMapper = shopDetailsMapper) }
+    }
+}
 
-            Image(
-                painter = painterResource(R.drawable.edit), contentDescription = "Edit shop name"
-            )
-
-            if(isNeedToLaunchShopDetailsEditScreen.value) {
-                BillEasyBottomSheet(
-                    sheetHeader = "Edit shop",
-                    onDoneClick = { true },
-                    onDismiss = { isNeedToLaunchShopDetailsEditScreen.value = false }
-                ) { EditShop(shopDetailsMapper = shopDetailsMapper) }
-            }
-
+@Composable
+fun OpenShopDetailsBottomSheet(isNeedToLaunchShopDetailsScreen: MutableState<Boolean>, shopViewModel: ShopViewModel) {
+    if(isNeedToLaunchShopDetailsScreen.value) {
+        BillEasyDetailsBottomSheet (
+            sheetHeader = SHOP_DETAILS,
+            onDismiss = { isNeedToLaunchShopDetailsScreen.value = false }
+        ) {
+            ShopDetails(shop = shopViewModel.shop.value)
         }
+    }
+}
+
+@Composable
+fun ShopDetails(shop: Shop) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        DetailItem("Shop Name", shop.shopName)
+        DetailItem("Shop Address", shop.shopAddress)
+        DetailItem("Shop Mobile Number", shop.shopMobileNumber)
+        DetailItem("Shop Email", shop.shopEmailAddress)
+        DetailItem("GST Number", shop.gstNumber)
+        DetailItem("TIN Number", shop.tinNumber)
+        DetailItem("Owner Name", shop.ownerName)
+        DetailItem("Owner Address", shop.ownerAddress)
+        DetailItem("Owner Mobile Number", shop.ownerMobileNumber)
+    }
+}
+
+@Composable
+private fun DetailItem(label: String, value: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = value.ifEmpty { "Not provided" },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -158,9 +249,27 @@ fun QuickStockAndCreditDetails() {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         stickyHeader { QuickStockAndCreditDetailStickyHeader("Stock Updates") }
-        items(20) { QuickStockAndCreditDetailsView("Item $it") }
+//        items(20) { QuickStockAndCreditDetailsView("Item $it") }
+        item {
+            Text(
+                text = "This feature yet to be implemented",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
         stickyHeader { QuickStockAndCreditDetailStickyHeader("Credit Given") }
-        items(20) { QuickStockAndCreditDetailsView("Credit $it") }
+        item {
+            Text(
+                text = "This feature yet to be implemented",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+//        items(20) { QuickStockAndCreditDetailsView("Credit $it") }
     }
 }
 
@@ -238,7 +347,12 @@ fun SalesChart(screenHeight: Int) {
                     .alpha(0.5f)
             )
 
-            Text(text = "This feature yet to be implemented", modifier = Modifier.offset(textX, textY))
+            Text(
+                text = "This feature yet to be implemented",
+                modifier = Modifier.offset(textX, textY),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
     }
 }

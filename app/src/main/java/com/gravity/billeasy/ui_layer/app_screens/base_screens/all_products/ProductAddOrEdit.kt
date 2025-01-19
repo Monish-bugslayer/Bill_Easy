@@ -38,6 +38,7 @@ import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
+import com.gravity.billeasy.ui_layer.decideKeyboardType
 import kotlinx.coroutines.delay
 
 /*
@@ -67,6 +68,7 @@ const val ADD_ANOTHER_QUANTITY = "Add another quantity"
 fun ProductAddOrEditScreen(
     productFieldMapper: MutableMap<String, EditableFields>,
     listState: LazyListState,
+    shopId: Long,
     onAddAnotherQuantity: (Product) -> Unit
 ) {
 
@@ -240,27 +242,13 @@ fun ProductAddOrEditScreen(
                     quantity = quantity,
                     buyingPrice = buyingPrice,
                     retailPrice = retailPrice,
-                    wholeSalePrice = wholeSalePrice
+                    wholeSalePrice = wholeSalePrice,
+                    shopId = shopId
                 )
                 onAddAnotherQuantity(product)
             }) {
                 Text(text = ADD_ANOTHER_QUANTITY, color = colorResource(R.color.black))
             }
         }
-    }
-}
-
-
-fun decideKeyboardType(fieldType: String): KeyboardType {
-    return when (fieldType) {
-        PRODUCT_NAME -> KeyboardType.Text
-        PRODUCT_CATEGORY -> KeyboardType.Text
-        UNIT -> KeyboardType.Text
-        AVAILABLE_STOCK -> KeyboardType.Number
-        QUANTITY -> KeyboardType.Number
-        BUYING_PRICE -> KeyboardType.Number
-        RETAIL_PRICE -> KeyboardType.Number
-        WHOLESALE_PRICE -> KeyboardType.Number
-        else -> KeyboardType.Text
     }
 }

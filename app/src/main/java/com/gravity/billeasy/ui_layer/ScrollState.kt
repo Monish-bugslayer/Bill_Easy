@@ -17,4 +17,5 @@ class ScrollState {
             return Offset.Zero
         }
     }
+    fun resetScrollState() { isNeedToShowFab.value = true }
 }

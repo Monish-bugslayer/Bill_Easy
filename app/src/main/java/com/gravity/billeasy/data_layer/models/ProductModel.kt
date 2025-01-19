@@ -9,5 +9,6 @@ data class Product(
     val quantity: Long,
     val buyingPrice: Double,
     val retailPrice: Double,
-    val wholeSalePrice: Double
+    val wholeSalePrice: Double,
+    val shopId: Long
 )

@@ -1,5 +1,6 @@
 package com.gravity.billeasy.ui_layer
 
+import android.graphics.Paint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -126,6 +127,66 @@ fun BillEasyBottomSheet(
                 }
                 sheetContent()
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BillEasyDetailsBottomSheet (
+    sheetHeader: String,
+    onDismiss: () -> Unit,
+    sheetContent: @Composable () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { newState ->
+            newState != SheetValue.Hidden
+        })
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        containerColor = colorResource(R.color.white),
+        onDismissRequest = { onDismiss() },
+        dragHandle = { null },
+        modifier = Modifier.imePadding()
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .drawBehind {
+                        drawLine(
+                            color = Color.Gray,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = 0.7f
+                        )
+                    }
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "back",
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .clip(CircleShape)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(bounded = true, radius = 100.dp)
+                        ) { onDismiss() }
+                )
+
+                Text(
+                    text = sheetHeader,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            sheetContent()
         }
     }
 }

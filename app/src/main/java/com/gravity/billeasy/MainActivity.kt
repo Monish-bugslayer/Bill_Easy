@@ -5,6 +5,7 @@ package com.gravity.billeasy
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -51,7 +52,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.gravity.billeasy.appdatastore.appPreferenceDataStore
+import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
+import com.gravity.billeasy.data_layer.DatabaseInstance
 import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.data_layer.repository.ProductRepository
+import com.gravity.billeasy.data_layer.repository.ShopRepository
+import com.gravity.billeasy.domain_layer.use_cases.ProductsUseCase
+import com.gravity.billeasy.domain_layer.use_cases.ShopUseCase
 import com.gravity.billeasy.ui.theme.BillEasyTheme
 import com.gravity.billeasy.ui_layer.ScrollState
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.AddSaleBottomSheet
@@ -60,16 +68,22 @@ import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 inline val appColorInt get() = R.color.orange_light
 inline val appColor @Composable get() = Color(LocalContext.current.resources.getColor(R.color.orange_light))
 
 class MainActivity : ComponentActivity() {
+    lateinit var productsViewModel: ProductsViewModel
+        private set
+    lateinit var shopViewModel: ShopViewModel
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
+        initViewModels(this)
         setContent {
             val context = LocalContext.current
             val window = (context as Activity).window
@@ -84,7 +98,6 @@ class MainActivity : ComponentActivity() {
             val isNeedToShowAddBillBottomSheet = remember { mutableStateOf(false) }
             val currentRoot = appNavigationImpl.getCurrentRoute()
             val scrollState = rememberScrollAwareState()
-
             BillEasyTheme {
                 Scaffold(modifier = Modifier.nestedScroll(scrollState.nestedScrollConnection), bottomBar = {
                     AnimatedVisibility(
@@ -98,16 +111,13 @@ class MainActivity : ComponentActivity() {
                             BottomNavigationBar(
                                 window = window,
                                 currentRoot = it,
+                                scrollState = scrollState,
                                 navigateToHomeScreen = { appNavigationImpl.navigateToHomeScreen() },
                                 navigateToMyProductsScreen = { appNavigationImpl.navigateToMyProducts() },
                                 navigateToBillScreen = { appNavigationImpl.navigateToSales() })
                         }
                     }
                 }, floatingActionButton = {
-                    // TODO When scroll up started the fab icon should become invisible and when
-                    //  scroll down started and reached the first position of the list, the fab icon
-                    //  should become visible
-
                     AnimatedVisibility(
                         visible = scrollState.isNeedToShowFab.value, enter = slideInHorizontally(
                             initialOffsetX = { it }, animationSpec = tween(durationMillis = 150)
@@ -136,17 +146,32 @@ class MainActivity : ComponentActivity() {
                     val navigationSetup = remember {
                         NavigationSetup(navHostController, appNavigationImpl)
                     }
-                    val appViewModel = navigationSetup.initViewModel(context)
-                    navigationSetup.SetupNavigation(innerPadding = innerPadding)
+                    navigationSetup.SetupNavigation(innerPadding = innerPadding, productsViewModel, shopViewModel)
                     ShowOrHideBottomSheet(
                         isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,
                         isNeedToShowAddProductBottomSheet = isNeedToShowAddProductBottomSheet,
                         isForAdd = true,
-                        productsViewModel = appViewModel,
+                        productsViewModel = productsViewModel,
                         product = null
                     )
                 }
             }
+        }
+    }
+
+    fun initViewModels(context: Context) {
+        val database = DatabaseInstance.getDatabase(context)
+        if( !::productsViewModel.isInitialized ) {
+            val productDao = database.productDao()
+            val productRepository = ProductRepository(productDao)
+            val productsUseCase = ProductsUseCase(productRepository)
+            productsViewModel = ProductsViewModel(productsUseCase)
+        }
+        if( !::shopViewModel.isInitialized ) {
+            val shopDao = database.shopDao()
+            val shopRepository = ShopRepository(shopDao)
+            val shopUseCase = ShopUseCase(shopRepository)
+            shopViewModel = ShopViewModel(shopUseCase, context.appPreferenceDataStore)
         }
     }
 }
@@ -161,7 +186,7 @@ fun ShowOrHideBottomSheet(
     isNeedToShowAddProductBottomSheet: MutableState<Boolean>?,
     productsViewModel: ProductsViewModel,
     isForAdd: Boolean,
-    product: Product?,
+    product: Product?
 ) {
     if (isNeedToShowAddProductBottomSheet?.value == true) {
         ProductAddOrEditBottomSheet(
@@ -204,9 +229,10 @@ fun AddProductAndSaleFab(
 fun BottomNavigationBar(
     window: Window,
     currentRoot: String,
+    scrollState: ScrollState,
     navigateToHomeScreen: () -> Unit,
     navigateToMyProductsScreen: () -> Unit,
-    navigateToBillScreen: () -> Unit,
+    navigateToBillScreen: () -> Unit
 ) {
     val context = LocalContext.current
     window.navigationBarColor = context.resources.getColor(appColorInt)
@@ -255,14 +281,17 @@ fun BottomNavigationBar(
                     if(currentRoot != it.name) {
                         when (it.name) {
                             BillEasyScreens.HOME.name -> {
+                                scrollState.resetScrollState()
                                 navigateToHomeScreen()
                             }
 
                             BillEasyScreens.MY_PRODUCTS.name -> {
+                                scrollState.resetScrollState()
                                 navigateToMyProductsScreen()
                             }
 
                             BillEasyScreens.BILLS.name -> {
+                                scrollState.resetScrollState()
                                 navigateToBillScreen()
                             }
                         }

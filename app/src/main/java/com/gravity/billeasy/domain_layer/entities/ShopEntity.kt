@@ -1,4 +1,4 @@
-package com.gravity.billeasy.domain_layer
+package com.gravity.billeasy.domain_layer.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "shop")
 data class ShopEntity(
     @PrimaryKey(autoGenerate = true)
-    val shopId: Long,
+    val shopId: Long = 0,
     val shopName: String,
     val shopAddress: String,
     val shopEmailAddress: String,

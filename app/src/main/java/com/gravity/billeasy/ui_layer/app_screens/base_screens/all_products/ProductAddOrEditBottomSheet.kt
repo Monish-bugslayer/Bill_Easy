@@ -3,13 +3,19 @@ package com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.gravity.billeasy.appdatastore.appPreferenceDataStore
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.EditableFields
+import com.gravity.billeasy.ui_layer.validateField
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 private const val ADD_YOUR_PRODUCT = "Add your product"
 private const val EDIT_YOUR_PRODUCT = "Edit your product"
@@ -23,6 +29,13 @@ fun ProductAddOrEditBottomSheet(
     onDismiss: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    var shopId = remember { mutableLongStateOf(0) }
+    LaunchedEffect(Unit) {
+       context.appPreferenceDataStore.data.collectLatest {
+           shopId.longValue = it.currentLoggedInShopId.toLong()
+        }
+    }
     val addProductFieldsMap = mutableMapOf<String, EditableFields>()
     val productName = remember { mutableStateOf(product?.productName ?: "") }
     val productCategory = remember { mutableStateOf(product?.category ?: "") }
@@ -79,7 +92,7 @@ fun ProductAddOrEditBottomSheet(
     BillEasyBottomSheet(
         sheetHeader = if (isForAdd) ADD_YOUR_PRODUCT else EDIT_YOUR_PRODUCT,
         onDoneClick = {
-            if (validateAddOrEditProductField(addProductFieldsMap.toList())) {
+            if (validateField(addProductFieldsMap.toList())) {
                 val newProduct = Product(
                     productId = if (isForAdd) 0 else productId.value.toLong(),
                     productName = addProductFieldsMap.getValue(PRODUCT_NAME).fieldName.value,
@@ -95,7 +108,8 @@ fun ProductAddOrEditBottomSheet(
                     wholeSalePrice = addProductFieldsMap.getValue(
                         WHOLESALE_PRICE
                     ).fieldName.value.toDouble(),
-                    retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble()
+                    retailPrice = addProductFieldsMap.getValue(RETAIL_PRICE).fieldName.value.toDouble(),
+                    shopId = shopId.longValue
                 )
                 if (isForAdd) productsViewModel.addProduct(newProduct) else productsViewModel.editProduct(newProduct)
                 true
@@ -106,20 +120,9 @@ fun ProductAddOrEditBottomSheet(
     ) {
         ProductAddOrEditScreen(
             productFieldMapper = addProductFieldsMap,
-            listState = listState
+            listState = listState,
+            shopId = shopId.longValue
         ) { productsViewModel.addProduct(it) }
-    }
-}
-
-fun validateAddOrEditProductField(fields: List<Pair<String, EditableFields>>): Boolean {
-    while(true) {
-        fields.forEach { field ->
-            if (field.second.fieldName.value.isEmpty()) {
-                field.second.isError.value = true
-                return false
-            }
-        }
-        return true
     }
 }
 

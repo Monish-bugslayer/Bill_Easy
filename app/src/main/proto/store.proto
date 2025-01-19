@@ -7,8 +7,9 @@ message Login {
 }
 
 message DatabaseTablePreferences {
-    bool unitAndCatagoryTableCreated = 1;
-    bool isShopTableCreated = 2;
-    bool isShopOwnerTableCreated = 3;
+    bool isShopTableCreated = 1;
 }
 
+message AppPreference {
+    string currentLoggedInShopId = 1;
+}
