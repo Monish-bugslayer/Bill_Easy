@@ -27,9 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -45,10 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Shop
+import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyDetailsBottomSheet
 import com.gravity.billeasy.ui_layer.EditableFields
-import com.gravity.billeasy.ui_layer.validateField
+import com.gravity.billeasy.ui_layer.isFormValid
+import com.gravity.billeasy.ui_layer.validateShopDetails
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 const val SHOP_NAME = "Shop name"
@@ -105,7 +105,7 @@ fun ShopDetailsEditable(shopViewModel: ShopViewModel) {
             .fillMaxWidth()
     ) {
         Text(
-            text = shopViewModel.shop.value.shopName,
+            text = shopViewModel.shop.value.name,
             color = colorResource(R.color.black),
             fontWeight = FontWeight.W700,
             fontSize = 20.sp,
@@ -136,60 +136,46 @@ fun ShopDetailsEditable(shopViewModel: ShopViewModel) {
 
 @Composable
 fun OpenEditShopDetailsBottomSheet(shopViewModel: ShopViewModel, isNeedToLaunchShopDetailsEditScreen: MutableState<Boolean>) {
-    val shopDetailsMapper: MutableMap<String, EditableFields> =
-        mutableMapOf<String, EditableFields>()
-    val shopName = remember { mutableStateOf("") }
-    val shopAddress = remember { mutableStateOf("") }
-    val shopEmailId = remember { mutableStateOf("") }
-    val shopMobileNumber = remember { mutableStateOf("") }
-    val gstNumber = remember { mutableStateOf("") }
-    val tinNumber = remember { mutableStateOf("") }
-    val ownerName = remember { mutableStateOf("") }
-    val ownerMobileNumber = remember { mutableStateOf("") }
-    val ownerAddress = remember { mutableStateOf("") }
+    val shopDetailsMapper: MutableMap<String, (String) -> Unit> =
+        mutableMapOf<String, (String) -> Unit>()
+    val errorStates = remember { mutableStateOf(ShopValidationState()) }
 
-//    val shop = remember { mutableStateOf<Shop>(Shop()) }
-//    val onNameChanged = { txt: String -> shop.value = shop.value.copy(shopName = txt) }
+
+    val shop = remember { mutableStateOf<Shop>(Shop()) }
+    val onNameChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(address = updatedValue) }
+    val onEmailAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(emailAddress = updatedValue) }
+    val onMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onGstNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onTinNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onOwnerAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onOwnerMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onOwnerNameChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
 
     shopDetailsMapper.apply {
-//        put(SHOP_NAME, onNameChanged, nameGetter, shop.value.shopName)
-        put(SHOP_NAME, EditableFields(shopName, remember { mutableStateOf(false) }))
-        put(SHOP_ADDRESS, EditableFields(shopAddress, remember { mutableStateOf(false) }))
-        put(SHOP_EMAIL_ADDRESS, EditableFields(shopEmailId, remember { mutableStateOf(false) }))
-        put(
-            SHOP_MOBILE_NUMBER,
-            EditableFields(shopMobileNumber, remember { mutableStateOf(false) })
-        )
-        put(GST_NUMBER, EditableFields(gstNumber, remember { mutableStateOf(false) }))
-        put(TIN_NUMBER, EditableFields(tinNumber, remember { mutableStateOf(false) }))
-        put(OWNER_NAME, EditableFields(ownerName, remember { mutableStateOf(false) }))
-        put(OWNER_ADDRESS, EditableFields(ownerAddress, remember { mutableStateOf(false) }))
-        put(
-            OWNER_MOBILE_NUMBER,
-            EditableFields(ownerMobileNumber, remember { mutableStateOf(false) })
-        )
+        put(SHOP_NAME, onNameChanged)
+        put(SHOP_ADDRESS, onAddressChanged)
+        put(SHOP_EMAIL_ADDRESS, onEmailAddressChanged)
+        put(SHOP_MOBILE_NUMBER, onMobileNumberChanged)
+        put(GST_NUMBER, onGstNumberChanged)
+        put(TIN_NUMBER, onTinNumberChanged)
+        put(OWNER_NAME, onOwnerNameChanged)
+        put(OWNER_ADDRESS, onOwnerAddressChanged)
+        put(OWNER_MOBILE_NUMBER, onOwnerMobileNumberChanged)
     }
     if(isNeedToLaunchShopDetailsEditScreen.value) {
         BillEasyBottomSheet(
             sheetHeader = EDIT_SHOP,
             onDoneClick = {
-                val updatedShop = Shop (
-                    shopId = shopViewModel.shop.value.shopId,
-                    shopName = shopDetailsMapper.getValue(SHOP_NAME).fieldName.value,
-                    shopAddress = shopDetailsMapper.getValue(SHOP_ADDRESS).fieldName.value,
-                    shopMobileNumber = shopDetailsMapper.getValue(SHOP_MOBILE_NUMBER).fieldName.value,
-                    shopEmailAddress = shopDetailsMapper.getValue(SHOP_EMAIL_ADDRESS).fieldName.value,
-                    ownerName = shopDetailsMapper.getValue(OWNER_NAME).fieldName.value,
-                    ownerAddress = shopDetailsMapper.getValue(OWNER_ADDRESS).fieldName.value,
-                    ownerMobileNumber = shopDetailsMapper.getValue(OWNER_MOBILE_NUMBER).fieldName.value,
-                    gstNumber = shopDetailsMapper.getValue(GST_NUMBER).fieldName.value,
-                    tinNumber = shopDetailsMapper.getValue(TIN_NUMBER).fieldName.value
-                )
-                shopViewModel.updateShop(updatedShop)
-                true
+                errorStates.value = validateShopDetails(shop.value)
+                if(isFormValid(errorStates.value)) {
+                    shopViewModel.updateShop(shop.value)
+                    true
+                }
+                false
             },
             onDismiss = { isNeedToLaunchShopDetailsEditScreen.value = false }
-        ) { EditShop(shopDetailsMapper = shopDetailsMapper) }
+        ) { EditShop(shopDetailsMapper = shopDetailsMapper, errorStates = errorStates.value) }
     }
 }
 
@@ -213,10 +199,10 @@ fun ShopDetails(shop: Shop) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        DetailItem("Shop Name", shop.shopName)
-        DetailItem("Shop Address", shop.shopAddress)
-        DetailItem("Shop Mobile Number", shop.shopMobileNumber)
-        DetailItem("Shop Email", shop.shopEmailAddress)
+        DetailItem("Shop Name", shop.name)
+        DetailItem("Shop Address", shop.address)
+        DetailItem("Shop Mobile Number", shop.mobileNumber)
+        DetailItem("Shop Email", shop.emailAddress)
         DetailItem("GST Number", shop.gstNumber)
         DetailItem("TIN Number", shop.tinNumber)
         DetailItem("Owner Name", shop.ownerName)

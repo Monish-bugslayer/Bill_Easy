@@ -121,6 +121,7 @@ fun BillDetails() {
                 onValueChange = { pair.second.fieldName.value = it },
                 focusManager = focusManager,
                 isError = pair.second.isError.value,
+                errorMessage = null,
                 focusRequestedModifier = focusRequestedModifier
             )
         }

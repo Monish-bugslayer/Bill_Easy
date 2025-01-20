@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
             BillEasyTheme {
                 Scaffold(modifier = Modifier.nestedScroll(scrollState.nestedScrollConnection), bottomBar = {
                     AnimatedVisibility(
-                        visible = showBottomBar.value, enter = slideInVertically(
+                        visible = shopViewModel.isNeedToShowCreateShopScreen.value.not(), enter = slideInVertically(
                             initialOffsetY = { it }, animationSpec = tween(durationMillis = 150)
                         ), exit = slideOutVertically(
                             targetOffsetY = { it }, animationSpec = tween(durationMillis = 150)
@@ -146,7 +146,13 @@ class MainActivity : ComponentActivity() {
                     val navigationSetup = remember {
                         NavigationSetup(navHostController, appNavigationImpl)
                     }
-                    navigationSetup.SetupNavigation(innerPadding = innerPadding, productsViewModel, shopViewModel)
+                    navigationSetup.SetupNavigation(
+                        innerPadding = innerPadding,
+                        productsViewModel,
+                        shopViewModel,
+                        if(shopViewModel.isNeedToShowCreateShopScreen.value)
+                            BillEasyScreens.CREATE_SHOP.name else BillEasyScreens.MY_PRODUCTS.name
+                    )
                     ShowOrHideBottomSheet(
                         isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,
                         isNeedToShowAddProductBottomSheet = isNeedToShowAddProductBottomSheet,

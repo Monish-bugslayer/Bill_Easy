@@ -9,6 +9,7 @@ interface DbMigration {
     fun migrateFrom_3_4(): Migration
     fun migrateFrom_4_5(): Migration
     fun migrateFrom_5_6(): Migration
+    fun migrateFrom_6_7(): Migration
 }
 
 class MigrationImpl: DbMigration {
@@ -196,4 +197,55 @@ class MigrationImpl: DbMigration {
         }
     }
 
+    override fun migrateFrom_6_7(): Migration {
+        return object: Migration(6,7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+            CREATE TABLE IF NOT EXISTS shop_temp (
+                shopId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                address TEXT NOT NULL,
+                emailAddress TEXT NOT NULL,
+                mobileNumber TEXT NOT NULL,
+                gstNumber TEXT NOT NULL,
+                tinNumber TEXT NOT NULL,
+                ownerName TEXT NOT NULL,
+                ownerAddress TEXT NOT NULL,
+                ownerMobileNumber TEXT NOT NULL
+            )
+        """)
+
+                database.execSQL("""
+            INSERT INTO shop_temp (
+                shopId,
+                name,
+                address,
+                emailAddress,
+                mobileNumber,
+                gstNumber,
+                tinNumber,
+                ownerName,
+                ownerAddress,
+                ownerMobileNumber
+            )
+            SELECT 
+                shopId,
+                shopName,
+                shopAddress,
+                shopEmailAddress,
+                shopMobileNumber,
+                gstNumber,
+                tinNumber,
+                ownerName,
+                ownerAddress,
+                ownerMobileNumber
+            FROM shop
+        """)
+
+                database.execSQL("DROP TABLE shop")
+
+                database.execSQL("ALTER TABLE shop_temp RENAME TO shop")
+            }
+        }
+    }
 }

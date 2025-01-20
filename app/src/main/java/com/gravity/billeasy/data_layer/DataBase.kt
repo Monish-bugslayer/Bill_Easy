@@ -15,7 +15,7 @@ import com.gravity.billeasy.domain_layer.entities.ShopEntity
 
 const val DB_NAME = "app_database"
 // TODO need to store db version in preference and show user that new version udates.
-const val DB_VERSION = 6
+const val DB_VERSION = 7
 
 @Database(
     entities = [ProductEntity::class, ShopEntity::class, SaleEntity::class],

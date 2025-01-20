@@ -11,27 +11,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.PRODUCT_NAME
 
 @Composable
-fun EditShop(shopDetailsMapper: MutableMap<String, EditableFields>) {
+fun EditShop(shopDetailsMapper: MutableMap<String, (String) -> Unit>, errorStates: ShopValidationState) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(shopDetailsMapper.toList()) { field ->
             val focusRequestedModifier =
                 if (field.first == SHOP_NAME) Modifier.focusRequester(focusRequester) else Modifier
+
+            val error = when (field.first) {
+                SHOP_NAME -> errorStates.nameError
+                SHOP_ADDRESS -> errorStates.addressError
+                SHOP_EMAIL_ADDRESS -> errorStates.emailError
+                SHOP_MOBILE_NUMBER -> errorStates.mobileError
+                GST_NUMBER -> errorStates.gstError
+                TIN_NUMBER -> errorStates.tinError
+                OWNER_NAME -> errorStates.ownerNameError
+                OWNER_ADDRESS -> errorStates.ownerAddressError
+                OWNER_MOBILE_NUMBER -> errorStates.ownerMobileError
+                else -> null
+            }
+
             BillEasyOutlineTextField (
                 label = field.first,
-                value = field.second.fieldName.value,
-                onValueChange = { it ->
-                    field.second.fieldName.value = it
-                },
+                value = "",
+                onValueChange = { it -> field.second(it) },
                 focusRequestedModifier = focusRequestedModifier,
                 focusManager = focusManager,
-                isError = field.second.isError.value
+                isError = error != null,
+                errorMessage = error
             )
         }
     }

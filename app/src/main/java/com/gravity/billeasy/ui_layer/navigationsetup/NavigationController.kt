@@ -10,7 +10,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 
 enum class BillEasyScreens {
-    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, BILLS
+    LOGIN, CREATE_ACCOUNT, OTP_VERIFICATION, HOME, MY_PRODUCTS, GENERATE_BILL, BILLS, CREATE_SHOP
 }
 
 @Stable

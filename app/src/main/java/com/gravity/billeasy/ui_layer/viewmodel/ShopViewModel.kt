@@ -7,7 +7,6 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gravity.billeasy.AppPreference
-import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.domain_layer.use_cases.ShopUseCase
 import kotlinx.coroutines.Dispatchers
@@ -22,17 +21,18 @@ class ShopViewModel(
 
     val shop: MutableState<Shop> get() = _shop
     private val _shop: MutableState<Shop> = mutableStateOf(Shop())
+    val isNeedToShowCreateShopScreen = mutableStateOf(false)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             shopUseCase.getCurrentShopDetails().collectLatest {
                 if(it != null) {
                     _shop.value = Shop (
-                        shopId = it.shopId,
-                        shopAddress = it.shopAddress,
-                        shopName = it.shopName,
-                        shopEmailAddress = it.shopEmailAddress,
-                        shopMobileNumber = it.shopMobileNumber,
+                        id = it.shopId,
+                        address = it.address,
+                        name = it.name,
+                        emailAddress = it.emailAddress,
+                        mobileNumber = it.mobileNumber,
                         ownerName = it.ownerName,
                         ownerMobileNumber = it.ownerMobileNumber,
                         ownerAddress = it.ownerAddress,
@@ -40,7 +40,7 @@ class ShopViewModel(
                         tinNumber = it.tinNumber
                     )
                     updateAppPreference()
-                }
+                } else isNeedToShowCreateShopScreen.value = true
             }
         }
     }
@@ -50,7 +50,7 @@ class ShopViewModel(
             appPreference.data.collectLatest {
                 if(it.currentLoggedInShopId == "") {
                     appPreference.updateData { preference ->
-                        preference.toBuilder().setCurrentLoggedInShopId(shop.value.shopId.toString()).build()
+                        preference.toBuilder().setCurrentLoggedInShopId(shop.value.id.toString()).build()
                     }
                 }
             }

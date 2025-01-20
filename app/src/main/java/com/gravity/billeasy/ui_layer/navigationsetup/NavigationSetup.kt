@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.Home
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.MyProducts
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.CreateShop
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.Sales
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.CreateAccountScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
@@ -27,11 +28,12 @@ class NavigationSetup(
     fun SetupNavigation(
         innerPadding: PaddingValues,
         productsViewModel: ProductsViewModel,
-        shopViewModel: ShopViewModel
+        shopViewModel: ShopViewModel,
+        startDestination: String = BillEasyScreens.MY_PRODUCTS.name
     ) {
         NavHost(
             navController = navHostController,
-            startDestination = BillEasyScreens.MY_PRODUCTS.name,
+            startDestination = startDestination,
             modifier = Modifier.padding(
                 top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding()
@@ -64,6 +66,8 @@ class NavigationSetup(
             }
 
             composable(route = BillEasyScreens.HOME.name) { Home(shopViewModel = shopViewModel) }
+
+            composable(route = BillEasyScreens.CREATE_SHOP.name) { CreateShop(shopViewModel = shopViewModel) }
 
             composable(route = BillEasyScreens.MY_PRODUCTS.name) {
                 MyProducts(productsViewModel = productsViewModel)

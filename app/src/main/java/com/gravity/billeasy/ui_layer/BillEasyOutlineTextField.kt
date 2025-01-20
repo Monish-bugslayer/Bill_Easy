@@ -23,6 +23,7 @@ fun BillEasyOutlineTextField(
     onValueChange: (String) -> Unit,
     focusManager: FocusManager,
     isError: Boolean,
+    errorMessage: String?,
     focusRequestedModifier: Modifier
 ) {
     OutlinedTextField(
@@ -40,8 +41,8 @@ fun BillEasyOutlineTextField(
         }),
         isError = isError,
         supportingText = {
-            if (isError) {
-                Text(text = "$label should not be empty")
+            if (errorMessage != null) {
+                Text(text = errorMessage)
             }
         },
         keyboardOptions = KeyboardOptions(
