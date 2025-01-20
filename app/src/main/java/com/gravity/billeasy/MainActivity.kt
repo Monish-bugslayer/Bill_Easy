@@ -161,17 +161,17 @@ class MainActivity : ComponentActivity() {
 
     fun initViewModels(context: Context) {
         val database = DatabaseInstance.getDatabase(context)
-        if( !::productsViewModel.isInitialized ) {
-            val productDao = database.productDao()
-            val productRepository = ProductRepository(productDao)
-            val productsUseCase = ProductsUseCase(productRepository)
-            productsViewModel = ProductsViewModel(productsUseCase)
-        }
         if( !::shopViewModel.isInitialized ) {
             val shopDao = database.shopDao()
             val shopRepository = ShopRepository(shopDao)
             val shopUseCase = ShopUseCase(shopRepository)
             shopViewModel = ShopViewModel(shopUseCase, context.appPreferenceDataStore)
+        }
+        if( !::productsViewModel.isInitialized ) {
+            val productDao = database.productDao()
+            val productRepository = ProductRepository(productDao)
+            val productsUseCase = ProductsUseCase(productRepository)
+            productsViewModel = ProductsViewModel(productsUseCase)
         }
     }
 }

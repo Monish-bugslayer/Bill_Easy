@@ -33,7 +33,9 @@ fun ProductAddOrEditBottomSheet(
     var shopId = remember { mutableLongStateOf(0) }
     LaunchedEffect(Unit) {
        context.appPreferenceDataStore.data.collectLatest {
-           shopId.longValue = it.currentLoggedInShopId.toLong()
+           if(it.currentLoggedInShopId != "") {
+               shopId.longValue = it.currentLoggedInShopId.toLong()
+           }
         }
     }
     val addProductFieldsMap = mutableMapOf<String, EditableFields>()

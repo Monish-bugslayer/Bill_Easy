@@ -26,19 +26,21 @@ class ShopViewModel(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             shopUseCase.getCurrentShopDetails().collectLatest {
-                _shop.value = Shop (
-                    shopId = it.shopId,
-                    shopAddress = it.shopAddress,
-                    shopName = it.shopName,
-                    shopEmailAddress = it.shopEmailAddress,
-                    shopMobileNumber = it.shopMobileNumber,
-                    ownerName = it.ownerName,
-                    ownerMobileNumber = it.ownerMobileNumber,
-                    ownerAddress = it.ownerAddress,
-                    gstNumber = it.gstNumber,
-                    tinNumber = it.tinNumber
-                )
-                updateAppPreference()
+                if(it != null) {
+                    _shop.value = Shop (
+                        shopId = it.shopId,
+                        shopAddress = it.shopAddress,
+                        shopName = it.shopName,
+                        shopEmailAddress = it.shopEmailAddress,
+                        shopMobileNumber = it.shopMobileNumber,
+                        ownerName = it.ownerName,
+                        ownerMobileNumber = it.ownerMobileNumber,
+                        ownerAddress = it.ownerAddress,
+                        gstNumber = it.gstNumber,
+                        tinNumber = it.tinNumber
+                    )
+                    updateAppPreference()
+                }
             }
         }
     }

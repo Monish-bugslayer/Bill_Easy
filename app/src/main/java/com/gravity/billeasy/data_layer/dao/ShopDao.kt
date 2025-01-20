@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ShopDao {
     // TODO in case in future if there is a support of adding multiple shops we need to get shop
     //  details by passing current logged in shop id
-    @Query("SELECT * from shop")
+    @Query("SELECT * from shop LIMIT 1")
     fun getCurrentShopDetails(): Flow<ShopEntity>
 
     @Update

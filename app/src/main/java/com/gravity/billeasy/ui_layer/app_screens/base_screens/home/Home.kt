@@ -148,7 +148,11 @@ fun OpenEditShopDetailsBottomSheet(shopViewModel: ShopViewModel, isNeedToLaunchS
     val ownerMobileNumber = remember { mutableStateOf("") }
     val ownerAddress = remember { mutableStateOf("") }
 
+//    val shop = remember { mutableStateOf<Shop>(Shop()) }
+//    val onNameChanged = { txt: String -> shop.value = shop.value.copy(shopName = txt) }
+
     shopDetailsMapper.apply {
+//        put(SHOP_NAME, onNameChanged, nameGetter, shop.value.shopName)
         put(SHOP_NAME, EditableFields(shopName, remember { mutableStateOf(false) }))
         put(SHOP_ADDRESS, EditableFields(shopAddress, remember { mutableStateOf(false) }))
         put(SHOP_EMAIL_ADDRESS, EditableFields(shopEmailId, remember { mutableStateOf(false) }))
