@@ -10,6 +10,22 @@ import kotlinx.coroutines.flow.Flow
 @Stable
 class ShopUseCase(private val shopRepo: ShopRepository) {
     fun getCurrentShopDetails(): Flow<ShopEntity?> = shopRepo.getCurrentShopDetails()
+    fun addShop(shop: Shop) {
+        shopRepo.addShop(
+            ShopEntity(
+                shopId = shop.id,
+                name = shop.name,
+                emailAddress = shop.emailAddress,
+                address = shop.address,
+                mobileNumber = shop.mobileNumber,
+                gstNumber = shop.gstNumber,
+                tinNumber = shop.tinNumber,
+                ownerAddress = shop.ownerAddress,
+                ownerMobileNumber = shop.ownerMobileNumber,
+                ownerName = shop.ownerName
+            )
+        )
+    }
     fun updateShop(shop: Shop) {
         shopRepo.updateShop(
             ShopEntity(

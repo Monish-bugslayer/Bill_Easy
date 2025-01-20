@@ -93,7 +93,6 @@ class MainActivity : ComponentActivity() {
             window.statusBarColor = resources.getColor(R.color.white)
             val navHostController: NavHostController = rememberNavController()
             val appNavigationImpl = AppNavigationControllerImpl(navHostController)
-            val showBottomBar = remember { mutableStateOf(true) }
             val isNeedToShowAddProductBottomSheet = remember { mutableStateOf(false) }
             val isNeedToShowAddBillBottomSheet = remember { mutableStateOf(false) }
             val currentRoot = appNavigationImpl.getCurrentRoute()
@@ -118,26 +117,29 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }, floatingActionButton = {
-                    AnimatedVisibility(
-                        visible = scrollState.isNeedToShowFab.value, enter = slideInHorizontally(
-                            initialOffsetX = { it }, animationSpec = tween(durationMillis = 150)
-                        ), exit = slideOutHorizontally(
-                            targetOffsetX = { it }, animationSpec = tween(durationMillis = 150)
-                        )
-                    ){
-                        AddProductAndSaleFab(
-                            if(currentRoot in setOf(
-                                    BillEasyScreens.HOME.name,
-                                    BillEasyScreens.MY_PRODUCTS.name
-                                )) "Add Product"
-                            else "Add Sale"
-                        ) {
-                            currentRoot?.let {
-                                when(it) {
-                                    BillEasyScreens.HOME.name, BillEasyScreens.MY_PRODUCTS.name -> {
-                                        isNeedToShowAddProductBottomSheet.value = true
+                    if(shopViewModel.isNeedToShowCreateShopScreen.value.not()) {
+                        AnimatedVisibility(
+                            visible = scrollState.isNeedToShowFab.value, enter = slideInHorizontally(
+                                initialOffsetX = { it }, animationSpec = tween(durationMillis = 150)
+                            ), exit = slideOutHorizontally(
+                                targetOffsetX = { it }, animationSpec = tween(durationMillis = 150)
+                            )
+                        ){
+                            AddProductAndSaleFab(
+                                if(currentRoot in setOf(
+                                        BillEasyScreens.HOME.name,
+                                        BillEasyScreens.MY_PRODUCTS.name
+                                    )) "Add Product"
+                                else "Add Sale"
+                            ) {
+                                currentRoot?.let {
+                                    when(it) {
+                                        BillEasyScreens.HOME.name,
+                                        BillEasyScreens.MY_PRODUCTS.name -> {
+                                            isNeedToShowAddProductBottomSheet.value = true
+                                        }
+                                        else -> isNeedToShowAddBillBottomSheet.value = true
                                     }
-                                    else -> isNeedToShowAddBillBottomSheet.value = true
                                 }
                             }
                         }
@@ -151,7 +153,7 @@ class MainActivity : ComponentActivity() {
                         productsViewModel,
                         shopViewModel,
                         if(shopViewModel.isNeedToShowCreateShopScreen.value)
-                            BillEasyScreens.CREATE_SHOP.name else BillEasyScreens.MY_PRODUCTS.name
+                            BillEasyScreens.CREATE_SHOP.name else BillEasyScreens.HOME.name
                     )
                     ShowOrHideBottomSheet(
                         isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,

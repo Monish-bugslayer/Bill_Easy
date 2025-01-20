@@ -46,7 +46,7 @@ import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyDetailsBottomSheet
-import com.gravity.billeasy.ui_layer.EditableFields
+import com.gravity.billeasy.ui_layer.IsNeedButton
 import com.gravity.billeasy.ui_layer.isFormValid
 import com.gravity.billeasy.ui_layer.validateShopDetails
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
@@ -124,7 +124,7 @@ fun ShopDetailsEditable(shopViewModel: ShopViewModel) {
             Image(
                 painter = painterResource(R.drawable.edit), contentDescription = "Edit shop name"
             )
-            OpenEditShopDetailsBottomSheet(shopViewModel, isNeedToLaunchShopDetailsEditScreen)
+            EditShopDetails(shopViewModel, isNeedToLaunchShopDetailsEditScreen)
             OpenShopDetailsBottomSheet(
                 shopViewModel = shopViewModel,
                 isNeedToLaunchShopDetailsScreen = isNeedToLaunchShopDetailsScreen
@@ -135,35 +135,38 @@ fun ShopDetailsEditable(shopViewModel: ShopViewModel) {
 }
 
 @Composable
-fun OpenEditShopDetailsBottomSheet(shopViewModel: ShopViewModel, isNeedToLaunchShopDetailsEditScreen: MutableState<Boolean>) {
-    val shopDetailsMapper: MutableMap<String, (String) -> Unit> =
-        mutableMapOf<String, (String) -> Unit>()
+fun EditShopDetails (
+    shopViewModel: ShopViewModel,
+    isNeedToLaunchShopDetailsEditScreen: MutableState<Boolean>? = null,
+    innerPadding: PaddingValues? = null,
+    isNeedButton: IsNeedButton = IsNeedButton.No
+) {
+    val shopDetailsMapper: MutableMap<String, Pair<(String) -> Unit, String>> =
+        mutableMapOf<String, Pair<(String) -> Unit, String>>()
     val errorStates = remember { mutableStateOf(ShopValidationState()) }
-
-
     val shop = remember { mutableStateOf<Shop>(Shop()) }
     val onNameChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
     val onAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(address = updatedValue) }
     val onEmailAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(emailAddress = updatedValue) }
-    val onMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
-    val onGstNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
-    val onTinNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
-    val onOwnerAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
-    val onOwnerMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
-    val onOwnerNameChanged = { updatedValue: String -> shop.value = shop.value.copy(name = updatedValue) }
+    val onMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(mobileNumber = updatedValue) }
+    val onGstNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(gstNumber = updatedValue) }
+    val onTinNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(tinNumber = updatedValue) }
+    val onOwnerAddressChanged = { updatedValue: String -> shop.value = shop.value.copy(ownerAddress = updatedValue) }
+    val onOwnerMobileNumberChanged = { updatedValue: String -> shop.value = shop.value.copy(ownerMobileNumber = updatedValue) }
+    val onOwnerNameChanged = { updatedValue: String -> shop.value = shop.value.copy(ownerName = updatedValue) }
 
     shopDetailsMapper.apply {
-        put(SHOP_NAME, onNameChanged)
-        put(SHOP_ADDRESS, onAddressChanged)
-        put(SHOP_EMAIL_ADDRESS, onEmailAddressChanged)
-        put(SHOP_MOBILE_NUMBER, onMobileNumberChanged)
-        put(GST_NUMBER, onGstNumberChanged)
-        put(TIN_NUMBER, onTinNumberChanged)
-        put(OWNER_NAME, onOwnerNameChanged)
-        put(OWNER_ADDRESS, onOwnerAddressChanged)
-        put(OWNER_MOBILE_NUMBER, onOwnerMobileNumberChanged)
+        put(SHOP_NAME, Pair(onNameChanged, shop.value.name))
+        put(SHOP_ADDRESS, Pair(onAddressChanged, shop.value.address))
+        put(SHOP_EMAIL_ADDRESS, Pair(onEmailAddressChanged, shop.value.emailAddress))
+        put(SHOP_MOBILE_NUMBER, Pair(onMobileNumberChanged, shop.value.mobileNumber))
+        put(GST_NUMBER, Pair(onGstNumberChanged, shop.value.gstNumber))
+        put(TIN_NUMBER, Pair(onTinNumberChanged, shop.value.tinNumber))
+        put(OWNER_NAME, Pair(onOwnerNameChanged, shop.value.ownerName))
+        put(OWNER_ADDRESS, Pair(onOwnerAddressChanged, shop.value.ownerAddress))
+        put(OWNER_MOBILE_NUMBER, Pair(onOwnerMobileNumberChanged, shop.value.ownerMobileNumber))
     }
-    if(isNeedToLaunchShopDetailsEditScreen.value) {
+    if(isNeedToLaunchShopDetailsEditScreen != null && isNeedToLaunchShopDetailsEditScreen.value) {
         BillEasyBottomSheet(
             sheetHeader = EDIT_SHOP,
             onDoneClick = {
@@ -175,7 +178,20 @@ fun OpenEditShopDetailsBottomSheet(shopViewModel: ShopViewModel, isNeedToLaunchS
                 false
             },
             onDismiss = { isNeedToLaunchShopDetailsEditScreen.value = false }
-        ) { EditShop(shopDetailsMapper = shopDetailsMapper, errorStates = errorStates.value) }
+        ) { EditShop(shopDetailsMapper = shopDetailsMapper, errorStates = errorStates.value, isNeedButton) }
+    } else {
+        if(innerPadding != null) {
+            CreateShop(
+                paddingValues = innerPadding,
+            ) {
+                EditShop(shopDetailsMapper = shopDetailsMapper, errorStates = errorStates.value, isNeedButton) {
+                    errorStates.value = validateShopDetails(shop.value)
+                    if(isFormValid(errorStates.value)) {
+                        shopViewModel.updateShop(shop.value)
+                    }
+                }
+            }
+        }
     }
 }
 

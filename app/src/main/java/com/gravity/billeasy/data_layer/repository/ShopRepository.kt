@@ -9,4 +9,5 @@ import kotlinx.coroutines.flow.Flow
 class ShopRepository(private val shopDao: ShopDao) {
     fun getCurrentShopDetails(): Flow<ShopEntity?> = shopDao.getCurrentShopDetails()
     fun updateShop(shopEntity: ShopEntity) { shopDao.updateShop(shopEntity) }
+    fun addShop(shopEntity: ShopEntity) = shopDao.addShop(shopEntity)
 }

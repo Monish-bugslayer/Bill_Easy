@@ -2,6 +2,7 @@ package com.gravity.billeasy.data_layer.dao
 
 import androidx.compose.runtime.Stable
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.gravity.billeasy.domain_layer.entities.ShopEntity
@@ -16,4 +17,7 @@ interface ShopDao {
 
     @Update
     fun updateShop(shopEntity: ShopEntity)
+
+    @Insert
+    fun addShop(shopEntity: ShopEntity)
 }

@@ -27,6 +27,7 @@ class ShopViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             shopUseCase.getCurrentShopDetails().collectLatest {
                 if(it != null) {
+                    isNeedToShowCreateShopScreen.value = false
                     _shop.value = Shop (
                         id = it.shopId,
                         address = it.address,
@@ -58,5 +59,6 @@ class ShopViewModel(
     }
 
     fun updateShop(shop: Shop) = viewModelScope.launch(Dispatchers.IO) { shopUseCase.updateShop(shop) }
+    fun addShop(shop: Shop) = viewModelScope.launch(Dispatchers.IO) { shopUseCase.addShop(shop) }
 
 }

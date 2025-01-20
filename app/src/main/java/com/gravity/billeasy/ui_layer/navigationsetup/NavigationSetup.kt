@@ -8,9 +8,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.gravity.billeasy.ui_layer.IsNeedButton
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.Home
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.MyProducts
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.CreateShop
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.EditShopDetails
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.Sales
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.CreateAccountScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
@@ -29,7 +31,7 @@ class NavigationSetup(
         innerPadding: PaddingValues,
         productsViewModel: ProductsViewModel,
         shopViewModel: ShopViewModel,
-        startDestination: String = BillEasyScreens.MY_PRODUCTS.name
+        startDestination: String = BillEasyScreens.HOME.name
     ) {
         NavHost(
             navController = navHostController,
@@ -67,7 +69,16 @@ class NavigationSetup(
 
             composable(route = BillEasyScreens.HOME.name) { Home(shopViewModel = shopViewModel) }
 
-            composable(route = BillEasyScreens.CREATE_SHOP.name) { CreateShop(shopViewModel = shopViewModel) }
+            composable(route = BillEasyScreens.CREATE_SHOP.name) {
+                EditShopDetails (
+                    shopViewModel,
+                    innerPadding = innerPadding,
+                    isNeedButton = IsNeedButton.Yes(
+                        onButtonClick = { navigationControllerImpl.navigateToHomeScreen() },
+                        buttonText = "Next"
+                    )
+                )
+            }
 
             composable(route = BillEasyScreens.MY_PRODUCTS.name) {
                 MyProducts(productsViewModel = productsViewModel)

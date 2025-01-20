@@ -24,7 +24,7 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.SHOP_NAME
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.TIN_NUMBER
 
 @Stable
-data class EditableFields(
+data class EditableFields (
     val fieldName: MutableState<String>,
     var isError: MutableState<Boolean>
 )
@@ -82,6 +82,7 @@ fun validateTINNumber(tin: String, key: String): String? {
     }
 }
 
+// TODO need to remove this and update to newer method of adding and validating like shop create and edit
 fun validateField(fields: List<Pair<String, EditableFields>>): Boolean {
     while(true) {
         fields.forEach { field ->

@@ -14,15 +14,15 @@ data class Shop(
 ) {
     constructor() : this (
         id = 0,
-        name = "Default Shop Name",
-        address = "Default Address",
-        mobileNumber = "0000000000",
-        emailAddress = "default@example.com",
-        gstNumber = "DEFAULTGST123",
-        tinNumber = "DEFAULTTIN456",
-        ownerName = "Default Owner",
-        ownerAddress = "Default Owner Address",
-        ownerMobileNumber = "9999999999"
+        name = "",
+        address = "",
+        mobileNumber = "",
+        emailAddress = "",
+        gstNumber = "",
+        tinNumber = "",
+        ownerName = "",
+        ownerAddress = "",
+        ownerMobileNumber = ""
     )
 }
 

@@ -44,6 +44,7 @@ object DatabaseInstance {
                 .addMigrations(dbMigrationImpl.migrateFrom_3_4())
                 .addMigrations(dbMigrationImpl.migrateFrom_4_5())
                 .addMigrations(dbMigrationImpl.migrateFrom_5_6())
+                .addMigrations(dbMigrationImpl.migrateFrom_6_7())
                 .build()
             INSTANCE = instance
             instance

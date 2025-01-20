@@ -7,10 +7,10 @@ import androidx.room.PrimaryKey
 data class ShopEntity(
     @PrimaryKey(autoGenerate = true)
     val shopId: Long = 0,
-    val shopName: String,
-    val shopAddress: String,
-    val shopEmailAddress: String,
-    val shopMobileNumber: String,
+    val name: String,
+    val address: String,
+    val emailAddress: String,
+    val mobileNumber: String,
     val gstNumber: String,
     val tinNumber: String,
     val ownerName: String,
