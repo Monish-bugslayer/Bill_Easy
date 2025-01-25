@@ -20,4 +20,13 @@ data class OrderedProduct(
     val orderedQuantity: Int,
     val pricePerUnit: Double,
     val orderTotal: Double,
-)
+) {
+    constructor(): this(
+        productId = 0L,
+        productName = "",
+        productCategory = "",
+        orderedQuantity = 0,
+        pricePerUnit = 0.0,
+        orderTotal = 0.0
+    )
+}

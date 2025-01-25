@@ -23,6 +23,7 @@ data class SaleEntity(
     val orderedQuantity: Int,
     val finalizedPerUnitPrice: Double,
     val totalPrice: Double,
-    val paymentType: String,
+    val paymentMethod: String,
+    val billType: String,
     val shopId: Long
 )

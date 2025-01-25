@@ -18,7 +18,8 @@ class SalesUseCase(private val salesRepo: SalesRepository) {
             productCategory = sale.productCategory,
             finalizedPerUnitPrice = sale.finalizedPerUnitPrice,
             totalPrice = sale.totalPrice,
-            paymentType = sale.paymentType,
+            paymentMethod = sale.paymentMethod,
+            billType = sale.billType,
             shopId = sale.shopId
         )
     )

@@ -132,7 +132,10 @@ fun EditShop(
             is IsNeedButton.Yes -> {
                 item {
                     ElevatedButton(onClick = {
-                        if(onValidateShop()) { isNeedButton.onButtonClick() }
+                        if(onValidateShop()) {
+                            // TODO after clicking need to close the keyboard and then we have to do this action.
+                            isNeedButton.onButtonClick()
+                        }
                     }) {
                         Text(isNeedButton.buttonText)
                     }

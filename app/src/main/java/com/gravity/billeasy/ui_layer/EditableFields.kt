@@ -3,6 +3,7 @@ package com.gravity.billeasy.ui_layer
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.KeyboardType
+import com.gravity.billeasy.data_layer.models.Sale
 import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.AVAILABLE_STOCK
@@ -42,6 +43,7 @@ fun validateShopDetails(shop: Shop): ShopValidationState {
         ownerMobileError = validateMobileNumber(shop.ownerMobileNumber, OWNER_MOBILE_NUMBER)
     )
 }
+
 
 fun validateNameFields(name: String, key: String): String? {
     return when {

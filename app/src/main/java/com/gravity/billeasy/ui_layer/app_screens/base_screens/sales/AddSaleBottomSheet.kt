@@ -38,8 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -61,20 +59,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gravity.billeasy.R
+import com.gravity.billeasy.data_layer.models.OrderedProduct
 import com.gravity.billeasy.data_layer.models.Product
+import com.gravity.billeasy.data_layer.models.Sale
+import com.gravity.billeasy.data_layer.models.SaleValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.CustomSearchBar
-import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_2
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.ProductNotAvailable
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_2
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_YOUR_PRODUCT
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.SHOP_NAME
-import com.gravity.billeasy.ui_layer.validateField
-import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.SalesViewModel
 
 const val CREATE_SALE = "Create sale"
 const val RETAIL_PRICE = "Retail price"
@@ -82,10 +80,11 @@ const val WHOLESALE_PRICE = "Wholesale price"
 const val CUSTOMER_NAME = "Customer name"
 const val BILLING_DATE = "Billing date"
 const val BILL_TYPE = "Bill type"
+const val PAYMENT_METHOD = "Payment method"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSaleBottomSheet(productsViewModel: ProductsViewModel, onDismiss: () -> Unit) {
+fun AddSaleBottomSheet(salesViewModel: SalesViewModel, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
     BillEasyBottomSheet(
         sheetHeader = CREATE_SALE,
@@ -94,36 +93,56 @@ fun AddSaleBottomSheet(productsViewModel: ProductsViewModel, onDismiss: () -> Un
         isNeedNextButton = false,
         onDoneClick = { true },
         onDismiss = onDismiss,
-    ) { AddSaleBottomSheetContent(productsViewModel, listState = listState) }
+    ) { AddSaleBottomSheetContent(salesViewModel, listState = listState) }
 }
 
 @Composable
-fun BillDetails() {
-    val customerName = remember { mutableStateOf("") }
-    val billingDate = remember { mutableStateOf("") }
-    val billType = remember { mutableStateOf("") }
-    val billDetailsMapper = mutableMapOf<String, EditableFields>()
+fun SaleDetails(orderedProduct: OrderedProduct) {
+    val sale = remember { mutableStateOf<Sale>(Sale()) }
+    sale.value = sale.value.copy(
+        productName = orderedProduct.productName,
+        productId = orderedProduct.productId,
+        productCategory = orderedProduct.productCategory,
+        orderedQuantity = orderedProduct.orderedQuantity,
+        finalizedPerUnitPrice = orderedProduct.pricePerUnit,
+        totalPrice = orderedProduct.orderTotal
+    )
+    val onCustomNameChanged = { updatedValue: String ->
+        sale.value = sale.value.copy(customerName = updatedValue)
+    }
+    val onBillingDateChanged = { updatedValue: String ->
+        sale.value = sale.value.copy(billingDate = updatedValue)
+    }
+    val onBillTypeChanged = { updatedValue: String ->
+        sale.value = sale.value.copy(billType = updatedValue)
+    }
+    val onPaymentMethodChanged = { updatedValue: String ->
+        sale.value = sale.value.copy(paymentMethod = updatedValue)
+    }
+    val errorStates = remember { mutableStateOf(SaleValidationState()) }
+    val billDetailsMapper = mutableMapOf<String, Pair<(String) -> Unit, String>>()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     billDetailsMapper.apply {
-        put(CUSTOMER_NAME, EditableFields(customerName, remember { mutableStateOf(false) }))
-        put(BILLING_DATE, EditableFields(billingDate, remember { mutableStateOf(false) }))
-        put(BILL_TYPE, EditableFields(billType, remember { mutableStateOf(false) }))
+        put(CUSTOMER_NAME, Pair(onCustomNameChanged, sale.value.customerName))
+        put(BILLING_DATE, Pair(onBillingDateChanged, sale.value.billingDate))
+        put(BILL_TYPE, Pair(onBillTypeChanged, sale.value.billType))
+        put(PAYMENT_METHOD, Pair(onPaymentMethodChanged, sale.value.paymentMethod))
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         billDetailsMapper.toList().forEach { pair ->
             val focusRequestedModifier =
-                if (pair.first == SHOP_NAME) Modifier.focusRequester(focusRequester) else Modifier
-            BillEasyOutlineTextField(
-                label = pair.first,
-                value = "",
-                onValueChange = { pair.second.fieldName.value = it },
-                focusManager = focusManager,
-                isError = pair.second.isError.value,
-                errorMessage = null,
-                focusRequestedModifier = focusRequestedModifier
-            )
+                if (pair.first == CUSTOMER_NAME) Modifier.focusRequester(focusRequester) else Modifier
+//            BillEasyOutlineTextField(
+//                label = pair.first,
+//                value = "",
+//                onValueChange = { pair.second.fieldName.value = it },
+//                focusManager = focusManager,
+//                isError = pair.second.isError.value,
+//                errorMessage = null,
+//                focusRequestedModifier = focusRequestedModifier
+//            )
         }
     }
 }
@@ -131,18 +150,18 @@ fun BillDetails() {
 
 @Composable
 fun AddSaleBottomSheetContent(
-    productsViewModel: ProductsViewModel,
+    salesViewModel: SalesViewModel,
     listState: LazyListState
 ) {
-    val searchResults by productsViewModel.searchResults.collectAsStateWithLifecycle()
+    val searchResults by salesViewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQuery = productsViewModel.searchQuery
-    val products = productsViewModel.allProducts.value
+    val searchQuery = salesViewModel.searchQuery
+    val products = salesViewModel.allProducts.value
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(start = 5.dp, end = 5.dp)) {
         CustomSearchBar(searchQuery = searchQuery,
-            onSearchQueryChange = { productsViewModel.onSearchQueryChange(it) },
+            onSearchQueryChange = { salesViewModel.onSearchQueryChange(it) },
             onSearch = { keyboardController?.hide() },
             onImportComplete = {},
             leadingIcon = {
@@ -154,7 +173,7 @@ fun AddSaleBottomSheetContent(
             },
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { productsViewModel.onSearchQueryChange("") }) {
+                    IconButton(onClick = { salesViewModel.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             tint = MaterialTheme.colorScheme.onSurface,
@@ -191,8 +210,9 @@ fun AddSaleBottomSheetContent(
 @Composable
 fun SaleProductCard(product: Product) {
     // product name, total price, ordered quant,selected price type, product category, per unti price should go while creating a sale
-    val totalPrice = remember { mutableDoubleStateOf(product.retailPrice) }
     val orderedCount = remember { mutableIntStateOf(0) }
+    val orderedProducts = mutableMapOf<Long, OrderedProduct>()
+    val selectedPerUnitPrice = remember { mutableDoubleStateOf(0.0) }
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -218,10 +238,26 @@ fun SaleProductCard(product: Product) {
                             .padding(end = 8.dp)
                     )
 
-                    CounterBox { count -> orderedCount.intValue = count }
+                    CounterBox { count ->
+                        orderedCount.intValue = count
+                        val orderedProduct = OrderedProduct(
+                            productId = product.productId,
+                            productName = product.productName,
+                            productCategory = product.category,
+                            pricePerUnit = selectedPerUnitPrice.doubleValue,
+                            orderTotal =
+                            selectedPerUnitPrice.doubleValue.times(orderedCount.intValue),
+                            orderedQuantity = orderedCount.intValue
+                        )
+                        if(orderedCount.intValue > 0) {
+                            orderedProducts[orderedProduct.productId] = orderedProduct
+                        } else if(orderedCount.intValue == 0 && orderedProducts.containsKey(orderedProduct.productId)) {
+                            orderedProducts.remove(orderedProduct.productId)
+                        }
+                    }
 
                     Text(
-                        text = "Total ₹ ${totalPrice.doubleValue.times(orderedCount.intValue)}",
+                        text = "Total ₹ ${selectedPerUnitPrice.doubleValue.times(orderedCount.intValue)}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.End
@@ -260,7 +296,7 @@ fun SaleProductCard(product: Product) {
                         RadioButtonAndText(
                             product.retailPrice.toString(), product.wholeSalePrice.toString()
                         ) { selectedPrice ->
-                            totalPrice.doubleValue = selectedPrice
+                            selectedPerUnitPrice.doubleValue = selectedPrice
                         }
                     }
                 }
@@ -277,9 +313,9 @@ fun CounterBox(onEditProductCount: (Int) -> Unit) {
         ), horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val iconBorderColor = MaterialTheme.colorScheme.primary
-        var productCount = remember { mutableStateOf(0) }
+        var productCount = remember { mutableIntStateOf(0) }
         Icon(painter = painterResource(R.drawable.baseline_remove_24),
-            contentDescription = "remove",
+            contentDescription = "remove product count",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(5.dp)
@@ -295,18 +331,18 @@ fun CounterBox(onEditProductCount: (Int) -> Unit) {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(bounded = true, radius = 100.dp)
                 ) {
-                    if (productCount.value != 0) {
-                        productCount.value--
-                        onEditProductCount(productCount.value)
+                    if (productCount.intValue != 0) {
+                        productCount.intValue--
+                        onEditProductCount(productCount.intValue)
                     }
                 })
         Text(
-            text = productCount.value.toString(),
+            text = productCount.intValue.toString(),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(5.dp)
         )
         Icon(imageVector = Icons.Default.Add,
-            contentDescription = "remove",
+            contentDescription = "add product count",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(5.dp)
@@ -322,8 +358,8 @@ fun CounterBox(onEditProductCount: (Int) -> Unit) {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(bounded = true, radius = 100.dp)
                 ) {
-                    productCount.value++
-                    onEditProductCount(productCount.value)
+                    productCount.intValue++
+                    onEditProductCount(productCount.intValue)
                 })
     }
 }

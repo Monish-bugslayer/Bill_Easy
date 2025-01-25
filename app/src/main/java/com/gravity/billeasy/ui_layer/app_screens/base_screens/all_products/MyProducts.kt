@@ -59,10 +59,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gravity.billeasy.R
-import com.gravity.billeasy.ShowOrHideBottomSheet
+import com.gravity.billeasy.ShowProductsBottomSheet
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.ui_layer.CustomSearchBar
 import com.gravity.billeasy.ui_layer.ShimmerLayout
@@ -88,12 +89,11 @@ fun MyProducts(productsViewModel: ProductsViewModel) {
             productsViewModel = productsViewModel,
             onImportComplete = { it-> productsViewModel.checkIsGivenIdExistsAndAddProduct(it)},
             onEditProduct = {
-            bottomSheetVisibility.value = true
-            product.value = it
+                bottomSheetVisibility.value = true
+                product.value = it
         })
         if(bottomSheetVisibility.value) {
-            ShowOrHideBottomSheet(
-                isNeedToShowAddSaleBottomSheet = null,
+            ShowProductsBottomSheet(
                 isNeedToShowAddProductBottomSheet = bottomSheetVisibility,
                 isForAdd = false,
                 productsViewModel = productsViewModel,
@@ -310,28 +310,33 @@ fun SwipeToDismissBoxContent(
             // TODO Ui misalignment occurs when enter very large data
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = product.productName,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .weight(2f)
-                        .padding(end = 8.dp)
+                        .weight(0.4f)
+                        .padding(end = 5.dp)
                 )
                 Text(
                     text = "Qty: ${product.quantity}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.weight(1f)
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.25f).padding(end = 5.dp)
                 )
                 Text(
                     text = "₹ ${product.retailPrice}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(0.35f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.End
                 )
             }
@@ -343,6 +348,28 @@ fun SwipeToDismissBoxContent(
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Box(modifier = Modifier.fillMaxHeight().width(IntrinsicSize.Max)) {
                         Column {
+
+                            if(product.productName.length > 13) {
+                                Text(
+                                    text = "Product name: ${product.productName}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+                            if(product.quantity.toString().length > 3) {
+                                Text(
+                                    text = "Quantity: ${product.quantity}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+                            if(product.retailPrice > 5) {
+                                Text(
+                                    text = "Retail Price: ₹ ${product.retailPrice}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
                             Text(
                                 text = "Category: ${product.category}",
                                 style = MaterialTheme.typography.bodyMedium

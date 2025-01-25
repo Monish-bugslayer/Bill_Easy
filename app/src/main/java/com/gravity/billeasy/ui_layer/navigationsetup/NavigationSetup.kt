@@ -18,6 +18,7 @@ import com.gravity.billeasy.ui_layer.app_screens.loginscreens.LoginScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.OTPVerificationScreen
 import com.gravity.billeasy.ui_layer.app_screens.loginscreens.Otp
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.SalesViewModel
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 class NavigationSetup(

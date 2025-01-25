@@ -19,46 +19,38 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gravity.billeasy.appdatastore.appPreferenceDataStore
-import com.gravity.billeasy.appdatastore.databasePreferenceDataStore
 import com.gravity.billeasy.data_layer.DatabaseInstance
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.data_layer.repository.ProductRepository
+import com.gravity.billeasy.data_layer.repository.SalesRepository
 import com.gravity.billeasy.data_layer.repository.ShopRepository
 import com.gravity.billeasy.domain_layer.use_cases.ProductsUseCase
+import com.gravity.billeasy.domain_layer.use_cases.SalesUseCase
 import com.gravity.billeasy.domain_layer.use_cases.ShopUseCase
 import com.gravity.billeasy.ui.theme.BillEasyTheme
 import com.gravity.billeasy.ui_layer.ScrollState
@@ -68,6 +60,7 @@ import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.SalesViewModel
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 inline val appColorInt get() = R.color.orange_light
@@ -77,6 +70,8 @@ class MainActivity : ComponentActivity() {
     lateinit var productsViewModel: ProductsViewModel
         private set
     lateinit var shopViewModel: ShopViewModel
+        private set
+    lateinit var salesViewModel: SalesViewModel
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,13 +150,17 @@ class MainActivity : ComponentActivity() {
                         if(shopViewModel.isNeedToShowCreateShopScreen.value)
                             BillEasyScreens.CREATE_SHOP.name else BillEasyScreens.HOME.name
                     )
-                    ShowOrHideBottomSheet(
-                        isNeedToShowAddSaleBottomSheet = isNeedToShowAddBillBottomSheet,
-                        isNeedToShowAddProductBottomSheet = isNeedToShowAddProductBottomSheet,
-                        isForAdd = true,
-                        productsViewModel = productsViewModel,
-                        product = null
-                    )
+                    if(isNeedToShowAddProductBottomSheet.value) {
+                        ProductAddOrEditBottomSheet(
+                            isForAdd = true,
+                            productsViewModel = productsViewModel,
+                            product = null
+                        ) { isNeedToShowAddProductBottomSheet.value = false }
+                    } else if(isNeedToShowAddBillBottomSheet.value) {
+                        AddSaleBottomSheet(
+                            salesViewModel = salesViewModel
+                        ) { isNeedToShowAddBillBottomSheet.value = false }
+                    }
                 }
             }
         }
@@ -169,6 +168,8 @@ class MainActivity : ComponentActivity() {
 
     fun initViewModels(context: Context) {
         val database = DatabaseInstance.getDatabase(context)
+        val productDao = database.productDao()
+        val productRepository = ProductRepository(productDao)
         if( !::shopViewModel.isInitialized ) {
             val shopDao = database.shopDao()
             val shopRepository = ShopRepository(shopDao)
@@ -176,10 +177,14 @@ class MainActivity : ComponentActivity() {
             shopViewModel = ShopViewModel(shopUseCase, context.appPreferenceDataStore)
         }
         if( !::productsViewModel.isInitialized ) {
-            val productDao = database.productDao()
-            val productRepository = ProductRepository(productDao)
             val productsUseCase = ProductsUseCase(productRepository)
             productsViewModel = ProductsViewModel(productsUseCase)
+        }
+        if( !::salesViewModel.isInitialized ) {
+            val salesDao = database.saleDao()
+            val saleRepo = SalesRepository(salesDao)
+            val salesUseCase = SalesUseCase(saleRepo)
+            salesViewModel = SalesViewModel(salesUseCase, productRepository)
         }
     }
 }
@@ -187,28 +192,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun rememberScrollAwareState() = remember { ScrollState() }
 
-
 @Composable
-fun ShowOrHideBottomSheet(
-    isNeedToShowAddSaleBottomSheet: MutableState<Boolean>?,
-    isNeedToShowAddProductBottomSheet: MutableState<Boolean>?,
+fun ShowProductsBottomSheet (
+    isNeedToShowAddProductBottomSheet: MutableState<Boolean>,
     productsViewModel: ProductsViewModel,
     isForAdd: Boolean,
     product: Product?
 ) {
-    if (isNeedToShowAddProductBottomSheet?.value == true) {
-        ProductAddOrEditBottomSheet(
-            isForAdd = isForAdd,
-            productsViewModel = productsViewModel,
-            product = product
-        ) { isNeedToShowAddProductBottomSheet.value = false }
-    }
-    else if(isNeedToShowAddSaleBottomSheet?.value == true) {
-        AddSaleBottomSheet(productsViewModel = productsViewModel
-        ) {
-            isNeedToShowAddSaleBottomSheet.value = false
-        }
-    }
+    ProductAddOrEditBottomSheet(
+        isForAdd = isForAdd,
+        productsViewModel = productsViewModel,
+        product = product
+    ) { isNeedToShowAddProductBottomSheet.value = false }
 }
 
 @Composable

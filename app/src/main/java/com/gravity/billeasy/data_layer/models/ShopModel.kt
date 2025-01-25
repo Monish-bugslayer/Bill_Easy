@@ -26,7 +26,7 @@ data class Shop(
     )
 }
 
-data class ShopValidationState(
+data class ShopValidationState (
     val nameError: String? = null,
     val addressError: String? = null,
     val emailError: String? = null,
