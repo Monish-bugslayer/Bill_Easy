@@ -21,7 +21,7 @@ import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.IsNeedButton
-import com.gravity.billeasy.ui_layer.isFormValid
+import com.gravity.billeasy.ui_layer.isShopFormValid
 import com.gravity.billeasy.ui_layer.validateShopDetails
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
@@ -62,7 +62,7 @@ fun EditShopDetails (
             sheetHeader = EDIT_SHOP,
             onDoneClick = {
                 errorStates.value = validateShopDetails(shop.value)
-                if(isFormValid(errorStates.value)) {
+                if(isShopFormValid(errorStates.value)) {
                     shopViewModel.updateShop(shop.value)
                     true
                 }
@@ -77,7 +77,7 @@ fun EditShopDetails (
             ) {
                 EditShop(shopDetailsMapper = shopDetailsMapper, errorStates = errorStates.value, isNeedButton) {
                     errorStates.value = validateShopDetails(shop.value)
-                    if(isFormValid(errorStates.value)) {
+                    if(isShopFormValid(errorStates.value)) {
                         shopViewModel.addShop(shop.value)
                         true
                     } else false

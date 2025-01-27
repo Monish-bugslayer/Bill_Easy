@@ -4,15 +4,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.KeyboardType
 import com.gravity.billeasy.data_layer.models.Sale
+import com.gravity.billeasy.data_layer.models.SaleValidationState
 import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.AVAILABLE_STOCK
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.BUYING_PRICE
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.PRODUCT_CATEGORY
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.PRODUCT_NAME
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.QUANTITY
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.RETAIL_PRICE
-import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.UNIT
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.WHOLESALE_PRICE
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.GST_NUMBER
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.OWNER_ADDRESS
@@ -23,6 +21,10 @@ import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.SHOP_EMAIL_AD
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.SHOP_MOBILE_NUMBER
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.SHOP_NAME
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.home.TIN_NUMBER
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.BILLING_DATE
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.BILL_TYPE
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.CUSTOMER_NAME
+import com.gravity.billeasy.ui_layer.app_screens.base_screens.sales.PAYMENT_METHOD
 
 @Stable
 data class EditableFields (
@@ -41,6 +43,15 @@ fun validateShopDetails(shop: Shop): ShopValidationState {
         ownerNameError = validateNameFields(shop.ownerName, OWNER_NAME),
         ownerAddressError = validateNameFields(shop.ownerAddress, OWNER_ADDRESS),
         ownerMobileError = validateMobileNumber(shop.ownerMobileNumber, OWNER_MOBILE_NUMBER)
+    )
+}
+
+fun validateSaleDetails(sale: Sale): SaleValidationState {
+    return SaleValidationState(
+        customerNameError = validateNameFields(sale.customerName, CUSTOMER_NAME),
+        billingDateError = validateNameFields(sale.billingDate, BILLING_DATE),
+        billTypeError = validateNameFields(sale.billType, BILL_TYPE),
+        paymentMethodError = validateNameFields(sale.paymentMethod, PAYMENT_METHOD)
     )
 }
 
@@ -97,11 +108,18 @@ fun validateField(fields: List<Pair<String, EditableFields>>): Boolean {
     }
 }
 
-fun isFormValid(validationState: ShopValidationState): Boolean {
+fun isShopFormValid(validationState: ShopValidationState): Boolean {
     return validationState.run {
         nameError == null && addressError == null && emailError == null &&
                 mobileError == null && gstError == null && tinError == null &&
                 ownerNameError == null && ownerAddressError == null && ownerMobileError == null
+    }
+}
+
+fun isSaleFormValid(validationState: SaleValidationState):  Boolean {
+    return validationState.run {
+        customerNameError == null && billTypeError == null && paymentMethodError == null
+                && billingDateError == null
     }
 }
 

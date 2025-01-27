@@ -32,7 +32,8 @@ class SalesViewModel(
     private val _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
     private val _allSales = mutableStateOf(emptyList<Sale>())
     val cumulativeTotal = mutableIntStateOf(0)
-    val orderedProducts: State<List<OrderedProduct>> = mutableStateOf(emptyList())
+    var orderedProducts: List<OrderedProduct> = emptyList()
+        private set
     val allSales: State<List<Sale>> get() = _allSales
     val allProducts: MutableState<List<Product>> get() = _allProducts
 
@@ -62,7 +63,7 @@ class SalesViewModel(
                         billId = it.billId,
                         customerName = it.customerName,
                         billingDate = it.billingDate,
-                        productName = it.productName,
+                        orderedProducts = it.orderedProducts,
                         productId = it.productId,
                         productCategory = it.productCategory,
                         orderedQuantity = it.orderedQuantity,
@@ -97,5 +98,9 @@ class SalesViewModel(
     }
 
     fun onSearchQueryChange(newQuery: String) { searchQuery = newQuery }
+
+    fun updateOrderedProducts(newOrderedProduct: MutableMap<Long, OrderedProduct>) = {
+        orderedProducts = newOrderedProduct.values.toList()
+    }
 
 }

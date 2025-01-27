@@ -43,12 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gravity.billeasy.R
 import com.gravity.billeasy.data_layer.models.Shop
-import com.gravity.billeasy.data_layer.models.ShopValidationState
-import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyDetailsBottomSheet
-import com.gravity.billeasy.ui_layer.IsNeedButton
-import com.gravity.billeasy.ui_layer.isFormValid
-import com.gravity.billeasy.ui_layer.validateShopDetails
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 const val SHOP_NAME = "Shop name"

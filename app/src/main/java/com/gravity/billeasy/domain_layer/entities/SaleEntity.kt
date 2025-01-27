@@ -17,12 +17,7 @@ data class SaleEntity(
     val billId: Long,
     val customerName: String,
     val billingDate: String,
-    val productName: String,
-    val productId: Long,
-    val productCategory: String,
-    val orderedQuantity: Int,
-    val finalizedPerUnitPrice: Double,
-    val totalPrice: Double,
+    val orderedProducts: String,
     val paymentMethod: String,
     val billType: String,
     val shopId: Long

@@ -93,14 +93,16 @@ fun AddSaleBottomSheet(salesViewModel: SalesViewModel, onDismiss: () -> Unit) {
         isNeedNextButton = false,
         onDoneClick = { true },
         onDismiss = onDismiss,
-    ) { AddSaleBottomSheetContent(salesViewModel, listState = listState) }
+    ) {
+        AddSaleBottomSheetContent(salesViewModel, listState = listState)
+    }
 }
 
 @Composable
 fun SaleDetails(orderedProduct: OrderedProduct) {
     val sale = remember { mutableStateOf<Sale>(Sale()) }
     sale.value = sale.value.copy(
-        productName = orderedProduct.productName,
+        orderedProducts = orderedProduct.productName,
         productId = orderedProduct.productId,
         productCategory = orderedProduct.productCategory,
         orderedQuantity = orderedProduct.orderedQuantity,
@@ -133,23 +135,31 @@ fun SaleDetails(orderedProduct: OrderedProduct) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         billDetailsMapper.toList().forEach { pair ->
             val focusRequestedModifier =
-                if (pair.first == CUSTOMER_NAME) Modifier.focusRequester(focusRequester) else Modifier
-//            BillEasyOutlineTextField(
-//                label = pair.first,
-//                value = "",
-//                onValueChange = { pair.second.fieldName.value = it },
-//                focusManager = focusManager,
-//                isError = pair.second.isError.value,
-//                errorMessage = null,
-//                focusRequestedModifier = focusRequestedModifier
-//            )
+                if (pair.first == CUSTOMER_NAME) Modifier.focusRequester(focusRequester)
+                else Modifier
+            val error = when (pair.first) {
+                CUSTOMER_NAME -> errorStates.value.customerNameError
+                BILLING_DATE -> errorStates.value.billingDateError
+                BILL_TYPE -> errorStates.value.billTypeError
+                PAYMENT_METHOD -> errorStates.value.paymentMethodError
+                else -> null
+            }
+            BillEasyOutlineTextField(
+                label = pair.first,
+                value = pair.second.second,
+                onValueChange = { pair.second.first(it) },
+                focusManager = focusManager,
+                isError = error != null,
+                errorMessage = null,
+                focusRequestedModifier = focusRequestedModifier
+            )
         }
     }
 }
 
 
 @Composable
-fun AddSaleBottomSheetContent(
+fun AddSaleBottomSheetContent (
     salesViewModel: SalesViewModel,
     listState: LazyListState
 ) {
@@ -199,7 +209,7 @@ fun AddSaleBottomSheetContent(
                 ) {
                     items(count = searchResults.size, key = { searchResults[it].productId }) {
                         val product = searchResults[it]
-                        SaleProductCard(product)
+                        SaleProductCard(product, salesViewModel)
                     }
                 }
             }
@@ -208,7 +218,7 @@ fun AddSaleBottomSheetContent(
 }
 
 @Composable
-fun SaleProductCard(product: Product) {
+fun SaleProductCard(product: Product, salesViewModel: SalesViewModel) {
     // product name, total price, ordered quant,selected price type, product category, per unti price should go while creating a sale
     val orderedCount = remember { mutableIntStateOf(0) }
     val orderedProducts = mutableMapOf<Long, OrderedProduct>()
@@ -254,6 +264,8 @@ fun SaleProductCard(product: Product) {
                         } else if(orderedCount.intValue == 0 && orderedProducts.containsKey(orderedProduct.productId)) {
                             orderedProducts.remove(orderedProduct.productId)
                         }
+
+                        salesViewModel.updateOrderedProducts(orderedProducts)
                     }
 
                     Text(

@@ -12,7 +12,7 @@ class SalesUseCase(private val salesRepo: SalesRepository) {
             billId = sale.billId,
             customerName = sale.customerName,
             billingDate = sale.billingDate,
-            productName = sale.productName,
+            orderedProducts = sale.orderedProducts,
             productId = sale.productId,
             orderedQuantity = sale.orderedQuantity,
             productCategory = sale.productCategory,
