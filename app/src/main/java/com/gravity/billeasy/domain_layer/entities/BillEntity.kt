@@ -12,12 +12,11 @@ import androidx.room.PrimaryKey
         entity = ShopEntity::class,
         onDelete = ForeignKey.CASCADE
     )])
-data class SaleEntity(
+data class BillEntity(
     @PrimaryKey(autoGenerate = true)
-    val billId: Long,
+    val id: Long,
     val customerName: String,
     val billingDate: String,
-    val orderedProducts: String,
     val paymentMethod: String,
     val billType: String,
     val shopId: Long

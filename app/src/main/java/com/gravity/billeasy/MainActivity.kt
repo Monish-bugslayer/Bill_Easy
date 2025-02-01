@@ -47,7 +47,7 @@ import com.gravity.billeasy.appdatastore.appPreferenceDataStore
 import com.gravity.billeasy.data_layer.DatabaseInstance
 import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.data_layer.repository.ProductRepository
-import com.gravity.billeasy.data_layer.repository.SalesRepository
+import com.gravity.billeasy.data_layer.repository.BillRepository
 import com.gravity.billeasy.data_layer.repository.ShopRepository
 import com.gravity.billeasy.domain_layer.use_cases.ProductsUseCase
 import com.gravity.billeasy.domain_layer.use_cases.SalesUseCase
@@ -182,7 +182,7 @@ class MainActivity : ComponentActivity() {
         }
         if( !::salesViewModel.isInitialized ) {
             val salesDao = database.saleDao()
-            val saleRepo = SalesRepository(salesDao)
+            val saleRepo = BillRepository(salesDao)
             val salesUseCase = SalesUseCase(saleRepo)
             salesViewModel = SalesViewModel(salesUseCase, productRepository)
         }

@@ -60,15 +60,9 @@ class SalesViewModel(
             salesUseCase.getAllSales().collectLatest { saleEntity ->
                 _allSales.value = saleEntity.map {
                     Sale(
-                        billId = it.billId,
+                        billId = it.id,
                         customerName = it.customerName,
                         billingDate = it.billingDate,
-                        orderedProducts = it.orderedProducts,
-                        productId = it.productId,
-                        productCategory = it.productCategory,
-                        orderedQuantity = it.orderedQuantity,
-                        finalizedPerUnitPrice = it.finalizedPerUnitPrice,
-                        totalPrice = it.totalPrice,
                         paymentMethod = it.paymentMethod,
                         billType = it.billType,
                         shopId = it.shopId

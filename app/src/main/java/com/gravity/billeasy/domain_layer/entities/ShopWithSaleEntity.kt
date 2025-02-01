@@ -10,5 +10,5 @@ data class ShopWithSaleEntity(
         parentColumn = "shopId",
         entityColumn = "shopId"
     )
-    val products: List<SaleEntity>
+    val products: List<BillEntity>
 )

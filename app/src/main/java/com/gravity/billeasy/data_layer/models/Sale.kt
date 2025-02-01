@@ -11,7 +11,6 @@ data class Sale (
     val billId: Long,
     val customerName: String,
     val billingDate: String,
-    val orderedProducts: String,
     val paymentMethod: String,
     val billType: String,
     val shopId: Long
@@ -20,7 +19,6 @@ data class Sale (
         billId = 0L,
         customerName = "",
         billingDate = "",
-        orderedProducts = "",
         paymentMethod = "",
         billType = "",
         shopId = 0L

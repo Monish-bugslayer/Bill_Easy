@@ -165,6 +165,7 @@ fun ProductAddOrEditScreen(
                         val focusRequestedModifier =
                             if (field.first == PRODUCT_NAME) Modifier.focusRequester(focusRequester) else Modifier
 
+                        // TODO need to change this to BillEasyOutlineTextField
                         OutlinedTextField(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = MaterialTheme.colorScheme.primary,

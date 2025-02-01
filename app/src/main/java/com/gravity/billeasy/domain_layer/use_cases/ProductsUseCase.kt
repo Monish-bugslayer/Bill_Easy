@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+
+// TODO need to remove all use cases this is unwanted isolation cause boiler plate code
 class ProductsUseCase(private val productRepository: ProductRepository) {
 
     suspend fun addProduct(product: Product) = productRepository.addProduct(

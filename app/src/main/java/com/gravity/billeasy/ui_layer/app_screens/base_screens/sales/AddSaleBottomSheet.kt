@@ -65,6 +65,7 @@ import com.gravity.billeasy.data_layer.models.Sale
 import com.gravity.billeasy.data_layer.models.SaleValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
+import com.gravity.billeasy.ui_layer.BillEasyOutlineTextFieldCustomizer
 import com.gravity.billeasy.ui_layer.CustomSearchBar
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_2
@@ -99,16 +100,8 @@ fun AddSaleBottomSheet(salesViewModel: SalesViewModel, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun SaleDetails(orderedProduct: OrderedProduct) {
+fun BillDetails() {
     val sale = remember { mutableStateOf<Sale>(Sale()) }
-    sale.value = sale.value.copy(
-        orderedProducts = orderedProduct.productName,
-        productId = orderedProduct.productId,
-        productCategory = orderedProduct.productCategory,
-        orderedQuantity = orderedProduct.orderedQuantity,
-        finalizedPerUnitPrice = orderedProduct.pricePerUnit,
-        totalPrice = orderedProduct.orderTotal
-    )
     val onCustomNameChanged = { updatedValue: String ->
         sale.value = sale.value.copy(customerName = updatedValue)
     }
@@ -144,6 +137,15 @@ fun SaleDetails(orderedProduct: OrderedProduct) {
                 PAYMENT_METHOD -> errorStates.value.paymentMethodError
                 else -> null
             }
+            val billEasyTextCustomizer = BillEasyOutlineTextFieldCustomizer(
+                trailingIcon = if(pair.first == BILLING_DATE) {
+                    @Composable {
+                        Icon(painterResource(R.drawable.calendar), "billing date")
+                    }
+                } else null,
+                paddingStart = 0.dp,
+                paddingTop = 0.dp
+            )
             BillEasyOutlineTextField(
                 label = pair.first,
                 value = pair.second.second,
@@ -151,25 +153,29 @@ fun SaleDetails(orderedProduct: OrderedProduct) {
                 focusManager = focusManager,
                 isError = error != null,
                 errorMessage = null,
+                billEasyOutlineTextFieldCustomizer = billEasyTextCustomizer,
                 focusRequestedModifier = focusRequestedModifier
             )
+
         }
     }
 }
 
 
 @Composable
-fun AddSaleBottomSheetContent (
-    salesViewModel: SalesViewModel,
-    listState: LazyListState
+fun AddSaleBottomSheetContent(
+    salesViewModel: SalesViewModel, listState: LazyListState
 ) {
     val searchResults by salesViewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchQuery = salesViewModel.searchQuery
     val products = salesViewModel.allProducts.value
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(start = 5.dp, end = 5.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 10.dp, end = 10.dp)
+    ) {
+        BillDetails()
         CustomSearchBar(searchQuery = searchQuery,
             onSearchQueryChange = { salesViewModel.onSearchQueryChange(it) },
             onSearch = { keyboardController?.hide() },
@@ -197,8 +203,7 @@ fun AddSaleBottomSheetContent (
                 ProductNotAvailable(NO_PRODUCTS_STRING_1, NO_PRODUCTS_STRING_2)
             } else if (searchResults.isEmpty()) {
                 ProductNotAvailable(
-                    SEARCH_RESULT_NOT_FOUND_STRING_1,
-                    SEARCH_RESULT_NOT_FOUND_STRING_2
+                    SEARCH_RESULT_NOT_FOUND_STRING_1, SEARCH_RESULT_NOT_FOUND_STRING_2
                 )
             } else {
                 LazyColumn(
@@ -219,7 +224,6 @@ fun AddSaleBottomSheetContent (
 
 @Composable
 fun SaleProductCard(product: Product, salesViewModel: SalesViewModel) {
-    // product name, total price, ordered quant,selected price type, product category, per unti price should go while creating a sale
     val orderedCount = remember { mutableIntStateOf(0) }
     val orderedProducts = mutableMapOf<Long, OrderedProduct>()
     val selectedPerUnitPrice = remember { mutableDoubleStateOf(0.0) }
@@ -255,13 +259,15 @@ fun SaleProductCard(product: Product, salesViewModel: SalesViewModel) {
                             productName = product.productName,
                             productCategory = product.category,
                             pricePerUnit = selectedPerUnitPrice.doubleValue,
-                            orderTotal =
-                            selectedPerUnitPrice.doubleValue.times(orderedCount.intValue),
+                            orderTotal = selectedPerUnitPrice.doubleValue.times(orderedCount.intValue),
                             orderedQuantity = orderedCount.intValue
                         )
-                        if(orderedCount.intValue > 0) {
+                        if (orderedCount.intValue > 0) {
                             orderedProducts[orderedProduct.productId] = orderedProduct
-                        } else if(orderedCount.intValue == 0 && orderedProducts.containsKey(orderedProduct.productId)) {
+                        } else if (orderedCount.intValue == 0 && orderedProducts.containsKey(
+                                orderedProduct.productId
+                            )
+                        ) {
                             orderedProducts.remove(orderedProduct.productId)
                         }
 
@@ -378,11 +384,9 @@ fun CounterBox(onEditProductCount: (Int) -> Unit) {
 
 @Composable
 fun RadioButtonAndText(
-    retailPrice: String,
-    wholeSalePrice: String,
-    onChoosePrice: (Double) -> Unit
+    retailPrice: String, wholeSalePrice: String, onChoosePrice: (Double) -> Unit
 ) {
-    val radioOptionMap = mutableMapOf<String, Double>()
+    val radioOptionMap = remember { mutableMapOf<String, Double>() }
     radioOptionMap.put(RETAIL_PRICE, retailPrice.toDouble())
     radioOptionMap.put(WHOLESALE_PRICE, wholeSalePrice.toDouble())
     val state = remember { mutableStateOf(radioOptionMap[RETAIL_PRICE]) }

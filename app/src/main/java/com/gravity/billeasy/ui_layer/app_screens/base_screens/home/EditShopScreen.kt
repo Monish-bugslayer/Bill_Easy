@@ -20,6 +20,7 @@ import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
+import com.gravity.billeasy.ui_layer.BillEasyOutlineTextFieldCustomizer
 import com.gravity.billeasy.ui_layer.IsNeedButton
 import com.gravity.billeasy.ui_layer.isShopFormValid
 import com.gravity.billeasy.ui_layer.validateShopDetails
@@ -124,7 +125,8 @@ fun EditShop(
                 focusRequestedModifier = focusRequestedModifier,
                 focusManager = focusManager,
                 isError = error != null,
-                errorMessage = error
+                errorMessage = error,
+                billEasyOutlineTextFieldCustomizer = BillEasyOutlineTextFieldCustomizer()
             )
         }
 
