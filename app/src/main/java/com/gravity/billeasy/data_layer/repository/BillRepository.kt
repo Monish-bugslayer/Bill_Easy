@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 class BillRepository(private val billDao: BillDao) {
 
-    suspend fun addSale(billEntity: BillEntity) = billDao.addSale(billEntity)
+    suspend fun addBill(billEntity: BillEntity) = billDao.addBill(billEntity)
 
-    suspend fun getAllSales(): Flow<List<BillEntity>> = billDao.getAllSales()
+    suspend fun getAllBills(): Flow<List<BillEntity>> = billDao.getAllBills()
 }

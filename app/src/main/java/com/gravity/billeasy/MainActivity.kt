@@ -49,8 +49,6 @@ import com.gravity.billeasy.data_layer.models.Product
 import com.gravity.billeasy.data_layer.repository.ProductRepository
 import com.gravity.billeasy.data_layer.repository.BillRepository
 import com.gravity.billeasy.data_layer.repository.ShopRepository
-import com.gravity.billeasy.domain_layer.use_cases.ProductsUseCase
-import com.gravity.billeasy.domain_layer.use_cases.SalesUseCase
 import com.gravity.billeasy.domain_layer.use_cases.ShopUseCase
 import com.gravity.billeasy.ui.theme.BillEasyTheme
 import com.gravity.billeasy.ui_layer.ScrollState
@@ -60,7 +58,7 @@ import com.gravity.billeasy.ui_layer.navigationsetup.AppNavigationControllerImpl
 import com.gravity.billeasy.ui_layer.navigationsetup.BillEasyScreens
 import com.gravity.billeasy.ui_layer.navigationsetup.NavigationSetup
 import com.gravity.billeasy.ui_layer.viewmodel.ProductsViewModel
-import com.gravity.billeasy.ui_layer.viewmodel.SalesViewModel
+import com.gravity.billeasy.ui_layer.viewmodel.BillViewModel
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel
 
 inline val appColorInt get() = R.color.orange_light
@@ -71,7 +69,7 @@ class MainActivity : ComponentActivity() {
         private set
     lateinit var shopViewModel: ShopViewModel
         private set
-    lateinit var salesViewModel: SalesViewModel
+    lateinit var billViewModel: BillViewModel
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,7 +156,7 @@ class MainActivity : ComponentActivity() {
                         ) { isNeedToShowAddProductBottomSheet.value = false }
                     } else if(isNeedToShowAddBillBottomSheet.value) {
                         AddSaleBottomSheet(
-                            salesViewModel = salesViewModel
+                            billViewModel = billViewModel
                         ) { isNeedToShowAddBillBottomSheet.value = false }
                     }
                 }
@@ -177,14 +175,12 @@ class MainActivity : ComponentActivity() {
             shopViewModel = ShopViewModel(shopUseCase, context.appPreferenceDataStore)
         }
         if( !::productsViewModel.isInitialized ) {
-            val productsUseCase = ProductsUseCase(productRepository)
-            productsViewModel = ProductsViewModel(productsUseCase)
+            productsViewModel = ProductsViewModel(productRepository)
         }
-        if( !::salesViewModel.isInitialized ) {
-            val salesDao = database.saleDao()
-            val saleRepo = BillRepository(salesDao)
-            val salesUseCase = SalesUseCase(saleRepo)
-            salesViewModel = SalesViewModel(salesUseCase, productRepository)
+        if( !::billViewModel.isInitialized ) {
+            val billDao = database.billDao()
+            val billRepo = BillRepository(billDao)
+            billViewModel = BillViewModel(billRepo, productRepository)
         }
     }
 }

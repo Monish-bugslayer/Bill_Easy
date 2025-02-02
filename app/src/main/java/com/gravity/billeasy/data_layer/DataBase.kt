@@ -28,7 +28,7 @@ const val DB_VERSION = 7
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun shopDao(): ShopDao
-    abstract fun saleDao(): BillDao
+    abstract fun billDao(): BillDao
 }
 
 object DatabaseInstance {

@@ -12,9 +12,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gravity.billeasy.data_layer.models.OrderedProduct
 import com.gravity.billeasy.data_layer.models.Product
-import com.gravity.billeasy.data_layer.models.Sale
+import com.gravity.billeasy.data_layer.models.Bill
+import com.gravity.billeasy.data_layer.repository.BillRepository
 import com.gravity.billeasy.data_layer.repository.ProductRepository
-import com.gravity.billeasy.domain_layer.use_cases.SalesUseCase
+import com.gravity.billeasy.domain_layer.entities.BillEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,17 +25,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Stable
-class SalesViewModel(
-    private val salesUseCase: SalesUseCase,
+class BillViewModel(
+    private val billRepository: BillRepository,
     private val productsRepo: ProductRepository
 ): ViewModel() {
 
     private val _allProducts: MutableState<List<Product>> = mutableStateOf(emptyList())
-    private val _allSales = mutableStateOf(emptyList<Sale>())
+    private val _allSales = mutableStateOf(emptyList<Bill>())
     val cumulativeTotal = mutableIntStateOf(0)
     var orderedProducts: List<OrderedProduct> = emptyList()
         private set
-    val allSales: State<List<Sale>> get() = _allSales
+    val allSales: State<List<Bill>> get() = _allSales
     val allProducts: MutableState<List<Product>> get() = _allProducts
 
     var searchQuery by mutableStateOf("")
@@ -57,9 +58,9 @@ class SalesViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            salesUseCase.getAllSales().collectLatest { saleEntity ->
+            billRepository.getAllBills().collectLatest { saleEntity ->
                 _allSales.value = saleEntity.map {
-                    Sale(
+                    Bill(
                         billId = it.id,
                         customerName = it.customerName,
                         billingDate = it.billingDate,
@@ -95,6 +96,21 @@ class SalesViewModel(
 
     fun updateOrderedProducts(newOrderedProduct: MutableMap<Long, OrderedProduct>) = {
         orderedProducts = newOrderedProduct.values.toList()
+    }
+
+    fun addBill(bill: Bill) {
+        viewModelScope.launch(Dispatchers.IO) {
+            billRepository.addBill(
+                BillEntity(
+                    id = 0,
+                    customerName = bill.customerName,
+                    billingDate = bill.billingDate,
+                    paymentMethod = bill.paymentMethod,
+                    billType = bill.billType,
+                    shopId = bill.shopId
+                )
+            )
+        }
     }
 
 }

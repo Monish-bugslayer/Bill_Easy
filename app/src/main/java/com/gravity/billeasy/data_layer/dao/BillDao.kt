@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BillDao {
     @Insert
-    suspend fun addSale(billEntity: BillEntity)
+    suspend fun addBill(billEntity: BillEntity)
 
     @Query("SELECT * from sales")
-    fun getAllSales(): Flow<List<BillEntity>>
+    fun getAllBills(): Flow<List<BillEntity>>
 }

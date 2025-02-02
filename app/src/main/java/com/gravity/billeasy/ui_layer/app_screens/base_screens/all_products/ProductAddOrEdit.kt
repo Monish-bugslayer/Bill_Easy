@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -39,6 +40,7 @@ import com.gravity.billeasy.ui_layer.EditableFields
 import com.gravity.billeasy.ui_layer.ProductCategory
 import com.gravity.billeasy.ui_layer.QuantityUnit
 import com.gravity.billeasy.ui_layer.decideKeyboardType
+import com.gravity.billeasy.ui_layer.toListOfStrings
 import kotlinx.coroutines.delay
 
 /*
@@ -75,43 +77,6 @@ fun ProductAddOrEditScreen(
     val fieldsToBeCleared =
         listOf<String>(AVAILABLE_STOCK, QUANTITY, BUYING_PRICE, RETAIL_PRICE, WHOLESALE_PRICE)
 
-    // TODO need to find how to write extension of Enum to get this list
-    val unitOptions: List<String> = listOf(
-        QuantityUnit.BAG.name,
-        QuantityUnit.BOX.name,
-        QuantityUnit.LOT.name,
-        QuantityUnit.SET.name,
-        QuantityUnit.PACK.name,
-        QuantityUnit.BUNDLE.name,
-        QuantityUnit.DOZEN.name,
-        QuantityUnit.GRAMS.name,
-        QuantityUnit.KILOGRAMS.name,
-        QuantityUnit.LITER.name,
-        QuantityUnit.MILLILITER.name,
-        QuantityUnit.PIECE.name,
-        QuantityUnit.ROLL.name,
-        QuantityUnit.SHEET.name
-    )
-
-    val categoryOptions: List<String> = listOf(
-        ProductCategory.CEREALS.name,
-        ProductCategory.OIL.name,
-        ProductCategory.BISCATES.name,
-        ProductCategory.SOAP.name,
-        ProductCategory.SPICES.name,
-        ProductCategory.SHAMPOO.name,
-        ProductCategory.CHIPS.name,
-        ProductCategory.CHOCOLATES.name,
-        ProductCategory.CIGARETTES.name,
-        ProductCategory.COFFEE_AND_TEA.name,
-        ProductCategory.PLASTIC_ITEMS.name,
-        ProductCategory.POOJA.name,
-        ProductCategory.OTHER.name,
-        ProductCategory.FLOUR.name,
-        ProductCategory.RICE.name,
-        ProductCategory.MASALA.name,
-    )
-
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
@@ -135,7 +100,7 @@ fun ProductAddOrEditScreen(
                 UNIT -> {
                     Spinner(
                         selectedValue = field.second.fieldName.value,
-                        options = unitOptions,
+                        options = QuantityUnit::class.toListOfStrings(),
                         label = UNIT,
                         onValueChangedEvent = { field.second.fieldName.value = it },
                         modifier = Modifier
@@ -149,7 +114,7 @@ fun ProductAddOrEditScreen(
                 PRODUCT_CATEGORY -> {
                     Spinner(
                         selectedValue = field.second.fieldName.value,
-                        options = categoryOptions,
+                        options = ProductCategory::class.toListOfStrings(),
                         label = PRODUCT_CATEGORY,
                         onValueChangedEvent = { field.second.fieldName.value = it },
                         modifier = Modifier

@@ -22,6 +22,7 @@ import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextFieldCustomizer
 import com.gravity.billeasy.ui_layer.IsNeedButton
+import com.gravity.billeasy.ui_layer.isBillFormValid
 import com.gravity.billeasy.ui_layer.isShopFormValid
 import com.gravity.billeasy.ui_layer.validateShopDetails
 import com.gravity.billeasy.ui_layer.viewmodel.ShopViewModel

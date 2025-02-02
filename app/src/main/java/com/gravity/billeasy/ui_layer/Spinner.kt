@@ -3,11 +3,10 @@ package com.gravity.billeasy.ui_layer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,8 +43,8 @@ fun Spinner(
     label: String,
     modifier: Modifier = Modifier,
     onValueChangedEvent: (String) -> Unit,
-    supportedString: String,
-    isError: Boolean
+    supportedString: String?,
+    isError: Boolean,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -65,15 +64,17 @@ fun Spinner(
                     .fillMaxWidth(),
                 readOnly = true,
                 value = selectedValue,
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 onValueChange = { },
                 isError = isError,
-                supportingText = { if (isError) Text(supportedString) },
+                // TODO in productsAddOrEditScreen the new add form method is not used hence we are
+                //  giving hadcoded string in supported text and it is always visible even without
+                //  any error. By now i have avoid its visibility by adding isError. Once moved to
+                //  new logic of add like we do it in Edit shop or AddBill, we can remove this isError condition
+                supportingText = { if (supportedString != null && isError) Text(supportedString) },
                 label = { Text(text = label) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -93,7 +94,7 @@ fun Spinner(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(300.dp)
+                            .height(IntrinsicSize.Max)
                             .menuAnchor()
                             .verticalScroll(rememberScrollState())
                             .padding(top = 5.dp), verticalArrangement = Arrangement.spacedBy(8.dp)

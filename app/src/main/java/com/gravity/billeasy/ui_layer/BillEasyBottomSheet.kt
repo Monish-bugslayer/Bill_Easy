@@ -1,6 +1,5 @@
 package com.gravity.billeasy.ui_layer
 
-import android.graphics.Paint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,7 +25,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,8 +49,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun BillEasyBottomSheet(
     sheetHeader: String,
-    isNeedNextButton: Boolean = false,
-    onNextClick: () -> Unit = { },
     onDoneClick: () -> Boolean,
     onDismiss: () -> Unit,
     sheetContent: @Composable () -> Unit,
@@ -74,7 +70,6 @@ fun BillEasyBottomSheet(
         dragHandle = { null },
         modifier = Modifier.imePadding()
     ) {
-        val showDoneButton = remember { mutableStateOf(isNeedNextButton.not()) }
         Box(Modifier.fillMaxSize()) {
             Column {
                 Row(modifier = Modifier
@@ -105,34 +100,28 @@ fun BillEasyBottomSheet(
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
-                    if(isNeedNextButton) {
-                        onNextClick()
-                        showDoneButton.value = true
-                    }
-                    if(showDoneButton.value) {
-                        Image(imageVector = Icons.Default.Check,
-                            colorFilter = ColorFilter.tint(colorResource(R.color.black)),
-                            contentDescription = "",
-                            alignment = Alignment.CenterEnd,
-                            modifier = Modifier
-                                .padding(end = 10.dp)
-                                .clip(CircleShape)
-                                .clickable {
-                                    if (onDoneClick()) {
-                                        bottomSheetScope
-                                            .launch {
-                                                isNeedToDismiss = true
-                                                sheetState.hide()
+                    Image(imageVector = Icons.Default.Check,
+                        colorFilter = ColorFilter.tint(colorResource(R.color.black)),
+                        contentDescription = "",
+                        alignment = Alignment.CenterEnd,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                if (onDoneClick()) {
+                                    bottomSheetScope
+                                        .launch {
+                                            isNeedToDismiss = true
+                                            sheetState.hide()
+                                        }
+                                        .invokeOnCompletion {
+                                            if (sheetState.isVisible) {
+                                                keyboardController?.hide()
+                                                onDismiss()
                                             }
-                                            .invokeOnCompletion {
-                                                if (sheetState.isVisible) {
-                                                    keyboardController?.hide()
-                                                    onDismiss()
-                                                }
-                                            }
-                                    }
-                                })
-                    }
+                                        }
+                                }
+                            })
                 }
                 sheetContent()
             }

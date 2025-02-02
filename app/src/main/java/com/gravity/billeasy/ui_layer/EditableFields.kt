@@ -3,8 +3,8 @@ package com.gravity.billeasy.ui_layer
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.KeyboardType
-import com.gravity.billeasy.data_layer.models.Sale
-import com.gravity.billeasy.data_layer.models.SaleValidationState
+import com.gravity.billeasy.data_layer.models.Bill
+import com.gravity.billeasy.data_layer.models.BillValidationState
 import com.gravity.billeasy.data_layer.models.Shop
 import com.gravity.billeasy.data_layer.models.ShopValidationState
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.AVAILABLE_STOCK
@@ -46,12 +46,12 @@ fun validateShopDetails(shop: Shop): ShopValidationState {
     )
 }
 
-fun validateSaleDetails(sale: Sale): SaleValidationState {
-    return SaleValidationState(
-        customerNameError = validateNameFields(sale.customerName, CUSTOMER_NAME),
-        billingDateError = validateNameFields(sale.billingDate, BILLING_DATE),
-        billTypeError = validateNameFields(sale.billType, BILL_TYPE),
-        paymentMethodError = validateNameFields(sale.paymentMethod, PAYMENT_METHOD)
+fun validateBillDetails(bill: Bill): BillValidationState {
+    return BillValidationState(
+        customerNameError = validateNameFields(bill.customerName, CUSTOMER_NAME),
+        billingDateError = validateNameFields(bill.billingDate, BILLING_DATE),
+        billTypeError = validateNameFields(bill.billType, BILL_TYPE),
+        paymentMethodError = validateNameFields(bill.paymentMethod, PAYMENT_METHOD)
     )
 }
 
@@ -116,7 +116,7 @@ fun isShopFormValid(validationState: ShopValidationState): Boolean {
     }
 }
 
-fun isSaleFormValid(validationState: SaleValidationState):  Boolean {
+fun isBillFormValid(validationState: BillValidationState):  Boolean {
     return validationState.run {
         customerNameError == null && billTypeError == null && paymentMethodError == null
                 && billingDateError == null

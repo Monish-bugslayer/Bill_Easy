@@ -59,21 +59,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gravity.billeasy.R
+import com.gravity.billeasy.data_layer.models.Bill
+import com.gravity.billeasy.data_layer.models.BillValidationState
 import com.gravity.billeasy.data_layer.models.OrderedProduct
 import com.gravity.billeasy.data_layer.models.Product
-import com.gravity.billeasy.data_layer.models.Sale
-import com.gravity.billeasy.data_layer.models.SaleValidationState
 import com.gravity.billeasy.ui_layer.BillEasyBottomSheet
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextFieldCustomizer
+import com.gravity.billeasy.ui_layer.BillType
 import com.gravity.billeasy.ui_layer.CustomSearchBar
+import com.gravity.billeasy.ui_layer.PaymentMethod
+import com.gravity.billeasy.ui_layer.Spinner
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_2
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.ProductNotAvailable
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_1
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_RESULT_NOT_FOUND_STRING_2
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.SEARCH_YOUR_PRODUCT
-import com.gravity.billeasy.ui_layer.viewmodel.SalesViewModel
+import com.gravity.billeasy.ui_layer.isBillFormValid
+import com.gravity.billeasy.ui_layer.toListOfStrings
+import com.gravity.billeasy.ui_layer.validateBillDetails
+import com.gravity.billeasy.ui_layer.viewmodel.BillViewModel
 
 const val CREATE_SALE = "Create sale"
 const val RETAIL_PRICE = "Retail price"
@@ -85,99 +91,109 @@ const val PAYMENT_METHOD = "Payment method"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSaleBottomSheet(salesViewModel: SalesViewModel, onDismiss: () -> Unit) {
+fun AddSaleBottomSheet(billViewModel: BillViewModel, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
-    BillEasyBottomSheet(
-        sheetHeader = CREATE_SALE,
-        // Need to show next button only if any modifications in the list are made
-        //orderedProducts.value.isNotEmpty()
-        isNeedNextButton = false,
-        onDoneClick = { true },
-        onDismiss = onDismiss,
-    ) {
-        AddSaleBottomSheetContent(salesViewModel, listState = listState)
-    }
-}
-
-@Composable
-fun BillDetails() {
-    val sale = remember { mutableStateOf<Sale>(Sale()) }
+    val bill = remember { mutableStateOf<Bill>(Bill()) }
     val onCustomNameChanged = { updatedValue: String ->
-        sale.value = sale.value.copy(customerName = updatedValue)
+        bill.value = bill.value.copy(customerName = updatedValue)
     }
     val onBillingDateChanged = { updatedValue: String ->
-        sale.value = sale.value.copy(billingDate = updatedValue)
+        bill.value = bill.value.copy(billingDate = updatedValue)
     }
     val onBillTypeChanged = { updatedValue: String ->
-        sale.value = sale.value.copy(billType = updatedValue)
+        bill.value = bill.value.copy(billType = updatedValue)
     }
     val onPaymentMethodChanged = { updatedValue: String ->
-        sale.value = sale.value.copy(paymentMethod = updatedValue)
+        bill.value = bill.value.copy(paymentMethod = updatedValue)
     }
-    val errorStates = remember { mutableStateOf(SaleValidationState()) }
+    val errorStates = remember { mutableStateOf(BillValidationState()) }
     val billDetailsMapper = mutableMapOf<String, Pair<(String) -> Unit, String>>()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     billDetailsMapper.apply {
-        put(CUSTOMER_NAME, Pair(onCustomNameChanged, sale.value.customerName))
-        put(BILLING_DATE, Pair(onBillingDateChanged, sale.value.billingDate))
-        put(BILL_TYPE, Pair(onBillTypeChanged, sale.value.billType))
-        put(PAYMENT_METHOD, Pair(onPaymentMethodChanged, sale.value.paymentMethod))
+        put(CUSTOMER_NAME, Pair(onCustomNameChanged, bill.value.customerName))
+        put(BILLING_DATE, Pair(onBillingDateChanged, bill.value.billingDate))
+        put(BILL_TYPE, Pair(onBillTypeChanged, bill.value.billType))
+        put(PAYMENT_METHOD, Pair(onPaymentMethodChanged, bill.value.paymentMethod))
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        billDetailsMapper.toList().forEach { pair ->
-            val focusRequestedModifier =
-                if (pair.first == CUSTOMER_NAME) Modifier.focusRequester(focusRequester)
-                else Modifier
-            val error = when (pair.first) {
-                CUSTOMER_NAME -> errorStates.value.customerNameError
-                BILLING_DATE -> errorStates.value.billingDateError
-                BILL_TYPE -> errorStates.value.billTypeError
-                PAYMENT_METHOD -> errorStates.value.paymentMethodError
-                else -> null
-            }
-            val billEasyTextCustomizer = BillEasyOutlineTextFieldCustomizer(
-                trailingIcon = if(pair.first == BILLING_DATE) {
-                    @Composable {
-                        Icon(painterResource(R.drawable.calendar), "billing date")
+    BillEasyBottomSheet(
+        sheetHeader = CREATE_SALE,
+        onDoneClick = {
+            errorStates.value = validateBillDetails(bill.value)
+            if (isBillFormValid(errorStates.value)) {
+                billViewModel.addBill(bill.value)
+                true
+            } else false
+        },
+        onDismiss = onDismiss,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            billDetailsMapper.toList().forEach { pair ->
+                val focusRequestedModifier =
+                    if (pair.first == CUSTOMER_NAME) Modifier.focusRequester(focusRequester)
+                    else Modifier
+                val error = when (pair.first) {
+                    CUSTOMER_NAME -> errorStates.value.customerNameError
+                    BILLING_DATE -> errorStates.value.billingDateError
+                    BILL_TYPE -> errorStates.value.billTypeError
+                    PAYMENT_METHOD -> errorStates.value.paymentMethodError
+                    else -> null
+                }
+                val billEasyTextCustomizer =
+                    BillEasyOutlineTextFieldCustomizer(trailingIcon = if (pair.first == BILLING_DATE) {
+                        @Composable {
+                            Icon(painterResource(R.drawable.calendar), "billing date")
+                        }
+                    } else null, paddingStart = 10.dp, paddingTop = 0.dp)
+                when (pair.first) {
+                    PAYMENT_METHOD, BILL_TYPE -> {
+                        Spinner(
+                            selectedValue = pair.second.second,
+                            options = if (pair.first == BILL_TYPE) BillType::class.toListOfStrings()
+                            else PaymentMethod::class.toListOfStrings(),
+                            label = pair.first,
+                            onValueChangedEvent = { pair.second.first(it) },
+                            supportedString = error,
+                            isError = error != null,
+                            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                        )
                     }
-                } else null,
-                paddingStart = 0.dp,
-                paddingTop = 0.dp
-            )
-            BillEasyOutlineTextField(
-                label = pair.first,
-                value = pair.second.second,
-                onValueChange = { pair.second.first(it) },
-                focusManager = focusManager,
-                isError = error != null,
-                errorMessage = null,
-                billEasyOutlineTextFieldCustomizer = billEasyTextCustomizer,
-                focusRequestedModifier = focusRequestedModifier
-            )
-
+                    else -> {
+                        BillEasyOutlineTextField (
+                            label = pair.first,
+                            value = pair.second.second,
+                            onValueChange = { pair.second.first(it) },
+                            focusManager = focusManager,
+                            isError = error != null,
+                            errorMessage = error,
+                            billEasyOutlineTextFieldCustomizer = billEasyTextCustomizer,
+                            focusRequestedModifier = focusRequestedModifier
+                        )
+                    }
+                }
+            }
         }
+
+        AddSaleBottomSheetContent(billViewModel, listState = listState)
     }
 }
 
-
 @Composable
 fun AddSaleBottomSheetContent(
-    salesViewModel: SalesViewModel, listState: LazyListState
+    billViewModel: BillViewModel, listState: LazyListState
 ) {
-    val searchResults by salesViewModel.searchResults.collectAsStateWithLifecycle()
+    val searchResults by billViewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQuery = salesViewModel.searchQuery
-    val products = salesViewModel.allProducts.value
+    val searchQuery = billViewModel.searchQuery
+    val products = billViewModel.allProducts.value
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(start = 10.dp, end = 10.dp)
     ) {
-        BillDetails()
         CustomSearchBar(searchQuery = searchQuery,
-            onSearchQueryChange = { salesViewModel.onSearchQueryChange(it) },
+            onSearchQueryChange = { billViewModel.onSearchQueryChange(it) },
             onSearch = { keyboardController?.hide() },
             onImportComplete = {},
             leadingIcon = {
@@ -189,7 +205,7 @@ fun AddSaleBottomSheetContent(
             },
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { salesViewModel.onSearchQueryChange("") }) {
+                    IconButton(onClick = { billViewModel.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             tint = MaterialTheme.colorScheme.onSurface,
@@ -214,7 +230,7 @@ fun AddSaleBottomSheetContent(
                 ) {
                     items(count = searchResults.size, key = { searchResults[it].productId }) {
                         val product = searchResults[it]
-                        SaleProductCard(product, salesViewModel)
+                        SaleProductCard(product, billViewModel)
                     }
                 }
             }
@@ -223,7 +239,7 @@ fun AddSaleBottomSheetContent(
 }
 
 @Composable
-fun SaleProductCard(product: Product, salesViewModel: SalesViewModel) {
+fun SaleProductCard(product: Product, billViewModel: BillViewModel) {
     val orderedCount = remember { mutableIntStateOf(0) }
     val orderedProducts = mutableMapOf<Long, OrderedProduct>()
     val selectedPerUnitPrice = remember { mutableDoubleStateOf(0.0) }
@@ -271,7 +287,7 @@ fun SaleProductCard(product: Product, salesViewModel: SalesViewModel) {
                             orderedProducts.remove(orderedProduct.productId)
                         }
 
-                        salesViewModel.updateOrderedProducts(orderedProducts)
+                        billViewModel.updateOrderedProducts(orderedProducts)
                     }
 
                     Text(
