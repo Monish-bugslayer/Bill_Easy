@@ -68,6 +68,7 @@ import com.gravity.billeasy.ui_layer.BillEasyOutlineTextField
 import com.gravity.billeasy.ui_layer.BillEasyOutlineTextFieldCustomizer
 import com.gravity.billeasy.ui_layer.BillType
 import com.gravity.billeasy.ui_layer.CustomSearchBar
+import com.gravity.billeasy.ui_layer.DatePicker
 import com.gravity.billeasy.ui_layer.PaymentMethod
 import com.gravity.billeasy.ui_layer.Spinner
 import com.gravity.billeasy.ui_layer.app_screens.base_screens.all_products.NO_PRODUCTS_STRING_1
@@ -159,6 +160,9 @@ fun AddSaleBottomSheet(billViewModel: BillViewModel, onDismiss: () -> Unit) {
                             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                         )
                     }
+                    BILLING_DATE -> {
+                        DatePicker(Modifier.padding(start = 10.dp, end = 10.dp), BILLING_DATE)
+                    }
                     else -> {
                         BillEasyOutlineTextField (
                             label = pair.first,
@@ -183,6 +187,7 @@ fun AddSaleBottomSheet(billViewModel: BillViewModel, onDismiss: () -> Unit) {
 fun AddSaleBottomSheetContent(
     billViewModel: BillViewModel, listState: LazyListState
 ) {
+    println("Add sale bottom sheet content")
     val searchResults by billViewModel.searchResults.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchQuery = billViewModel.searchQuery
@@ -240,6 +245,7 @@ fun AddSaleBottomSheetContent(
 
 @Composable
 fun SaleProductCard(product: Product, billViewModel: BillViewModel) {
+    println("Sales product card")
     val orderedCount = remember { mutableIntStateOf(0) }
     val orderedProducts = mutableMapOf<Long, OrderedProduct>()
     val selectedPerUnitPrice = remember { mutableDoubleStateOf(0.0) }
@@ -286,7 +292,7 @@ fun SaleProductCard(product: Product, billViewModel: BillViewModel) {
                         ) {
                             orderedProducts.remove(orderedProduct.productId)
                         }
-
+                        println(orderedProducts)
                         billViewModel.updateOrderedProducts(orderedProducts)
                     }
 

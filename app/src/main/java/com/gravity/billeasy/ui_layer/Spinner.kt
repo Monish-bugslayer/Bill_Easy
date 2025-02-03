@@ -91,6 +91,8 @@ fun Spinner(
                         )
                     )
                 ) {
+                    // TODO Need to find a fix for this: Since this Spinner is inside a Lazycolumn i
+                    //  cant able to put another lazy column or column with vertical scroll.
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -99,7 +101,6 @@ fun Spinner(
                             .verticalScroll(rememberScrollState())
                             .padding(top = 5.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-
                         options.forEach { option ->
                             Text(text = option,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -109,7 +110,8 @@ fun Spinner(
                                     .clickable {
                                         expanded = false
                                         onValueChangedEvent(option)
-                                    })
+                                    }
+                            )
                         }
                     }
                 }
